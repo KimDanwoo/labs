@@ -12,6 +12,8 @@ const INITIAL_DELTA = 1 / 60;
 const MAX_DELTA = 1 / 30;
 const INITIAL_SCALE = 2;
 const AVERAGE_WINDOW = 30;
+const FRAME_CAP = { rate: 60, tolerance: 0.9 } as const;
+const MIN_FRAME_SECONDS = FRAME_CAP.tolerance / FRAME_CAP.rate;
 
 export class Ticker {
   readonly events = new Events<{ tick: [] }>();
@@ -31,6 +33,7 @@ export class Ticker {
 
   update(timestamp: number): void {
     const elapsed = timestamp / MILLISECONDS_PER_SECOND;
+    if (elapsed - this.elapsed < MIN_FRAME_SECONDS) return;
     this.delta = Math.min(elapsed - this.elapsed, this.maxDelta);
     this.elapsed = elapsed;
     this.deltaScaled = this.delta * this.scale;

@@ -1,26 +1,20 @@
 import gsap from 'gsap';
-import { color, Fn, If, mix, positionGeometry, screenUV, texture, uniform, vec4, viewportCoordinate } from 'three/tsl';
+import { color, Fn, mix, positionGeometry, screenSize, screenUV, sin, smoothstep, uniform, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import type { AudioItem } from '@views/drive/lib/engine/game/audioItem';
 import { getGame } from '@views/drive/lib/engine/game/gameContext';
 
-const COLORS = { start: '#251f2b', end: '#1d1721' } as const;
-const PATTERN_SIZE = 200;
-const STROKE_SIZE = 10;
-const STROKE_WEIGHT = 0.2;
-const PATTERN_ALPHA_MAX = 0.68;
-const DIAGONAL_AMPLITUDE = 0.5;
-const DIAGONAL_INVERT_MULTIPLIER = 1 + DIAGONAL_AMPLITUDE * 2;
-const SCREEN_DIAGONAL = 1.414;
-const COLOR_NOISE = 0.2;
+const COLORS = { shallow: '#1FA7B8', deep: '#0B6A80', foam: '#F4FFFB' } as const;
+const TIDE = { margin: 0.16, foamWidth: 0.035 } as const;
+const SWELL = { amplitude: 0.045, frequency: 5, speed: 1.6 } as const;
+const CHOP = { amplitude: 0.018, frequency: 13, speed: 2.7 } as const;
 const RENDER_ORDER = 99;
-const DURATION = { show: 2, hide: 4 } as const;
+const DURATION = { show: 1.1, hide: 1.6 } as const;
 const SWOOSH_VOLUME = 0.25;
 
 export class Overlay {
   readonly #progress = uniform(0);
-  readonly #patternSize = uniform(PATTERN_SIZE);
   readonly #inverted = uniform(0);
   readonly #mesh: THREE.Mesh;
   readonly #sounds: { show: AudioItem; hide: AudioItem };
@@ -41,8 +35,6 @@ export class Overlay {
         volume: SWOOSH_VOLUME,
       }),
     };
-    this.#patternSize.value = PATTERN_SIZE * game.viewport.pixelRatio;
-
     const material = new THREE.MeshBasicNodeMaterial({ transparent: true, depthTest: false, depthWrite: false });
     material.outputNode = this.#outputNode();
     material.vertexNode = vec4(positionGeometry.x, positionGeometry.y, 0, 1);
@@ -51,39 +43,27 @@ export class Overlay {
     this.#mesh.renderOrder = RENDER_ORDER;
     this.#mesh.visible = true;
     game.scene.add(this.#mesh);
-
-    game.viewport.events.on('change', () => {
-      this.#patternSize.value = PATTERN_SIZE * game.viewport.pixelRatio;
-    });
   }
 
   #outputNode(): THREE.Node<'vec4'> {
-    const { noises } = getGame();
-    const pattern = getGame().texture('overlayPatternTexture');
-    const strokeSize = uniform(STROKE_SIZE);
-    const colorStart = uniform(color(COLORS.start));
-    const colorEnd = uniform(color(COLORS.end));
+    const { elapsedUniform } = getGame().ticker;
     return Fn(() => {
-      const isInverted = this.#inverted.greaterThan(0.5);
-      const strokeMask = viewportCoordinate.x.add(viewportCoordinate.y).div(strokeSize).mod(1).sub(0.5).mul(2).abs();
-      const patternUv = viewportCoordinate.div(this.#patternSize).mod(1);
-      const patternMask = texture(pattern, patternUv).a.remap(0, PATTERN_ALPHA_MAX, 0, 1).toVar();
-      If(isInverted, () => {
-        patternMask.assign(patternMask.oneMinus());
-      });
-      const mask = patternMask.add(strokeMask.mul(STROKE_WEIGHT)).mul(1 / (1 + STROKE_WEIGHT));
+      const along = screenUV.x.mul(screenSize.x.div(screenSize.y));
+      const height = screenUV.y.oneMinus();
+      const swell = sin(along.mul(SWELL.frequency).add(elapsedUniform.mul(SWELL.speed))).mul(SWELL.amplitude);
+      const chop = sin(along.mul(CHOP.frequency).sub(elapsedUniform.mul(CHOP.speed))).mul(CHOP.amplitude);
+      const tide = mix(this.#progress, this.#progress.oneMinus(), this.#inverted);
+      const surface = tide
+        .mul(1 + TIDE.margin * 2)
+        .sub(TIDE.margin)
+        .add(swell)
+        .add(chop);
+      const depth = mix(surface.sub(height), height.sub(surface), this.#inverted);
+      depth.lessThan(0).discard();
 
-      const diagonalRatio = screenUV.length().div(SCREEN_DIAGONAL).toVar();
-      If(isInverted, () => {
-        diagonalRatio.assign(diagonalRatio.oneMinus());
-      });
-      const diagonalProgress = this.#progress
-        .sub(diagonalRatio.mul(DIAGONAL_AMPLITUDE))
-        .mul(DIAGONAL_INVERT_MULTIPLIER);
-      diagonalProgress.lessThan(mask).discard();
-
-      const colorHash = texture(noises.hash, viewportCoordinate.div(noises.resolution)).r.sub(0.5).mul(COLOR_NOISE);
-      return vec4(mix(colorStart, colorEnd, screenUV.length().add(colorHash)), 1);
+      const water = mix(color(COLORS.shallow), color(COLORS.deep), smoothstep(0, 1, depth));
+      const foam = smoothstep(TIDE.foamWidth, 0, depth);
+      return vec4(mix(water, color(COLORS.foam), foam), 1);
     })();
   }
 

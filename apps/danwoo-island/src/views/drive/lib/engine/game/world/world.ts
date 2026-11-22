@@ -25,7 +25,7 @@ import {
 import { pruneShadowCasters } from '@views/drive/lib/engine/game/world/shadowCasters';
 import { VisualVehicle } from '@views/drive/lib/engine/game/world/visualVehicle';
 import { WaterSurface } from '@views/drive/lib/engine/game/world/waterSurface';
-import { WindLines } from '@views/drive/lib/engine/game/world/windLines';
+import { WindPetals } from '@views/drive/lib/engine/game/world/windPetals';
 
 export class World {
   readonly grid = new Grid();
@@ -35,7 +35,7 @@ export class World {
   floor: Floor | null = null;
   waterSurface: WaterSurface | null = null;
   grass: Grass | null = null;
-  windLines: WindLines | null = null;
+  windPetals: WindPetals | null = null;
   confetti: Confetti | null = null;
   rain: RainLines | null = null;
   lightnings: Lightnings | null = null;
@@ -54,7 +54,7 @@ export class World {
     this.floor = new Floor();
     this.waterSurface = new WaterSurface();
     this.grass = new Grass();
-    this.windLines = new WindLines();
+    this.windPetals = new WindPetals();
     this.confetti = new Confetti();
     this.rain = new RainLines();
     this.lightnings = new Lightnings();
@@ -85,9 +85,9 @@ export class World {
   }
 
   refreshAfterReset(): void {
-    const { bowling, cookie, social } = this.areas ?? {};
+    const { beachGoal, cookie, social } = this.areas ?? {};
     this.explosiveCrates?.reset();
-    bowling?.restart();
+    beachGoal?.restart();
     cookie?.refreshAfterReset();
     social?.refreshAfterReset();
     if (this.lanterns) this.lanterns.instancedGroup.needsUpdate = true;

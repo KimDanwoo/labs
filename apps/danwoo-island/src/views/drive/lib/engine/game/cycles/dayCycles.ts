@@ -5,8 +5,6 @@ import { Cycles } from '@views/drive/lib/engine/game/cycles/cycles';
 import { WORLD_CONFIG } from '@views/drive/lib/engine/worldConfig';
 
 interface DayPreset {
-  revealColor: THREE.Color;
-  revealIntensity: number;
   electricField: number;
   temperature: number;
   lightColor: THREE.Color;
@@ -20,10 +18,10 @@ interface DayPreset {
 
 type DayInterval = 'night' | 'deepNight';
 
-const DAY_SECONDS = 4 * 60;
+const DAY_SECONDS = 8 * 60;
+const MORNING_PROGRESS = 0.02;
 
 interface PresetColors {
-  reveal: string;
   light: string;
   shadow: string;
   fogA: string;
@@ -31,7 +29,6 @@ interface PresetColors {
 }
 
 interface PresetNumbers {
-  revealIntensity: number;
   electricField: number;
   temperature: number;
   lightIntensity: number;
@@ -41,7 +38,6 @@ interface PresetNumbers {
 
 const preset = (colors: PresetColors, numbers: PresetNumbers): DayPreset => ({
   ...numbers,
-  revealColor: new THREE.Color(colors.reveal),
   lightColor: new THREE.Color(colors.light),
   shadowColor: new THREE.Color(colors.shadow),
   fogColorA: new THREE.Color(colors.fogA),
@@ -50,9 +46,8 @@ const preset = (colors: PresetColors, numbers: PresetNumbers): DayPreset => ({
 
 const PRESETS = {
   day: preset(
-    { reveal: '#79cbd5', light: '#fff5e6', shadow: '#8aaee8', fogA: '#82d5e5', fogB: '#c9eaf4' },
+    { light: '#fff5e6', shadow: '#8aaee8', fogA: '#82d5e5', fogB: '#c9eaf4' },
     {
-      revealIntensity: 12,
       electricField: 0,
       temperature: 5,
       lightIntensity: 1.2,
@@ -61,9 +56,8 @@ const PRESETS = {
     },
   ),
   dusk: preset(
-    { reveal: '#e8a18a', light: '#ffb88f', shadow: '#7187b2', fogA: '#f4b493', fogB: '#e9b7c6' },
+    { light: '#ffb49c', shadow: '#7a88b8', fogA: '#f5a593', fogB: '#f3bdb4' },
     {
-      revealIntensity: 5.55,
       electricField: 0.25,
       temperature: 0,
       lightIntensity: 1.2,
@@ -72,9 +66,8 @@ const PRESETS = {
     },
   ),
   night: preset(
-    { reveal: '#5e8da8', light: '#3f5d80', shadow: '#425d85', fogA: '#122c40', fogB: '#203b50' },
+    { light: '#4c6ca6', shadow: '#3d528e', fogA: '#0e2546', fogB: '#1c3a66' },
     {
-      revealIntensity: 10,
       electricField: 1,
       temperature: -7.5,
       lightIntensity: 3.8,
@@ -83,9 +76,8 @@ const PRESETS = {
     },
   ),
   dawn: preset(
-    { reveal: '#e8b99e', light: '#ffe0bb', shadow: '#95accb', fogA: '#f5d1b2', fogB: '#d2e4ed' },
+    { light: '#ffe0bb', shadow: '#95accb', fogA: '#f5d1b2', fogB: '#d2e4ed' },
     {
-      revealIntensity: 4.85,
       electricField: 0.25,
       temperature: 0,
       lightIntensity: 1.2,
@@ -97,12 +89,11 @@ const PRESETS = {
 
 const KEYFRAMES: Keyframe<DayPreset>[] = [
   { properties: PRESETS.day, stop: 0 },
-  { properties: PRESETS.day, stop: 0.15 },
-  { properties: PRESETS.dusk, stop: 0.25 },
-  { properties: PRESETS.night, stop: 0.35 },
-  { properties: PRESETS.night, stop: 0.6 },
-  { properties: PRESETS.dawn, stop: 0.8 },
-  { properties: PRESETS.day, stop: 0.9 },
+  { properties: PRESETS.day, stop: 0.48 },
+  { properties: PRESETS.dusk, stop: 0.56 },
+  { properties: PRESETS.night, stop: 0.64 },
+  { properties: PRESETS.night, stop: 0.82 },
+  { properties: PRESETS.dawn, stop: 0.92 },
 ];
 
 export class DayCycles extends Cycles<DayPreset, DayInterval> {
@@ -110,10 +101,11 @@ export class DayCycles extends Cycles<DayPreset, DayInterval> {
     super({
       durationSeconds: DAY_SECONDS,
       forcedProgress: WORLD_CONFIG.dayCycleProgress,
+      startProgress: MORNING_PROGRESS,
       keyframes: KEYFRAMES,
       intervals: [
-        { name: 'night', start: 0.25, end: 0.7 },
-        { name: 'deepNight', start: 0.35, end: 0.6 },
+        { name: 'night', start: 0.56, end: 0.88 },
+        { name: 'deepNight', start: 0.64, end: 0.82 },
       ],
     });
   }

@@ -1,6 +1,7 @@
 import * as THREE from 'three/webgpu';
 
 import { NAME_GLYPHS } from '@views/drive/lib/engine/game/world/areas/nameGlyphs';
+import { islandMaterialByKey, VERTEX_COLOR_KEY } from '@views/drive/lib/engine/game/world/islandMaterials';
 
 type PathCommand =
   | readonly ['M' | 'L', number, number]
@@ -26,6 +27,10 @@ const HEIGHT_SCALE = 1.6;
 const SPAN_CENTER = 0.4;
 const BEVEL = 0.012;
 const CURVE_SEGMENTS = 6;
+const FACE_COLORS = ['#49BDC5', '#F47F75', '#F4B94F'] as const;
+const EDGE_COLOR = '#bb8650';
+const YAW_JITTER = [0.09, -0.06, 0.11] as const;
+const CAP_GROUP = 0;
 
 function glyphShapes({ path }: GlyphOutline): THREE.Shape[] {
   const shapePath = new THREE.ShapePath();
@@ -64,10 +69,21 @@ function colliderSize(object: THREE.Object3D): THREE.Vector3 {
   return collider.scale.clone();
 }
 
-function paintWithPalette(geometry: THREE.BufferGeometry, template: THREE.Mesh): void {
-  const paletteUv = template.geometry.getAttribute('uv');
-  const uv = geometry.getAttribute('uv');
-  for (let index = 0; index < uv.count; index += 1) uv.setXY(index, paletteUv.getX(0), paletteUv.getY(0));
+function paintCutout(geometry: THREE.BufferGeometry, index: number): void {
+  const { count } = geometry.getAttribute('position');
+  const face = new THREE.Color(FACE_COLORS[index % FACE_COLORS.length]);
+  const edge = new THREE.Color(EDGE_COLOR);
+  const caps = geometry.groups[CAP_GROUP];
+  const capEnd = caps ? caps.start + caps.count : 0;
+  const colors = new Float32Array(count * 3);
+  for (let vertex = 0; vertex < count; vertex += 1) {
+    const isCap = vertex < capEnd;
+    const { r, g, b } = isCap ? face : edge;
+    colors.set([r, g, b], vertex * 3);
+  }
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  geometry.deleteAttribute('uv');
+  geometry.clearGroups();
 }
 
 const isMesh = (object: THREE.Object3D): object is THREE.Mesh => object instanceof THREE.Mesh;
@@ -93,13 +109,14 @@ export function replaceLandingName(model: THREE.Object3D): void {
 
   for (const original of originals) model.remove(original);
   for (const [index, { character, geometry, size }] of syllables.entries()) {
-    paintWithPalette(geometry, template);
-    const mesh = new THREE.Mesh(geometry, template.material);
+    paintCutout(geometry, index);
+    const mesh = new THREE.Mesh(geometry, islandMaterialByKey(VERTEX_COLOR_KEY));
     mesh.name = `refLettersPhysicalDynamic${index}`;
     mesh.userData = { ...template.userData, letter: character };
     mesh.position.copy(start).addScaledVector(direction, cursor + size.x / 2);
     mesh.position.y = template.position.y - letterSize.y / 2 + size.y / 2;
     mesh.quaternion.copy(template.quaternion);
+    mesh.rotateY(YAW_JITTER[index % YAW_JITTER.length] ?? 0);
     const collider = new THREE.Object3D();
     collider.name = `cuboidName${index}`;
     collider.scale.copy(size);

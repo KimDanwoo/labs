@@ -7,6 +7,8 @@ import type { SuspensionState } from '@views/drive/lib/engine/game/physics/vehic
 import {
   ACTIONS,
   DIE_RESPAWN_DELAY,
+  FLY_BUTTON,
+  FLY_CATEGORY,
   HONK_DURATION,
   NIPPLE_JUMP_DURATION,
   numberOrZero,
@@ -77,6 +79,24 @@ export class Player {
       if (inputs.mode === INPUT_MODE.touch) inputs.nipple.jump();
     });
     inputs.nipple.events.on('tap', () => this.#nippleJump());
+    inputs.events.on('fly', (action) => {
+      if (action.active) this.#toggleFlight();
+    });
+    inputs.interactiveButtons.events.on(FLY_BUTTON, () => this.#toggleFlight());
+  }
+
+  #toggleFlight(): void {
+    if (this.state !== Player.STATE_DEFAULT) return;
+    getGame().physicalVehicle.flight.toggle();
+  }
+
+  #syncFlyButton(): void {
+    const { inputs } = getGame();
+    const buttons = inputs.interactiveButtons;
+    const shouldShow = inputs.filters.has(FLY_CATEGORY);
+    if (shouldShow === buttons.has(FLY_BUTTON)) return;
+    if (shouldShow) buttons.addItems([FLY_BUTTON]);
+    else buttons.removeItems([FLY_BUTTON]);
   }
 
   #isActive(name: string): boolean {
@@ -85,6 +105,11 @@ export class Player {
 
   #updateSuspensions(): void {
     if (this.state !== Player.STATE_DEFAULT) return;
+    const isFlying = getGame().physicalVehicle.flight.isActive;
+    if (isFlying) {
+      this.suspensions.fill('low');
+      return;
+    }
     const activeState: SuspensionState = this.#isActive('suspensions') ? 'high' : 'mid';
     const raisedWheels = WHEEL_SUSPENSION_ACTIONS.map((names) => names.some((name) => this.#isActive(name)));
     for (const [index, isRaised] of raisedWheels.entries()) this.suspensions[index] = isRaised ? activeState : 'low';
@@ -166,6 +191,7 @@ export class Player {
     this.steering = 0;
     this.boosting = 0;
     this.braking = 0;
+    this.#syncFlyButton();
     if (this.state !== Player.STATE_DEFAULT) return;
 
     this.#readThrottleInputs();
@@ -181,10 +207,10 @@ export class Player {
     if (forward?.active) this.accelerating += numberOrZero(forward.value);
     if (backward?.active) this.accelerating -= numberOrZero(backward.value);
     if (this.#isActive('boost')) this.boosting = 1;
-    if (this.#isActive('brake')) {
-      this.accelerating = 0;
-      this.braking = 1;
-    }
+    if (!this.#isActive('brake')) return;
+    this.braking = 1;
+    const isFlying = getGame().physicalVehicle.flight.isActive;
+    if (!isFlying) this.accelerating = 0;
   }
 
   #readSteeringInputs(): void {

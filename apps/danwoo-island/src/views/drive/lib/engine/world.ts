@@ -10,6 +10,10 @@ DefaultLoadingManager.setURLModifier(worldAsset);
 
 export function startWorld(): void {
   if (peekGame()) return;
+  const root = document.documentElement;
+  const hasOrphanedWorld = root.dataset.worldStarted !== undefined;
+  if (hasOrphanedWorld) return;
+  root.dataset.worldStarted = '';
   new Game();
 }
 

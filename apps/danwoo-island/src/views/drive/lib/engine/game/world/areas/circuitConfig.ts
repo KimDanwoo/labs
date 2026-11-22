@@ -51,7 +51,7 @@ export const PODIUM_CONFETTI_DELAY = { min: 2, spread: 3 } as const;
 export const TIMER_PLAYER_OFFSET = { x: -2, z: 1 } as const;
 export const BANNER = { speed: 10, phase: 0.5, base: 0.5, amplitude: 0.5 } as const;
 export const RACE_WEATHER = { humidity: 0, electricField: 0, clouds: 0, wind: 0 } as const;
-export const RACE_DAY = { progress: 0.85, fogNearRatio: 0.65, fogFarRatio: 1.25 } as const;
+export const RACE_DAY = { progress: 0.2, fogNearRatio: 0.65, fogFarRatio: 1.25 } as const;
 export const RESTART_ACTION = {
   name: 'circuitRestart',
   categories: ['racing'],

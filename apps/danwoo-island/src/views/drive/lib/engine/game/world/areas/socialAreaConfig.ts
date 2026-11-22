@@ -1,3 +1,5 @@
+import * as THREE from 'three/webgpu';
+
 import type { InstanceReference } from '@views/drive/lib/engine/game/instancedGroup';
 import type { WorldObject } from '@views/drive/lib/engine/game/objectColliders';
 
@@ -20,7 +22,8 @@ export const LINK_MODELS = new Map<string, string>([
   ['Danwoo Lab', 'x'],
 ]);
 export const LINK_ELEVATION = 1;
-export const UNLINKED_SIGNS = /^(bluesky001|linkedIn|discord)Physical/;
+export const LINK_FRONT = new THREE.Vector3(0, 0, 1.1);
+export const UNLINKED_SIGNS = /^(bluesky|linkedIn|discord)/i;
 export const FAN_COUNT = 30;
 export const FAN_MASS = 0.02;
 export const FAN_HIDDEN_LIFT = 99;

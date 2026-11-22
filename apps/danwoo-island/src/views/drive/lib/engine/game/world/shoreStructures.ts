@@ -74,6 +74,41 @@ const SURFBOARD_PROPORTION = { width: 0.27, depth: 0.15 } as const;
 export function surfboardSize(height: number): THREE.Vector3 {
   return new THREE.Vector3(height * SURFBOARD_PROPORTION.width, height, height * SURFBOARD_PROPORTION.depth);
 }
+const CRATER_SLOPE = 0.94;
+const CRATER_FLAT = 0.995;
+const CRATER_RIM_HEIGHT = 0.5;
+
+function craterFaces(ground: THREE.Mesh): { sand: THREE.BufferGeometry; stone: THREE.BufferGeometry } {
+  const source = ground.geometry.clone().applyMatrix4(ground.matrix);
+  const flat = source.index ? source.toNonIndexed() : source;
+  const position = flat.getAttribute('position');
+  flat.computeBoundingBox();
+  const bounds = flat.boundingBox ?? new THREE.Box3();
+  const rimHeight = THREE.MathUtils.lerp(bounds.min.y, bounds.max.y, CRATER_RIM_HEIGHT);
+  const sand: number[] = [];
+  const stone: number[] = [];
+  const triangle = new THREE.Triangle();
+  const normal = new THREE.Vector3();
+  for (let vertex = 0; vertex < position.count; vertex += 3) {
+    triangle.a.fromBufferAttribute(position, vertex);
+    triangle.b.fromBufferAttribute(position, vertex + 1);
+    triangle.c.fromBufferAttribute(position, vertex + 2);
+    triangle.getNormal(normal);
+    const isSteep = Math.abs(normal.y) < CRATER_SLOPE;
+    const isFlat = Math.abs(normal.y) > CRATER_FLAT;
+    const isRaised = triangle.getMidpoint(new THREE.Vector3()).y > rimHeight;
+    const isRimTop = isFlat && isRaised;
+    const isStone = isSteep || isRimTop;
+    const target = isStone ? stone : sand;
+    for (const point of [triangle.a, triangle.b, triangle.c]) target.push(point.x, point.y, point.z);
+  }
+  const toGeometry = (values: number[]): THREE.BufferGeometry =>
+    new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(values, 3));
+  source.dispose();
+  flat.dispose();
+  return { sand: toGeometry(sand), stone: toGeometry(stone) };
+}
+
 const SURF_FLAG_PROPORTION = { width: 0.375, depth: 0.125 } as const;
 function surfFlagSize(height: number): THREE.Vector3 {
   return new THREE.Vector3(height * SURF_FLAG_PROPORTION.width, height, height * SURF_FLAG_PROPORTION.depth);
@@ -86,7 +121,9 @@ export function rebuildSurfPoint(model: THREE.Object3D): void {
   const parts = createParts();
   const ground = requireMesh(findChildMatching(container, /^trimesh/));
   ground.updateMatrix();
-  parts.add('sand', ground.geometry.clone(), { matrix: ground.matrix });
+  const { sand, stone } = craterFaces(ground);
+  parts.add('sand', sand);
+  parts.add('basalt', stone);
   const pillars = container.children
     .filter((child) => CUBOID.test(child.name))
     .map(cuboidFrame)

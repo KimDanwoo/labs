@@ -42,10 +42,10 @@ const WATERLINE_COLOR = '#ffffff';
 export function revealNode(outputColor: ColorNode): ColorNode {
   const { reveal } = getGame();
   return Fn(([base]: [ColorNode]): ColorNode => {
-    const distanceToCenter = positionWorld.xz.sub(reveal.position2Uniform).length();
+    const distanceToCenter = reveal.distanceFrom(positionWorld.xz).toVar();
     distanceToCenter.greaterThan(reveal.distance).discard();
 
-    const revealMix = distanceToCenter.step(reveal.distance.sub(reveal.thickness));
+    const revealMix = distanceToCenter.smoothstep(reveal.distance.sub(reveal.thickness), reveal.distance);
     const revealColor = reveal.color.mul(reveal.intensity);
     return mix(base.rgb, revealColor, revealMix);
   })(outputColor);
@@ -102,7 +102,8 @@ export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial {
 
   #catchShadow(): (shadow?: THREE.Node<'vec4'>) => THREE.Node {
     const catchShadow = Fn(([shadow]: [THREE.Node<'vec4'>]): FloatNode => {
-      this.#catchedShadow.mulAssign(shadow.r);
+      const received = shadow.r.toVar();
+      this.#catchedShadow.mulAssign(received);
       return float(1);
     });
     return (shadow) => {

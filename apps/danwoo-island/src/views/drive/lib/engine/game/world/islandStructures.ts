@@ -5,7 +5,7 @@ import { revealNode } from '@views/drive/lib/engine/game/materials/meshDefaultMa
 import { createParts, type Parts } from '@views/drive/lib/engine/game/world/islandGeometry';
 import { islandModelMesh } from '@views/drive/lib/engine/game/world/islandModels';
 import { placedInArea } from '@views/drive/lib/engine/game/world/layout/areaPlacement';
-import { removeComponents } from '@views/drive/lib/engine/game/world/meshComponents';
+import { removeComponents, type MeshComponent } from '@views/drive/lib/engine/game/world/meshComponents';
 import { surfboardSize } from '@views/drive/lib/engine/game/world/shoreStructures';
 import {
   CUBOID,
@@ -20,7 +20,7 @@ import {
 } from '@views/drive/lib/engine/game/world/structureKit';
 
 const NEON_GAIN = 1.6;
-const BOWLING_SIGN = { scale: 0.65, poleBottom: 5.3 } as const;
+const GOAL_SIGN = { scale: 0.65, poleBottom: 5.3 } as const;
 
 function neonMaterial(neonTexture: THREE.Texture): THREE.MeshBasicNodeMaterial {
   neonTexture.colorSpace = THREE.SRGBColorSpace;
@@ -34,35 +34,44 @@ function neonMaterial(neonTexture: THREE.Texture): THREE.MeshBasicNodeMaterial {
   return material;
 }
 
-const BOWLING_SIGN_ART = { meshes: ['Plane042', 'Plane043'], reach: 2.5 } as const;
+const OLD_SIGN_ART = { meshes: ['Plane042', 'Plane043'], reach: 2.5 } as const;
 
 function removeOldSignArt(model: THREE.Object3D, sign: THREE.Object3D): void {
   model.updateMatrixWorld(true);
   const signPosition = sign.getWorldPosition(new THREE.Vector3());
-  for (const name of BOWLING_SIGN_ART.meshes) {
+  for (const name of OLD_SIGN_ART.meshes) {
     const art = requireMesh(findChild(model, name));
     const anchor = art.worldToLocal(signPosition.clone());
     removeComponents(art, ({ box }) => {
       const center = box.getCenter(new THREE.Vector3());
-      return Math.hypot(center.x - anchor.x, center.z - anchor.z) < BOWLING_SIGN_ART.reach;
+      return Math.hypot(center.x - anchor.x, center.z - anchor.z) < OLD_SIGN_ART.reach;
     });
   }
 }
 
-export function rebuildBowlingSign(model: THREE.Object3D, neonTexture: THREE.Texture): void {
+const LANE_MARK = { mesh: 'Plane043', maxSize: 1, maxHeight: 0.05 } as const;
+
+export function removeLaneMarks(model: THREE.Object3D): void {
+  removeComponents(requireMesh(findChild(model, LANE_MARK.mesh)), ({ box }) => {
+    const size = box.getSize(new THREE.Vector3());
+    return Math.max(size.x, size.z) < LANE_MARK.maxSize && size.y < LANE_MARK.maxHeight;
+  });
+}
+
+export function rebuildBeachGoalSign(model: THREE.Object3D, signTexture: THREE.Texture): void {
   findChild(model, 'sign001').removeFromParent();
   removeOldSignArt(model, findChild(model, 'sign002'));
   const sign = swapForGroup(findChild(model, 'sign002'));
   const parts = createParts();
   parts.box('neonBoard', [4.0, 2.05, 0.12], { position: [0.05, -0.04, -0.08] });
-  for (const side of [-1, 1]) parts.box('metalDark', [0.14, 4.4, 0.14], { position: [side * 1.6, -3.1, -0.12] });
+  for (const side of [-1, 1]) parts.box('bamboo', [0.14, 4.4, 0.14], { position: [side * 1.6, -3.1, -0.12] });
   const group = parts.build();
-  const neon = new THREE.Mesh(new THREE.PlaneGeometry(3.86, 1.9), neonMaterial(neonTexture));
+  const neon = new THREE.Mesh(new THREE.PlaneGeometry(3.86, 1.9), neonMaterial(signTexture));
   neon.name = 'neon';
   neon.position.set(0.05, -0.04, 0.0);
   group.add(neon);
-  group.scale.setScalar(BOWLING_SIGN.scale);
-  group.position.y = -BOWLING_SIGN.poleBottom * (1 - BOWLING_SIGN.scale);
+  group.scale.setScalar(GOAL_SIGN.scale);
+  group.position.y = -GOAL_SIGN.poleBottom * (1 - GOAL_SIGN.scale);
   sign.add(group);
 }
 
@@ -140,14 +149,21 @@ export function rebuildWaterfallCliff(model: THREE.Object3D): void {
   model.add(islandModelMesh('waterfallCliff', matrix), islandModelMesh('waterfallBasin', matrix));
 }
 
-const TOTEM = { base: 0.42, size: new THREE.Vector3(0.9, 3.2, 0.9) } as const;
+const PILLAR = { base: 0.42, size: new THREE.Vector3(0.9, 3.2, 0.9), carvingDepth: 0.25, crownStart: 1 } as const;
 
-export function replaceWithTotem(pillar: THREE.Object3D): void {
+function isFaceCarving({ box }: MeshComponent): boolean {
+  const isOnFront = box.min.z > PILLAR.carvingDepth;
+  const isBelowCrown = box.max.y < PILLAR.crownStart;
+  return isOnFront && isBelowCrown;
+}
+
+export function replaceWithPillar(pillar: THREE.Object3D): void {
   if (!(pillar instanceof THREE.Mesh)) return;
-  const lift = new THREE.Matrix4().makeTranslation(0, TOTEM.base + TOTEM.size.y / 2, 0);
-  const totem = islandModelMesh('tikiTotem', lift, TOTEM.size);
-  pillar.geometry = totem.geometry;
-  pillar.material = totem.material;
+  const carved = islandModelMesh('tikiTotem', null, PILLAR.size);
+  removeComponents(carved, isFaceCarving);
+  carved.geometry.translate(0, PILLAR.base + PILLAR.size.y / 2, 0);
+  pillar.geometry = carved.geometry;
+  pillar.material = carved.material;
 }
 
 const BONFIRE = {

@@ -1,5 +1,5 @@
 import gsap from 'gsap';
-import { color, uniform, vec2 } from 'three/tsl';
+import { atan, color, uniform, vec2 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import type { Audio } from '@views/drive/lib/engine/game/audio';
@@ -8,7 +8,7 @@ import { introCenter } from '@views/drive/lib/engine/game/introCenter';
 import { prefersDataSaving } from '@views/drive/lib/engine/game/jukebox/idle';
 import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
 import type { Intro } from '@views/drive/lib/engine/game/world/intro';
-import { isTideLoading, TIDE_REVEAL } from '@views/drive/lib/engine/game/world/tideLoading';
+import { TIDE_REVEAL } from '@views/drive/lib/engine/game/world/tideLoading';
 
 const SKIP_PATTERN = /skip/i;
 const SKIP_SPEED = 4;
@@ -21,7 +21,14 @@ const SETTLE_DURATION = 2.6;
 const UNBOUNDED_RADIUS = 99999;
 const INTRO_ZOOM = { start: 0.6, settled: 0.24, portraitSettled: 0.08 } as const;
 const INTRO_SEE_THROUGH = 0.5;
-const REVEAL_DEFAULTS = { thickness: 0.05, color: '#e88eff', intensity: 5.5 } as const;
+const FOAM_THICKNESS = 0.45;
+const SWELL = {
+  strength: 0.08,
+  waves: [
+    { lobes: 5, speed: 0.9, weight: 0.6 },
+    { lobes: 11, speed: -1.7, weight: 0.4 },
+  ],
+} as const;
 const START_KEYS = [
   'Gamepad.cross',
   'Keyboard.Enter',
@@ -44,9 +51,9 @@ export class Reveal {
   readonly position: THREE.Vector3;
   readonly position2Uniform: THREE.UniformNode<'vec2', THREE.Vector2>;
   readonly distance = uniform(0);
-  readonly thickness = uniform(REVEAL_DEFAULTS.thickness);
-  readonly color = uniform(color(REVEAL_DEFAULTS.color));
-  readonly intensity = uniform(REVEAL_DEFAULTS.intensity);
+  readonly thickness = uniform(FOAM_THICKNESS);
+  readonly color = uniform(color(TIDE_REVEAL.color));
+  readonly intensity = uniform(TIDE_REVEAL.intensity);
   readonly #hover = { multiplier: 1 };
   readonly #sound: ReturnType<Audio['register']>;
   readonly #update = (): void => this.#tick();
@@ -65,9 +72,19 @@ export class Reveal {
     game.ticker.events.on('tick', this.#update, TICK_ORDER.reveal);
   }
 
-  start(): void {
+  distanceFrom(position: THREE.Node<'vec2'>): THREE.Node<'float'> {
+    const offset = position.sub(this.position2Uniform).toVar();
+    const angle = atan(offset.y, offset.x);
+    const time = getGame().ticker.elapsedUniform;
+    const swell = SWELL.waves
+      .map(({ lobes, speed, weight }) => angle.mul(lobes).add(time.mul(speed)).sin().mul(weight))
+      .reduce((sum, wave) => sum.add(wave));
+    return offset.length().div(swell.mul(SWELL.strength).add(1));
+  }
+
+  start(onLabelShown: () => void): void {
     const game = getGame();
-    requireIntro().hideRing(() => {
+    requireIntro().hideLoader(() => {
       game.world.grid.show();
       this.distance.value = 0;
       gsap.to(this.distance, { value: OPEN_RADIUS, ease: 'back.out(1.7)', duration: 2 / speed(), overwrite: true });
@@ -80,7 +97,10 @@ export class Reveal {
 
       const intro = requireIntro();
       intro.createLabelContent();
-      game.ticker.wait(1, () => intro.showLabel());
+      game.ticker.wait(1, () => {
+        intro.showLabel();
+        onLabelShown();
+      });
 
       const { islandTrees } = game.world;
       if (islandTrees) islandTrees.seeThroughMultiplier = INTRO_SEE_THROUGH;
@@ -164,14 +184,6 @@ export class Reveal {
   }
 
   #tick(): void {
-    const { multiplier } = this.#hover;
-    if (isTideLoading) {
-      this.color.value.set(TIDE_REVEAL.color);
-      this.intensity.value = TIDE_REVEAL.intensity * multiplier;
-      return;
-    }
-    const { dayCycles } = getGame();
-    this.color.value.copy(dayCycles.colorOf('revealColor'));
-    this.intensity.value = dayCycles.numberOf('revealIntensity') * multiplier;
+    this.intensity.value = TIDE_REVEAL.intensity * this.#hover.multiplier;
   }
 }

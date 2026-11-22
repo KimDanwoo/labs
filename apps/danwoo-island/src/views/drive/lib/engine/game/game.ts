@@ -28,7 +28,6 @@ import { Overlay } from '@views/drive/lib/engine/game/overlay';
 import { Physics } from '@views/drive/lib/engine/game/physics/physics';
 import { PhysicsVehicle } from '@views/drive/lib/engine/game/physics/physicsVehicle';
 import { Player } from '@views/drive/lib/engine/game/player';
-import { preRender } from '@views/drive/lib/engine/game/preRenderer';
 import { QUALITY, Quality } from '@views/drive/lib/engine/game/quality';
 import { RayCursor } from '@views/drive/lib/engine/game/rayCursor';
 import { Rendering } from '@views/drive/lib/engine/game/rendering';
@@ -104,7 +103,8 @@ export class Game extends GameRegistry {
     this.provide('audio', new Audio());
     this.provide('notifications', new Notifications());
     this.provide('rayCursor', new RayCursor());
-    this.provide('viewport', new Viewport(domElement));
+    this.provide('viewport', new Viewport(domElement, this.quality.level));
+    this.quality.events.on('change', (level) => this.viewport.applyQuality(level));
     this.provide('modals', new Modals());
     this.provide('menu', new Menu());
     const rendering = this.provide('rendering', new Rendering());
@@ -156,10 +156,14 @@ export class Game extends GameRegistry {
     this.world.populate();
     this.provide('overlay', new Overlay());
 
-    const shouldPreRender = this.quality.level === QUALITY.high && this.rendering.isWebGPU();
-    if (shouldPreRender) preRender();
+    const isHighQuality = this.quality.level === QUALITY.high;
+    const shouldPrecompile = isHighQuality && this.rendering.isWebGPU();
+    if (shouldPrecompile) await this.rendering.precompile().catch(reportError);
+    const onLabelShown = (): void => {
+      if (shouldPrecompile) void this.rendering.precompileOffscreen().catch(reportError);
+    };
     this.ticker.wait(REVEAL_DELAY_FRAMES, () => {
-      this.reveal.start();
+      this.reveal.start(onLabelShown);
     });
   }
 

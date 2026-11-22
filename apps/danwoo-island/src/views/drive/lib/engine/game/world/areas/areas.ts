@@ -4,8 +4,8 @@ import { getGame } from '@views/drive/lib/engine/game/gameContext';
 import { AchievementsArea } from '@views/drive/lib/engine/game/world/areas/achievementsArea';
 import { AltarArea } from '@views/drive/lib/engine/game/world/areas/altarArea';
 import { forEachAreaModel } from '@views/drive/lib/engine/game/world/areas/areaModels';
+import { BeachGoalArea } from '@views/drive/lib/engine/game/world/areas/beachGoalArea';
 import { BehindTheSceneArea } from '@views/drive/lib/engine/game/world/areas/behindTheSceneArea';
-import { BowlingArea } from '@views/drive/lib/engine/game/world/areas/bowlingArea';
 import { CareerArea } from '@views/drive/lib/engine/game/world/areas/careerArea';
 import { CircuitArea } from '@views/drive/lib/engine/game/world/areas/circuitArea';
 import { CookieArea } from '@views/drive/lib/engine/game/world/areas/cookieArea';
@@ -21,8 +21,8 @@ import { areaQuaternion, placedInArea } from '@views/drive/lib/engine/game/world
 interface AreaTypes {
   achievements: AchievementsArea;
   altar: AltarArea;
+  beachGoal: BeachGoalArea;
   behindTheScene: BehindTheSceneArea;
-  bowling: BowlingArea;
   career: CareerArea;
   circuit: CircuitArea;
   cookie: CookieArea;
@@ -40,8 +40,8 @@ type AreaName = keyof AreaTypes;
 const AREA_BUILDERS: { [K in AreaName]: (model: THREE.Object3D) => AreaTypes[K] } = {
   achievements: (model) => new AchievementsArea(model),
   altar: (model) => new AltarArea(model),
+  beachGoal: (model) => new BeachGoalArea(model),
   behindTheScene: (model) => new BehindTheSceneArea(model),
-  bowling: (model) => new BowlingArea(model),
   career: (model) => new CareerArea(model),
   circuit: (model) => new CircuitArea(model),
   cookie: (model) => new CookieArea(model),
@@ -52,6 +52,8 @@ const AREA_BUILDERS: { [K in AreaName]: (model: THREE.Object3D) => AreaTypes[K] 
   toilet: (model) => new ShowerArea(model),
   timeMachine: (model) => new TimeMachineArea(model),
 };
+
+const UPSTREAM_MODEL_NAMES = new Map<string, AreaName>([['bowling', 'beachGoal']]);
 
 const isAreaName = (name: string): name is AreaName => name in AREA_BUILDERS;
 const AREA_NAMES = Object.keys(AREA_BUILDERS).filter(isAreaName);
@@ -66,6 +68,7 @@ export function createAreas(): Areas {
   const game = getGame();
   const { scene } = game.model('areasModel');
   applyIslandTextures(scene, game.resources);
+  for (const child of scene.children) child.name = UPSTREAM_MODEL_NAMES.get(child.name) ?? child.name;
 
   const areas: Areas = {};
   forEachAreaModel([...scene.children], AREA_NAMES, (name, model) => buildArea(areas, name, model));

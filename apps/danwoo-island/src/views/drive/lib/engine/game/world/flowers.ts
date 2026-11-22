@@ -14,7 +14,7 @@ const PETAL_SIZE = 0.08;
 const PETAL_DROP = 0.75;
 const SHADOW_OFFSET = 0.25;
 const UP = new THREE.Vector3(0, 1, 0);
-const BLOSSOMS = { plumeria: '#fff2d6', hibiscus: '#f0786a', orchid: '#f59ac0', allamanda: '#ffd25a' } as const;
+export const BLOSSOMS = { plumeria: '#fff2d6', hibiscus: '#f0786a', orchid: '#f59ac0', allamanda: '#ffd25a' } as const;
 const BLOSSOM_SHARE = { bright: 0.45, allamanda: 0.7, orchid: 0.5 } as const;
 const BLOSSOM_SEED = { pale: 7, bright: 13 } as const;
 

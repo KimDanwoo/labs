@@ -16,7 +16,7 @@ import {
 import { dotjari, watermelonTray } from '@views/drive/lib/engine/game/world/villageLeisure';
 import { barCounter } from '@views/drive/lib/engine/game/world/villageLounge';
 import { gochujangJar, makgeolliBowl, oilBottle } from '@views/drive/lib/engine/game/world/villagePantry';
-import { beachBall, bowlingPin, pinwheel } from '@views/drive/lib/engine/game/world/villageToys';
+import { beachBall, pinwheel } from '@views/drive/lib/engine/game/world/villageToys';
 import {
   candleSticks,
   placeGamepad,
@@ -86,7 +86,6 @@ const BUILDERS: readonly Matched<PropBuilder>[] = [
     build: (_parts, container) => container.add(islandModelMesh('portalArch', null)),
   },
   { pattern: /^blowerPhysicalDynamic/, build: modelOnFirstCollider('coconutCrate') },
-  { pattern: /^refPinPhysicalDynamic$/, build: bowlingPin },
   { pattern: /^refBallPhysicalDynamic$/, build: onFirstCollider(beachBall) },
 ];
 

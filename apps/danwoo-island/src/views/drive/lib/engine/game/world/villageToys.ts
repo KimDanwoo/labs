@@ -2,53 +2,10 @@ import * as THREE from 'three/webgpu';
 
 import type { Parts } from '@views/drive/lib/engine/game/world/islandGeometry';
 import type { PartName } from '@views/drive/lib/engine/game/world/islandMaterials';
-import { lathe, type Profile, type PropFrame } from '@views/drive/lib/engine/game/world/villageKit';
+import type { PropFrame } from '@views/drive/lib/engine/game/world/villageKit';
 
-const PIN_PROFILE: Profile = [
-  [0, 0.02],
-  [0.3, 0.02],
-  [0.46, 0.55],
-  [0.48, 0.85],
-  [0.36, 1.45],
-  [0.22, 1.85],
-  [0.24, 2.2],
-  [0.3, 2.5],
-  [0.24, 2.8],
-  [0, 2.92],
-];
-
-interface PinBand {
-  readonly shade: PartName;
-  readonly topRadius: number;
-  readonly bottomRadius: number;
-  readonly height: number;
-  readonly y: number;
-}
-
-const ISLAND_PIN = {
-  segments: 10,
-  bands: [
-    { shade: 'bunting2', topRadius: 0.24, bottomRadius: 0.245, height: 0.12, y: 1.95 },
-    { shade: 'bunting1', topRadius: 0.242, bottomRadius: 0.24, height: 0.08, y: 2.08 },
-  ] satisfies readonly PinBand[],
-} as const;
-
-export function bowlingPin(parts: Parts): void {
-  lathe(parts, 'bunting4', PIN_PROFILE, {}, ISLAND_PIN.segments);
-  for (const band of ISLAND_PIN.bands) {
-    parts.prism(
-      band.shade,
-      band.topRadius,
-      band.bottomRadius,
-      band.height,
-      { position: [0, band.y, 0] },
-      ISLAND_PIN.segments,
-    );
-  }
-}
-
-const BEACH_BALL_PANELS: readonly PartName[] = ['bunting2', 'bunting4', 'bunting1', 'bunting4', 'bunting3', 'bunting4'];
-const BEACH_BALL = { fullTurn: Math.PI * 2, widthSegments: 3, heightSegments: 8 } as const;
+const BEACH_BALL_PANELS: readonly PartName[] = ['lagoon', 'bunting4', 'bunting2', 'bunting4', 'bunting3', 'bunting4'];
+const BEACH_BALL = { fullTurn: Math.PI * 2, widthSegments: 4, heightSegments: 10 } as const;
 
 export function beachBall(parts: Parts, { size }: PropFrame): void {
   const radius = size.x / 2;

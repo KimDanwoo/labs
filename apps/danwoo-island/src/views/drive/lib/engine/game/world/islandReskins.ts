@@ -4,6 +4,7 @@ import { type Triple } from '@views/drive/lib/engine/game/world/islandGeometry';
 import { fixedLandmark, LIGHTHOUSE } from '@views/drive/lib/engine/game/world/islandLandmarks';
 import { type PartName, islandMaterial } from '@views/drive/lib/engine/game/world/islandMaterials';
 import { islandModelMesh } from '@views/drive/lib/engine/game/world/islandModels';
+import { type MeshComponent, removeComponents } from '@views/drive/lib/engine/game/world/meshComponents';
 
 const CAREER_PAINT = new Map<string, PartName>([
   ['emissiveOrangeRadialGradient', 'bunting3'],
@@ -18,7 +19,19 @@ const SCOREBOARD = {
   frame: 'Cube180',
   body: 'Cube177',
   origin: [-1.88, 0, 0.51] satisfies Triple,
+  crest: { halfWidth: 1, bottom: 4.34 },
+  postFace: { inner: 2.7, bottom: 3.3, top: 3.95, front: 0.2 },
 } as const;
+
+function isCarvedFace({ box }: MeshComponent): boolean {
+  const { crest, postFace } = SCOREBOARD;
+  const center = box.getCenter(new THREE.Vector3());
+  const isCrest = Math.abs(center.x) < crest.halfWidth && box.min.y >= crest.bottom;
+  const isOnPost = Math.abs(center.x) > postFace.inner && box.max.z > postFace.front;
+  const isFaceHeight = center.y > postFace.bottom && center.y < postFace.top;
+  const isPostFace = isOnPost && isFaceHeight;
+  return isCrest || isPostFace;
+}
 
 function paint(mesh: THREE.Object3D | undefined, shade: PartName): void {
   if (mesh instanceof THREE.Mesh) mesh.material = islandMaterial(shade);
@@ -48,7 +61,10 @@ export function rebuildTikiScoreboard(model: THREE.Object3D): void {
   if (!(body instanceof THREE.Mesh)) return;
   if (!body.parent) return;
   for (const mesh of [frame, body]) mesh.geometry.setDrawRange(0, 0);
-  body.parent.add(islandModelMesh('tikiScoreboard', new THREE.Matrix4().makeTranslation(...SCOREBOARD.origin)));
+  const board = islandModelMesh('tikiScoreboard', null);
+  removeComponents(board, isCarvedFace);
+  board.geometry.translate(...SCOREBOARD.origin);
+  body.parent.add(board);
 }
 
 export function removeAwardsTable(model: THREE.Object3D): void {

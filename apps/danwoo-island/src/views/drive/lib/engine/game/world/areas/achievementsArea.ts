@@ -20,7 +20,7 @@ import * as THREE from 'three/webgpu';
 import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
 import { Area } from '@views/drive/lib/engine/game/world/areas/area';
 import { paintAchievementsBasin } from '@views/drive/lib/engine/game/world/islandReskins';
-import { rebuildWaterfallCliff, replaceWithTotem } from '@views/drive/lib/engine/game/world/islandStructures';
+import { rebuildWaterfallCliff, replaceWithPillar } from '@views/drive/lib/engine/game/world/islandStructures';
 import { rebuildVillageProps } from '@views/drive/lib/engine/game/world/islandVillage';
 
 const PARTICLE_COUNT = 100;
@@ -47,7 +47,7 @@ export class AchievementsArea extends Area {
   constructor(model: THREE.Object3D) {
     super(model);
     this.#pillar = this.requireReference('pillar');
-    replaceWithTotem(this.#pillar);
+    replaceWithPillar(this.#pillar);
     this.game.audio.register({
       path: 'sounds/magic/Mountain Audio - Small Chimes - Loop.mp3',
       autoplay: true,

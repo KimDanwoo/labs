@@ -25,15 +25,6 @@ export const repeat: TextureSetup = (texture) => {
   texture.wrapT = THREE.RepeatWrapping;
 };
 
-export const repeatX: TextureSetup = (texture) => {
-  texture.wrapS = THREE.RepeatWrapping;
-};
-
-export const clamp: TextureSetup = (texture) => {
-  texture.wrapS = THREE.ClampToEdgeWrapping;
-  texture.wrapT = THREE.ClampToEdgeWrapping;
-};
-
 export const srgb: TextureSetup = (texture) => {
   texture.colorSpace = THREE.SRGBColorSpace;
 };

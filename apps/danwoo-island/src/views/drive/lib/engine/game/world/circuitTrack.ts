@@ -10,7 +10,7 @@ import { stripGeometry } from '@views/drive/lib/engine/game/world/trackGeometry'
 
 const SAMPLE_SPACING = 1;
 const ROAD_LIFT = 0.03;
-const CURB = { width: 1.2, lift: 0.06, stripe: 2, red: '#e8473a', white: '#fff4ea' } as const;
+const CURB = { width: 1.2, lift: 0.06, stripe: 2, wave: 0.7, teal: '#2bb3c4', cream: '#fff1d6' } as const;
 const ROAD_COLOR = '#384246';
 const GLITTER = { scarcity: 100, intensity: 0.3, perlin: 0.05, hash: 0.2, time: 0.004, view: 0.004 } as const;
 
@@ -37,13 +37,15 @@ function roadMaterial(glitterVariation: THREE.UniformNode<'float', number>): Mes
 }
 
 function curbMaterial(): MeshDefaultMaterial {
+  const crest = uv().y.mul(PI).sin().mul(CURB.wave);
   const stripe = step(
     0.5,
     uv()
-      .x.div(CURB.stripe * 2)
+      .x.add(crest)
+      .div(CURB.stripe * 2)
       .fract(),
   );
-  const colorNode = mix(color(CURB.red), color(CURB.white), stripe);
+  const colorNode = mix(color(CURB.teal), color(CURB.cream), stripe);
   return new MeshDefaultMaterial({ colorNode, hasLightBounce: false, hasWater: false });
 }
 

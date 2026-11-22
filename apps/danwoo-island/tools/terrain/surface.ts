@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { type Point, WORLD_SIZE } from '../../src/views/drive/lib/engine/game/world/layout/islandLayout';
-import { landDistance, objectDistance, smoothstep, trackClearance } from './fields';
+import { landDistance, objectDistance, smoothstep, trackClearance, trailDistance } from './fields';
 import { GLADE_RADIUS, GROVE_RADIUS, gladeDistance, groveDistance } from './groves';
 import { ragged, valueNoise } from './noise';
 
@@ -14,6 +14,8 @@ const CLEARING_EDGE = { cell: 7, reach: 2.5 } as const;
 const TUFTS = { cell: 9, from: 0.68, to: 0.74 } as const;
 const GLADE_EDGE = { cell: 4, reach: 1.5 } as const;
 const GLADE_FRINGE = 1.5;
+const TRAIL = { clearance: 1.6, edge: 1.2 } as const;
+const TRAIL_EDGE = { cell: 3, reach: 0.6 } as const;
 const PAVED = { shoulder: 2.5, edge: 1.5 } as const;
 
 interface Grayscale {
@@ -68,6 +70,7 @@ export function sampleTerrain(point: Point): TerrainSample {
   const grass =
     grassCover(point, land) *
     smoothstep(GRASS.trackClearance, GRASS.trackClearance + GRASS.edge, track) *
+    smoothstep(TRAIL.clearance, TRAIL.clearance + TRAIL.edge, trailDistance(point) + ragged(point, TRAIL_EDGE)) *
     smoothstep(
       GRASS.padClearance,
       GRASS.padClearance + GRASS.edge,

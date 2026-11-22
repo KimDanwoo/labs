@@ -1,6 +1,7 @@
 import * as THREE from 'three/webgpu';
 
 import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { repaintSlots } from '@views/drive/lib/engine/game/world/islandMaterials';
 import { type IslandModelKey, islandModelMesh } from '@views/drive/lib/engine/game/world/islandModels';
 import { TRACK } from '@views/drive/lib/engine/game/world/layout/islandLayout';
 import {
@@ -15,6 +16,8 @@ const SAMPLE_SPACING = 0.5;
 const TAKEOFF = { length: 9, height: 1.8 } as const;
 const LANDING = { length: 8, height: 1 } as const;
 const KICKER = { length: 3, height: 0.45, tail: 0.6 } as const;
+const PALETTE_SLOT = { red: 16, lagoon: 3 } as const;
+const LAGOON_STRIPES = new Map([[PALETTE_SLOT.red, PALETTE_SLOT.lagoon]]);
 
 type Profile = (along: number) => number;
 
@@ -107,7 +110,9 @@ function rampModel(model: IslandModelKey, { point, forward }: TrackSample): THRE
   const matrix = new THREE.Matrix4()
     .makeTranslation(point[0], 0, point[1])
     .multiply(new THREE.Matrix4().makeRotationY(heading));
-  return islandModelMesh(model, matrix);
+  const mesh = islandModelMesh(model, matrix);
+  repaintSlots(mesh.geometry, LAGOON_STRIPES);
+  return mesh;
 }
 
 export function buildCircuitJumps(): void {

@@ -1,4 +1,4 @@
-import { color, Fn, min, mix, positionLocal, positionWorld, texture, uniform, uv, vec3 } from 'three/tsl';
+import { color, Fn, min, mix, positionLocal, positionWorld, smoothstep, texture, uniform, uv, vec3 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import { getGame } from '@views/drive/lib/engine/game/gameContext';
@@ -12,6 +12,21 @@ const MAX_SUBDIVISIONS = 320;
 const DEPTH_SCALE = -1.5;
 const BED_ROCK = { halfHeight: 0.5, halfWidth: 6 } as const;
 const THROTTLE_ORDER = 2;
+const DECK = {
+  high: '#ecd1a2',
+  low: '#c29a70',
+  plankWidth: 0.55,
+  plankRatio: 5,
+  seam: 0.05,
+  toneRange: 0.2,
+  rowSalt: 7.31,
+  patchFrequency: 0.03,
+} as const;
+const HASH = { scale: 12.9898, spread: 43758.5453 } as const;
+
+function pseudoRandom(value: THREE.Node<'float'>): THREE.Node<'float'> {
+  return value.mul(HASH.scale).sin().mul(HASH.spread).fract();
+}
 
 function floorSize(): number {
   return Math.round(getGame().view.optimalArea.radius * 2) + 1;
@@ -65,17 +80,22 @@ export class Floor {
     const game = getGame();
     const size = floorSize();
     const terrainData = game.terrain.terrainNode(positionWorld.xz);
-    const slabHighColor = uniform(color('#e8dfcc'));
-    const slabLowColor = uniform(color('#a3a79e'));
-    const slabTextureFrequency = uniform(0.175);
-    const slabNoiseFrequency = uniform(0.03);
-    const slabsTexture = game.texture('floorSlabsTexture');
+    const deckHighColor = uniform(color(DECK.high));
+    const deckLowColor = uniform(color(DECK.low));
     const colorNode = Fn(() => {
       const baseColor = game.terrain.colorNode(terrainData);
-      const slabNoise = texture(game.noises.perlin, positionWorld.xz.mul(slabNoiseFrequency)).r;
-      const slabs = texture(slabsTexture, positionWorld.xz.mul(slabTextureFrequency)).r;
-      const slabColor = mix(slabLowColor, slabHighColor, slabs);
-      return mix(baseColor, slabColor, terrainData.r.mul(slabNoise)).rgb;
+      const deckNoise = texture(game.noises.perlin, positionWorld.xz.mul(DECK.patchFrequency)).r;
+      const deck = positionWorld.xz.div(DECK.plankWidth);
+      const row = deck.y.floor();
+      const along = deck.x.div(DECK.plankRatio).add(pseudoRandom(row));
+      const plankTone = pseudoRandom(along.floor().add(row.mul(DECK.rowSalt)));
+      const acrossEdge = min(deck.y.fract(), deck.y.fract().oneMinus());
+      const alongEdge = min(along.fract(), along.fract().oneMinus()).mul(DECK.plankRatio);
+      const edge = min(acrossEdge, alongEdge);
+      const seam = smoothstep(DECK.seam, edge.fwidth().add(DECK.seam), edge);
+      const shade = seam.mul(plankTone.mul(DECK.toneRange).add(1 - DECK.toneRange));
+      const deckColor = mix(deckLowColor, deckHighColor, shade);
+      return mix(baseColor, deckColor, terrainData.r.mul(deckNoise)).rgb;
     })();
 
     const material = new MeshDefaultMaterial({

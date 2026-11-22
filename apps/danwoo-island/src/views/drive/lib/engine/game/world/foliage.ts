@@ -6,10 +6,12 @@ import {
   mix,
   normalWorld,
   positionLocal,
+  positionView,
   rotateUV,
   screenSize,
   screenUV,
   smoothstep,
+  step,
   texture,
   uniform,
   uv,
@@ -32,11 +34,43 @@ interface FoliageOptions {
 }
 
 const rng = alea('foliage');
-const PLANE_COUNT = 56;
-const PLANE_SIZE = 1.0;
+const PLANE_COUNT = 40;
+const PLANE_SIZE = 1.2;
+const LEAF_CLUSTER = { seed: 'leafCluster', size: 128, count: 8, length: 0.2, width: 0.12, margin: 0.24 } as const;
 const NORMAL_BLEND = 0.85;
 const WIND_ROTATION = 2.2;
 const SEE_THROUGH_EDGE = { min: 3, max: 15 } as const;
+const SEE_THROUGH_DEPTH_MARGIN = 1;
+
+function leafClusterTexture(): THREE.CanvasTexture {
+  const { size, count, length, width, margin } = LEAF_CLUSTER;
+  const random = alea(LEAF_CLUSTER.seed);
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const context = canvas.getContext('2d');
+  if (!context) throw new Error('2D canvas is not supported');
+  context.fillStyle = '#000';
+  context.fillRect(0, 0, size, size);
+  context.globalCompositeOperation = 'lighten';
+  const radius = length * size;
+  for (let leaf = 0; leaf < count; leaf += 1) {
+    const spread = 1 - margin * 2;
+    context.save();
+    context.translate((margin + random() * spread) * size, (margin + random() * spread) * size);
+    context.rotate(random() * Math.PI);
+    context.scale(1, width / length);
+    const falloff = context.createRadialGradient(0, 0, 0, 0, 0, radius);
+    falloff.addColorStop(0, '#fff');
+    falloff.addColorStop(1, '#000');
+    context.fillStyle = falloff;
+    context.beginPath();
+    context.arc(0, 0, radius, 0, Math.PI * 2);
+    context.fill();
+    context.restore();
+  }
+  return new THREE.CanvasTexture(canvas);
+}
 
 function leafPlane(): THREE.PlaneGeometry {
   const plane = new THREE.PlaneGeometry(PLANE_SIZE, PLANE_SIZE);
@@ -79,6 +113,7 @@ export class Foliage {
   readonly #seeThroughPosition = uniform(vec2());
   readonly #seeThroughEdgeMin = uniform(0.11);
   readonly #seeThroughEdgeMax = uniform(0.57);
+  readonly #vehicleDepth = uniform(0);
   readonly #shadowOffset = uniform(1);
   readonly #instanceMatrix: THREE.InstancedBufferAttribute;
 
@@ -105,7 +140,7 @@ export class Foliage {
 
   #material(colorA: ColorUniform, colorB: ColorUniform): MeshDefaultMaterial {
     const game = getGame();
-    const foliageTexture = game.texture('foliageTexture');
+    const foliageTexture = leafClusterTexture();
     const foliageAlpha = Fn(() => {
       const rotatedUv = rotateUV(uv(), game.wind.offsetNode(positionLocal.xz).length().mul(WIND_ROTATION), vec2(0.5));
       return texture(foliageTexture, rotatedUv).r;
@@ -115,7 +150,9 @@ export class Foliage {
       if (this.#isSeeThrough) {
         const toVehicle = screenUV.sub(this.#seeThroughPosition);
         toVehicle.mulAssign(vec2(screenSize.x.div(screenSize.y), 1));
-        const distanceFade = smoothstep(this.#seeThroughEdgeMin, this.#seeThroughEdgeMax, toVehicle.length());
+        const isInFront = step(positionView.z.negate(), this.#vehicleDepth.add(SEE_THROUGH_DEPTH_MARGIN));
+        const edgeFade = smoothstep(this.#seeThroughEdgeMin, this.#seeThroughEdgeMax, toVehicle.length());
+        const distanceFade = mix(1, edgeFade, isInFront);
         alpha.assign(foliageAlpha().mul(distanceFade.mul(this.#threshold.oneMinus()).add(this.#threshold)));
       } else {
         alpha.assign(foliageAlpha());
@@ -139,9 +176,10 @@ export class Foliage {
   }
 
   update(): void {
-    const { world, view } = getGame();
+    const { world, view, player } = getGame();
     const screenPosition = world.visualVehicle?.screenPosition;
     if (screenPosition) this.#seeThroughPosition.value.copy(screenPosition);
+    this.#vehicleDepth.value = view.depthOf(player.position);
     const radius = view.spherical.radius.current;
     this.#seeThroughEdgeMin.value = (SEE_THROUGH_EDGE.min / radius) * this.seeThroughMultiplier;
     this.#seeThroughEdgeMax.value = (SEE_THROUGH_EDGE.max / radius) * this.seeThroughMultiplier;

@@ -25,7 +25,7 @@ export function listenFocusActions(view: View): void {
 export function listenZoom(view: View): void {
   view.game.inputs.addActions([
     { name: 'zoom', categories: ['wandering', 'racing'], keys: ['Wheel.roll'] },
-    { name: 'zoomToggle', categories: ['wandering', 'racing'], keys: ['Gamepad.r3'] },
+    { name: 'zoomToggle', categories: ['racing'], keys: ['Gamepad.r3'] },
   ]);
   view.game.inputs.events.on('zoom', ({ value }) => {
     if (typeof value === 'number') nudgeZoom(view.zoom, -value * ZOOM.wheelSensitivity);

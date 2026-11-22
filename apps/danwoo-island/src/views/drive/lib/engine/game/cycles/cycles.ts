@@ -33,13 +33,21 @@ export abstract class Cycles<P extends Record<keyof P, CycleValue>, N extends st
   progressDelta = 1;
   readonly #durationSeconds: number;
   readonly #forcedProgress: number | null;
+  readonly #startOffset: number;
   readonly #keyframes: ResolvedKeyframe[];
   readonly #insideIntervals = new Map<N, boolean>();
   readonly #intervals: readonly Interval<N>[];
 
-  protected constructor({ durationSeconds, forcedProgress, keyframes, intervals = [] }: CyclesOptions<P, N>) {
+  protected constructor({
+    durationSeconds,
+    forcedProgress,
+    startProgress,
+    keyframes,
+    intervals = [],
+  }: CyclesOptions<P, N>) {
     this.#durationSeconds = durationSeconds;
     this.#forcedProgress = forcedProgress;
+    this.#startOffset = startProgress === undefined ? 0 : startProgress - (this.#clockProgress() % 1);
     this.#keyframes = wrapKeyframes(keyframes).map(({ stop, properties }) => ({ stop, values: valuesOf(properties) }));
     this.#intervals = intervals;
     this.absoluteProgress = this.#currentAbsoluteProgress();
@@ -70,8 +78,12 @@ export abstract class Cycles<P extends Record<keyof P, CycleValue>, N extends st
     this.#advance((emit) => emit());
   }
 
+  #clockProgress(): number {
+    return Date.now() / MILLISECONDS_PER_SECOND / this.#durationSeconds;
+  }
+
   #currentAbsoluteProgress(): number {
-    return this.#forcedProgress ?? Date.now() / MILLISECONDS_PER_SECOND / this.#durationSeconds;
+    return this.#forcedProgress ?? this.#clockProgress() + this.#startOffset;
   }
 
   #initialProperties(keyframes: readonly Keyframe<P>[]): Record<string, CycleProperty> {

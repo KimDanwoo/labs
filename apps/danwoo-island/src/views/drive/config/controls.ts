@@ -24,18 +24,20 @@ export const KEYBOARD_CONTROLS: readonly KeyControl[] = [
   { keys: ['숫자 키', '숫자 패드'], joiner: '/', action: '유압 서스펜션' },
   { keys: ['왼쪽 클릭 (드래그)'], joiner: '', action: '카메라 이동' },
   { keys: ['H'], joiner: '', action: '경적' },
+  { keys: ['G'], joiner: '', action: '비행·착륙 (날면서 SPACE 상승, B 하강)' },
 ];
 
 export const TOUCH_CONTROLS: readonly KeyControl[] = [
   { keys: ['한 손가락'], joiner: '', action: '차 움직이기' },
   { keys: ['두 손가락'], joiner: '', action: '카메라 이동·확대' },
   { keys: ['차를 탭'], joiner: '', action: '점프' },
+  { keys: ['비행 버튼'], joiner: '', action: '비행·착륙' },
 ];
 
 export const GAMEPAD_CONTROLS: readonly GamepadControl[] = [
   { kind: 'paired', xbox: 'B', playstation: { kind: 'icon', icon: 'circle' }, action: '부스트' },
-  { kind: 'paired', xbox: 'Y', playstation: { kind: 'icon', icon: 'triangle' }, action: '점프' },
-  { kind: 'paired', xbox: 'X', playstation: { kind: 'icon', icon: 'square' }, action: '브레이크' },
+  { kind: 'paired', xbox: 'Y', playstation: { kind: 'icon', icon: 'triangle' }, action: '점프·비행 중 상승' },
+  { kind: 'paired', xbox: 'X', playstation: { kind: 'icon', icon: 'square' }, action: '브레이크·비행 중 하강' },
   { kind: 'paired', xbox: 'A', playstation: { kind: 'icon', icon: 'cross' }, action: '상호작용·나가기' },
   { kind: 'paired', xbox: 'LT', playstation: { kind: 'label', label: 'L2' }, action: '가속' },
   { kind: 'paired', xbox: 'RT', playstation: { kind: 'label', label: 'R2' }, action: '후진' },
@@ -43,7 +45,7 @@ export const GAMEPAD_CONTROLS: readonly GamepadControl[] = [
   { kind: 'shared', key: '왼쪽 스틱', action: '조향' },
   { kind: 'shared', key: '왼쪽 스틱 누르기', action: '경적' },
   { kind: 'shared', key: '오른쪽 스틱', action: '카메라 이동' },
-  { kind: 'shared', key: '오른쪽 스틱 누르기', action: '확대·축소' },
+  { kind: 'shared', key: '오른쪽 스틱 누르기', action: '비행·착륙 (레이스 중엔 확대·축소)' },
   { kind: 'shared', key: 'Select', action: '초기화' },
   { kind: 'shared', key: 'Start', action: '일시정지' },
 ];

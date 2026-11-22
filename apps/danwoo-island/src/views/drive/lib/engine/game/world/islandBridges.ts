@@ -2,10 +2,13 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import * as THREE from 'three/webgpu';
 
 import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import type { ColliderDescription } from '@views/drive/lib/engine/game/physics/physicsTypes';
 import { islandModelGeometry, islandPaletteMaterial } from '@views/drive/lib/engine/game/world/islandModels';
 import { BRIDGES, type BridgeSpan } from '@views/drive/lib/engine/game/world/layout/islandLayout';
 
 const DECK = { top: 0.12, thickness: 0.3, landing: 3, segment: 2.4 } as const;
+const RAIL = { halfThickness: 0.1, halfHeight: 0.5 } as const;
+const RAIL_SIDES = [-1, 1] as const;
 const UP = new THREE.Vector3(0, 1, 0);
 
 interface SpanFrame {
@@ -59,6 +62,13 @@ export function placeIslandBridges(): void {
             parameters: [span.width / 2, DECK.thickness / 2, length / 2],
             position: { x: 0, y: DECK.top - DECK.thickness / 2, z: 0 },
           },
+          ...RAIL_SIDES.map(
+            (side): ColliderDescription => ({
+              shape: 'cuboid',
+              parameters: [RAIL.halfThickness, RAIL.halfHeight, length / 2],
+              position: { x: side * (span.width / 2 - RAIL.halfThickness), y: DECK.top + RAIL.halfHeight, z: 0 },
+            }),
+          ),
         ],
       },
     );

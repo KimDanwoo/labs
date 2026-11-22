@@ -1,6 +1,6 @@
 import { getGame } from '@views/drive/lib/engine/game/gameContext';
 import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
-import { attribute, color } from 'three/tsl';
+import { attribute, uniform } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 const SHADES = {
@@ -75,7 +75,7 @@ function shadedMaterial(name: ShadeName): MeshDefaultMaterial {
   if (cached) return cached;
   const isLit = !SIGNAGE_FACES.has(name);
   const material = new MeshDefaultMaterial({
-    colorNode: color(SHADES[name]).rgb,
+    colorNode: uniform(new THREE.Color(SHADES[name])).rgb,
     hasCoreShadows: isLit,
     hasDropShadows: isLit,
   });
@@ -112,4 +112,11 @@ export function repaintSlots(geometry: THREE.BufferGeometry, repaint: SlotRepain
     if (slot !== undefined) uv.setXY(vertex, (slot + 0.5) / PALETTE_SLOTS, PALETTE_ROW);
   }
   uv.needsUpdate = true;
+}
+
+export function fillSlot(geometry: THREE.BufferGeometry, slot: number): THREE.BufferGeometry {
+  const uv = geometry.getAttribute('uv');
+  if (!uv) return geometry;
+  for (let vertex = 0; vertex < uv.count; vertex += 1) uv.setXY(vertex, (slot + 0.5) / PALETTE_SLOTS, PALETTE_ROW);
+  return geometry;
 }

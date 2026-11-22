@@ -27,11 +27,14 @@ import { placedInArea } from '@views/drive/lib/engine/game/world/layout/areaPlac
 
 const LANDING_CLEARING = placedInArea('landing', new THREE.Vector3(58.4, 0, 32.4));
 const GRASS_CLEARINGS = [{ x: LANDING_CLEARING.x, z: LANDING_CLEARING.z, radius: 2.4 }] as const;
-const SUBDIVISIONS_BY_QUALITY = { [QUALITY.high]: 280, [QUALITY.low]: 200 } as const;
+const SUBDIVISIONS_BY_QUALITY = { [QUALITY.high]: 200, [QUALITY.low]: 140 } as const;
 const SURFACE_IDEAL = 2000;
-const BLADE = { width: 0.17, height: 0.46, heightRandomness: 0.55, lean: 1.4 } as const;
-const SHADE = { base: 0.7, tip: 1.22 } as const;
-const BLADE_SHAPE = [0, 1, 1, 0, -1, 0];
+const BLADE = { width: 0.22, height: 0.48, heightRandomness: 0.55, lean: 0.9 } as const;
+const SHADE = { base: [0.56, 0.72, 0.7], tip: [1.32, 1.26, 0.9] } as const;
+const PATCH = { scale: 0.045, lush: [0.84, 0.98, 0.95], sunlit: [1.16, 1.1, 0.8] } as const;
+const SPRIG = { root: 0.35, overlap: 0.05, shortTip: 0.7 } as const;
+const LEAF_SHAPE = [-SPRIG.root, 0, -1, 1, SPRIG.overlap, 0, -SPRIG.overlap, 0, 1, SPRIG.shortTip, SPRIG.root, 0];
+const LEAF_VERTICES = LEAF_SHAPE.length / 2;
 const OVERFLOW_GROWTH = { initial: 0.5, resized: 0.4 } as const;
 const HIDDEN_THRESHOLD = 0.1;
 const HIDDEN_LIFT = 100;
@@ -44,8 +47,8 @@ function surfaceOverflow(size: number): number {
 
 function bladeGeometry(size: number, fragmentSize: number, subdivisions: number): THREE.BufferGeometry {
   const count = subdivisions * subdivisions;
-  const position = new Float32Array(count * 3 * 2);
-  const heightRandomness = new Float32Array(count * 3);
+  const position = new Float32Array(count * LEAF_VERTICES * 2);
+  const heightRandomness = new Float32Array(count * LEAF_VERTICES);
   for (let x = 0; x < subdivisions; x += 1) {
     const fragmentX = (x / subdivisions - 0.5) * size + fragmentSize * 0.5;
     for (let z = 0; z < subdivisions; z += 1) {
@@ -53,8 +56,11 @@ function bladeGeometry(size: number, fragmentSize: number, subdivisions: number)
       const blade = x * subdivisions + z;
       const positionX = fragmentX + (Math.random() - 0.5) * fragmentSize;
       const positionZ = fragmentZ + (Math.random() - 0.5) * fragmentSize;
-      position.set([positionX, positionZ, positionX, positionZ, positionX, positionZ], blade * 6);
-      heightRandomness.set([Math.random(), Math.random(), Math.random()], blade * 3);
+      const randomness = Math.random();
+      for (let vertex = 0; vertex < LEAF_VERTICES; vertex += 1) {
+        position.set([positionX, positionZ], (blade * LEAF_VERTICES + vertex) * 2);
+        heightRandomness[blade * LEAF_VERTICES + vertex] = randomness;
+      }
     }
   }
   const geometry = new THREE.BufferGeometry();
@@ -113,12 +119,12 @@ export class Grass {
 
   #material(): MeshDefaultMaterial {
     const game = getGame();
-    const vertexLoopIndex = varying(vertexIndex.toFloat().mod(3));
-    const tipness = varying(step(vertexLoopIndex, 0.5));
+    const leafShape = uniformArray<'float'>(LEAF_SHAPE, 'float');
+    const shapeIndex = vertexIndex.toFloat().mod(LEAF_VERTICES).mul(2);
+    const tipness = varying(leafShape.element(shapeIndex.add(1)));
     const wind = varying(vec2());
     const bladePosition = varying(vec2());
     const heightRandomness = uniform(BLADE.heightRandomness);
-    const bladeShape = uniformArray<'float'>(BLADE_SHAPE, 'float');
 
     const terrainData = game.terrain.terrainNode(bladePosition);
     const clearing = GRASS_CLEARINGS.reduce<THREE.Node<'float'>>(
@@ -135,7 +141,16 @@ export class Grass {
     const hidden = step(terrainData.g.sub(0.4), HIDDEN_THRESHOLD);
 
     const material = new MeshDefaultMaterial({
-      colorNode: game.terrain.colorNode(terrainData).mul(mix(SHADE.base, SHADE.tip, tipness)),
+      colorNode: game.terrain
+        .colorNode(terrainData)
+        .mul(mix(vec3(...SHADE.base), vec3(...SHADE.tip), tipness))
+        .mul(
+          mix(
+            vec3(...PATCH.lush),
+            vec3(...PATCH.sunlit),
+            texture(game.noises.perlin, bladePosition.mul(PATCH.scale)).r,
+          ),
+        ),
       normalNode: vec3(0, 1, 0),
       hasWater: false,
       hasLightBounce: false,
@@ -157,11 +172,10 @@ export class Grass {
         .mul(heightRandomness.mul(attribute('heightRandomness', 'float')).add(heightRandomness.oneMinus()))
         .mul(heightVariation)
         .mul(grassAmount);
-      const shapeIndex = vertexLoopIndex.mod(3).mul(2);
       const lean = attribute('heightRandomness', 'float').sub(0.5).mul(BLADE.lean).mul(tipness);
       const shape = vec3(
-        bladeShape.element(shapeIndex).add(lean).mul(this.#bladeWidth).mul(grassAmount),
-        bladeShape.element(shapeIndex.add(1)).mul(height),
+        leafShape.element(shapeIndex).add(lean).mul(this.#bladeWidth).mul(grassAmount),
+        tipness.mul(height),
         0,
       );
       const vertexPosition = position3.add(shape);

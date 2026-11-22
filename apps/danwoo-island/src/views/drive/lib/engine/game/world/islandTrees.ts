@@ -5,10 +5,13 @@ import {
   Fn,
   mix,
   positionLocal,
+  positionView,
+  screenCoordinate,
   screenSize,
   screenUV,
   select,
   sin,
+  smoothstep,
   step,
   texture,
   uniform,
@@ -40,8 +43,12 @@ interface TreeGrove {
 
 const TRUNK_HALF_HEIGHT = 2.5;
 const SWAY = { wind: 0.35, flutter: 0.06, flutterSpeed: 1.7, curve: 1.5 } as const;
-const SEE_THROUGH_RADIUS = 3;
+const SEE_THROUGH_RADIUS = 4;
+const SEE_THROUGH_SOFT_START = 0.6;
+const SEE_THROUGH_DEPTH_MARGIN = 1;
+const DITHER = { scale: 52.9829189, x: 0.06711056, y: 0.00583715 } as const;
 const SWAY_MARGIN = 0.5;
+const CULL_CELL_SIZE = 32;
 const LEAF_SLOTS = { deep: 9, light: 12 } as const;
 const LEAF_COLORS = { deep: '#4f9a45', light: '#8fcc56' } as const;
 
@@ -69,6 +76,9 @@ export function mixGroves(species: readonly TreeSpecies[], references: readonly 
   }));
 }
 
+const LEAF_SLOT_SET = new Set<number>(Object.values(LEAF_SLOTS));
+const isLeaf = (u: number): boolean => LEAF_SLOT_SET.has(Math.floor(u * PALETTE_SLOTS));
+
 function speciesGeometry({ model, baseOffsetX, swayStart, crownStart }: TreeSpecies): THREE.BufferGeometry {
   const geometry = islandModelGeometry(model);
   geometry.computeBoundingBox();
@@ -77,13 +87,15 @@ function speciesGeometry({ model, baseOffsetX, swayStart, crownStart }: TreeSpec
   geometry.computeBoundingBox();
 
   const positions = geometry.getAttribute('position');
+  const uvs = geometry.getAttribute('uv');
   const top = geometry.boundingBox?.max.y ?? 1;
   const sway = new Float32Array(positions.count);
   const crown = new Float32Array(positions.count);
   for (let index = 0; index < positions.count; index += 1) {
     const height = positions.getY(index);
     sway[index] = THREE.MathUtils.clamp((height - swayStart) / (top - swayStart), 0, 1) ** SWAY.curve;
-    crown[index] = height > crownStart ? 1 : 0;
+    const isCrown = height > crownStart || isLeaf(uvs.getX(index));
+    crown[index] = Number(isCrown);
   }
   geometry.setAttribute('sway', new THREE.BufferAttribute(sway, 1));
   geometry.setAttribute('crown', new THREE.BufferAttribute(crown, 1));
@@ -97,6 +109,10 @@ function plantedMatrix(
 ): THREE.Matrix4 {
   const scale = THREE.MathUtils.lerp(min, max, random());
   return tree.matrix.clone().multiply(new THREE.Matrix4().makeScale(scale, scale, scale));
+}
+
+function cullCell({ x, z }: THREE.Vector3): string {
+  return `${Math.floor(x / CULL_CELL_SIZE)}:${Math.floor(z / CULL_CELL_SIZE)}`;
 }
 
 function addTrunkColliders(references: readonly THREE.Object3D[], radius: number): void {
@@ -118,6 +134,7 @@ export class IslandTrees {
   seeThroughMultiplier = 1;
   readonly #seeThroughPosition = uniform(vec2());
   readonly #seeThroughRadius = uniform(0);
+  readonly #vehicleDepth = uniform(0);
 
   constructor(groves: readonly TreeGrove[]) {
     const game = getGame();
@@ -127,17 +144,21 @@ export class IslandTrees {
   }
 
   #plant({ species, references }: TreeGrove, material: MeshDefaultMaterial): void {
-    const mesh = new THREE.InstancedMesh(speciesGeometry(species), material, references.length);
+    const geometry = speciesGeometry(species);
     const random = alea(species.model);
-    for (const [index, tree] of references.entries()) {
-      mesh.setMatrixAt(index, plantedMatrix(tree, species.scaleRange, random));
+    const planted = references.map((tree) => ({ tree, matrix: plantedMatrix(tree, species.scaleRange, random) }));
+    const cells = new Set(planted.map(({ tree }) => cullCell(tree.position)));
+    for (const cell of cells) {
+      const trees = planted.filter(({ tree }) => cullCell(tree.position) === cell);
+      const mesh = new THREE.InstancedMesh(geometry, material, trees.length);
+      for (const [index, { matrix }] of trees.entries()) mesh.setMatrixAt(index, matrix);
+      mesh.computeBoundingSphere();
+      if (mesh.boundingSphere) mesh.boundingSphere.radius += SWAY_MARGIN;
+      mesh.name = species.model;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      getGame().scene.add(mesh);
     }
-    mesh.computeBoundingSphere();
-    if (mesh.boundingSphere) mesh.boundingSphere.radius += SWAY_MARGIN;
-    mesh.name = species.model;
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-    getGame().scene.add(mesh);
     addTrunkColliders(references, species.trunkRadius);
   }
 
@@ -147,7 +168,19 @@ export class IslandTrees {
     const crown = attribute('crown', 'float');
     const alphaNode = Fn(() => {
       const toVehicle = screenUV.sub(this.#seeThroughPosition).mul(vec2(screenSize.x.div(screenSize.y), 1));
-      return mix(1, step(this.#seeThroughRadius, toVehicle.length()), crown);
+      const opening = smoothstep(
+        this.#seeThroughRadius.mul(SEE_THROUGH_SOFT_START),
+        this.#seeThroughRadius,
+        toVehicle.length(),
+      );
+      const dither = screenCoordinate.x
+        .mul(DITHER.x)
+        .add(screenCoordinate.y.mul(DITHER.y))
+        .fract()
+        .mul(DITHER.scale)
+        .fract();
+      const isInFront = step(positionView.z.negate(), this.#vehicleDepth.add(SEE_THROUGH_DEPTH_MARGIN));
+      return mix(1, step(dither, opening), crown.mul(isInFront));
     })();
     const slot = uv().x.mul(PALETTE_SLOTS).floor();
     const paletteColor = texture(game.texture('paletteTexture')).rgb;
@@ -172,9 +205,10 @@ export class IslandTrees {
   }
 
   update(): void {
-    const { world, view } = getGame();
+    const { world, view, player } = getGame();
     const screenPosition = world.visualVehicle?.screenPosition;
     if (screenPosition) this.#seeThroughPosition.value.copy(screenPosition);
+    this.#vehicleDepth.value = view.depthOf(player.position);
     const radius = view.spherical.radius.current;
     this.#seeThroughRadius.value = (SEE_THROUGH_RADIUS / radius) * this.seeThroughMultiplier;
   }

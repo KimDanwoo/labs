@@ -1,8 +1,8 @@
+import { gradientColor } from '@views/drive/lib/engine/game/materials';
 import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
 import type { PartName, VehicleParts } from '@views/drive/lib/engine/game/world/boxyVehicle';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { color } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 const HALF_TURN = Math.PI / 2;
@@ -13,7 +13,7 @@ const PAINT_UV = { offsetX: 1.6, width: 3.2, top: 0.76, height: 1.4 } as const;
 const WHEEL_GUARD = /^wheelGuard/;
 const WHEEL_CONTAINER = /^wheelContainer/;
 export function shadedMaterial(shade: string): MeshDefaultMaterial {
-  const material = new MeshDefaultMaterial({ colorNode: color(shade).rgb });
+  const material = new MeshDefaultMaterial({ colorNode: gradientColor(shade, shade) });
   material.userData.prevent = true;
   return material;
 }
@@ -86,7 +86,7 @@ export function addCabin(parts: VehicleParts): void {
     bevelSegments: 1,
   });
   parts.add('bodyPainted', cabin, [0, 0, -0.66]);
-  parts.box('bodyPainted', [1.77, 0.09, 1.43], [-0.45, 0.715, 0], { radius: 0.025 });
+  parts.box('cream', [1.77, 0.09, 1.43], [-0.45, 0.715, 0], { radius: 0.025 });
   parts.box('bodyPainted', [1.01, 0.16, 1.37], [0.89, 0.12, 0], { radius: 0.025 });
   parts.box('trim', [0.94, 0.018, 1.25], [0.91, 0.025, 0]);
   parts.box('glass', [0.025, 0.43, 1.15], [0.409, 0.394, 0], { radius: 0.01, rotation: [0, 0, 0.184] });
@@ -95,8 +95,8 @@ export function addCabin(parts: VehicleParts): void {
     parts.box('glass', [0.43, 0.4, 0.022], [0.085, 0.395, side * 0.682], { radius: 0.025 });
     parts.box('glass', [0.48, 0.4, 0.022], [-0.455, 0.395, side * 0.682], { radius: 0.02 });
     parts.box('glass', [0.35, 0.4, 0.022], [-0.96, 0.395, side * 0.682], { radius: 0.02 });
-    parts.box('trim', [1.66, 0.033, 0.026], [-0.43, 0.157, side * 0.701]);
-    parts.box('trim', [1.65, 0.024, 0.027], [-0.43, 0.656, side * 0.706]);
+    parts.box('cream', [1.66, 0.033, 0.026], [-0.43, 0.157, side * 0.701]);
+    parts.box('cream', [1.65, 0.024, 0.027], [-0.43, 0.656, side * 0.706]);
     parts.box('trim', [0.024, 0.54, 0.023], [-0.17, -0.06, side * 0.706]);
     for (const x of [-0.62, -0.07]) parts.box('trim', [0.14, 0.038, 0.043], [x, 0.07, side * 0.72], { radius: 0.008 });
     for (const x of [-0.76, 0.25]) {
@@ -106,8 +106,9 @@ export function addCabin(parts: VehicleParts): void {
     parts.box('trim', [0.1, 0.036, 0.15], [0.3, 0.25, side * 0.76]);
     parts.box('bodyPainted', [0.18, 0.13, 0.105], [0.29, 0.29, side * 0.865], { radius: 0.022 });
     parts.box('glass', [0.015, 0.09, 0.08], [0.192, 0.295, side * 0.865]);
-    parts.box('trim', [1.0, 0.09, 0.15], [-0.05, -0.47, side * 0.77], { radius: 0.015 });
+    parts.box('cream', [1.0, 0.09, 0.15], [-0.05, -0.47, side * 0.77], { radius: 0.015 });
     parts.box('metal', [0.93, 0.018, 0.12], [-0.05, -0.42, side * 0.78]);
+    parts.box('cream', [2.55, 0.055, 0.012], [0.02, -0.01, side * 0.703]);
   }
   for (const z of [-0.3, 0.3]) parts.box('trim', [0.02, 0.02, 0.34], [0.45, 0.2, z], { rotation: [0.07, 0, 0] });
 }
@@ -159,18 +160,18 @@ export function addFront(parts: VehicleParts): void {
     const blinker = side < 0 ? 'blinkerLeft' : 'blinkerRight';
     parts.box(blinker, [0.12, 0.047, 0.11], [0.91, 0.28, side * 0.61], { radius: 0.01 });
   }
-  parts.box('trim', [0.17, 0.19, 1.62], [1.44, -0.34, 0], { radius: 0.025 });
+  parts.box('cream', [0.17, 0.19, 1.62], [1.44, -0.34, 0], { radius: 0.025 });
   parts.box('metal', [0.035, 0.095, 0.71], [1.531, -0.37, 0], { radius: 0.012 });
   parts.box('trim', [0.02, 0.09, 0.3], [1.553, -0.31, 0]);
 }
 export function addRear(parts: VehicleParts): void {
-  parts.box('trim', [0.16, 0.17, 1.57], [-1.29, -0.35, 0], { radius: 0.022 });
+  parts.box('cream', [0.16, 0.17, 1.57], [-1.29, -0.35, 0], { radius: 0.022 });
   parts.box('trim', [0.045, 0.42, 0.08], [-1.28, 0.0, -0.45]);
   parts.box('metal', [0.04, 0.035, 0.13], [-1.295, 0.11, -0.46]);
   parts.cylinder('trim', 0.37, 0.19, [-1.38, 0.11, 0.02]);
   parts.ring('metal', 0.335, 0.016, [-1.485, 0.11, 0.02]);
-  parts.cylinder('bodyPainted', 0.31, 0.018, [-1.49, 0.11, 0.02]);
-  parts.cylinder('trim', 0.055, 0.012, [-1.505, 0.11, 0.02]);
+  parts.cylinder('board', 0.31, 0.018, [-1.49, 0.11, 0.02]);
+  parts.cylinder('cream', 0.13, 0.012, [-1.505, 0.11, 0.02]);
   for (const side of SIDES) {
     parts.box('trim', [0.045, 0.13, 0.29], [-1.29, -0.17, side * 0.53], { radius: 0.014 });
     parts.box('redLens', [0.015, 0.086, 0.19], [-1.318, -0.17, side * 0.56], { radius: 0.009 });
@@ -188,4 +189,31 @@ export function wheelAssembly(original: THREE.Object3D): THREE.Object3D {
     if (WHEEL_GUARD.test(child.name)) wheels.remove(child);
   }
   return wheels;
+}
+const RACK = { bars: [-1.0, 0.1], barY: 0.8, footY: 0.775, rail: 0.62 } as const;
+const BOARD = { length: 1.05, tail: 0.16, belly: 0.29, thickness: 0.05, bevel: 0.02, x: -0.42, y: 0.85 } as const;
+function surfboardGeometry(): THREE.ExtrudeGeometry {
+  const { length, tail, belly } = BOARD;
+  const outline = new THREE.Shape();
+  outline.moveTo(-length, -tail);
+  outline.bezierCurveTo(-length / 2, -belly, length / 2, -belly, length, 0);
+  outline.bezierCurveTo(length / 2, belly, -length / 2, belly, -length, tail);
+  outline.quadraticCurveTo(-length - 0.04, 0, -length, -tail);
+  return new THREE.ExtrudeGeometry(outline, {
+    depth: BOARD.thickness,
+    curveSegments: 14,
+    bevelEnabled: true,
+    bevelThickness: BOARD.bevel,
+    bevelSize: BOARD.bevel,
+    bevelSegments: 2,
+  });
+}
+export function addSurfRack(parts: VehicleParts): void {
+  for (const x of RACK.bars) {
+    parts.box('trim', [0.06, 0.045, 1.42], [x, RACK.barY, 0], { radius: 0.012 });
+    for (const side of SIDES) parts.box('trim', [0.09, 0.05, 0.07], [x, RACK.footY, side * RACK.rail]);
+    parts.box('trim', [0.07, 0.014, 0.6], [x, BOARD.y + BOARD.thickness + BOARD.bevel + 0.006, 0]);
+  }
+  parts.add('board', surfboardGeometry(), [BOARD.x, BOARD.y, 0], [-HALF_TURN, 0, 0]);
+  parts.box('cream', [1.6, 0.008, 0.045], [BOARD.x + 0.05, BOARD.y + BOARD.thickness + BOARD.bevel, 0]);
 }

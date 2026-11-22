@@ -2,7 +2,7 @@ import type { Track } from '@views/drive/lib/engine/game/tracks';
 import type { Trail } from '@views/drive/lib/engine/game/trails';
 import * as THREE from 'three/webgpu';
 
-export type PaintName = 'red' | 'orange' | 'white' | 'black' | 'flames' | 'abyssal';
+export type PaintName = 'coral' | 'red' | 'orange' | 'white' | 'black' | 'flames' | 'abyssal';
 export interface BlinkerCallbacks {
   left: (action: { active: boolean }) => void;
   right: (action: { active: boolean }) => void;

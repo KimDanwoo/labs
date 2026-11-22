@@ -13,13 +13,15 @@ import {
   PONDS,
   RESPAWN_POINTS,
   respawnPosition,
+  RIVERS,
   TRACK,
+  TRAILS,
   WORLD_SIZE,
   type AreaKey,
   type Bounds,
   type Point,
 } from '../../src/views/drive/lib/engine/game/world/layout/islandLayout';
-import { valueNoise } from './noise';
+import { ragged, valueNoise } from './noise';
 
 const CURVE_SAMPLES = 12;
 export const trackLoop = closedCurve(TRACK.centerline, CURVE_SAMPLES);
@@ -44,21 +46,19 @@ const ZONE_SHORE = 7.5;
 const SHORE_BULGE = { cell: 14, reach: 4 } as const;
 const WORLD_EDGE = 3;
 const EDGE_BAYS = { cell: 11, reach: 4 } as const;
-const BRIDGE_WATER = { abutment: 0.2, reach: 3 } as const;
+const RIVER_BANK = { cell: 7, reach: 0.4 } as const;
 const POND_SHORE = { lobes: 3, wobble: 0.15 } as const;
 
-const along = (from: Point, to: Point, share: number): Point => [
-  from[0] + (to[0] - from[0]) * share,
-  from[1] + (to[1] - from[1]) * share,
-];
+const pathDistance = (point: Point, path: readonly Point[]): number =>
+  Math.min(...path.slice(1).map((to, index) => segmentDistance(point, path[index] ?? to, to)));
 
-const bridgeSpans = BRIDGES.map(({ from, to }): readonly [Point, Point] => [
-  along(from, to, BRIDGE_WATER.abutment),
-  along(from, to, 1 - BRIDGE_WATER.abutment),
-]);
+function riverWater(point: Point): number {
+  const bank = ragged(point, RIVER_BANK);
+  return Math.min(...RIVERS.map(({ course, width }) => pathDistance(point, course) - width / 2)) + bank;
+}
 
-function bridgeWater(point: Point): number {
-  return Math.min(...bridgeSpans.map(([from, to]) => segmentDistance(point, from, to) - BRIDGE_WATER.reach));
+export function trailDistance(point: Point): number {
+  return Math.min(...TRAILS.map((trail) => pathDistance(point, trail)));
 }
 
 export function pondShore([x, z]: Point): number {
@@ -92,7 +92,7 @@ export function landDistance(point: Point): number {
   return Math.min(
     land,
     boxDistance(point, TRACK.waterJump.from, TRACK.waterJump.to),
-    bridgeWater(point),
+    riverWater(point),
     pondShore(point),
   );
 }
@@ -130,8 +130,6 @@ export function respawnDistance(point: Point): number {
   return Math.min(...respawnPoints.map(([x, z]) => Math.hypot(point[0] - x, point[1] - z)));
 }
 
-const bridgeEnds = BRIDGES.flatMap(({ from, to }) => [from, to]);
-
 export function bridgeDistance(point: Point): number {
-  return Math.min(...bridgeEnds.map(([x, z]) => Math.hypot(point[0] - x, point[1] - z)));
+  return Math.min(...BRIDGES.map(({ from, to }) => segmentDistance(point, from, to)));
 }

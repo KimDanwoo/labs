@@ -1,4 +1,4 @@
-import { float, Fn, luminance, mix, texture, uniform, uv, vec3, vec4 } from 'three/tsl';
+import { float, Fn, luminance, mix, normalWorld, texture, uniform, uv, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import { getGame } from '@views/drive/lib/engine/game/gameContext';
@@ -61,13 +61,37 @@ function baseAlpha({ alphaMap, opacity }: ConvertibleMaterial): THREE.Node<'floa
 function convert(base: ConvertibleMaterial): MeshDefaultMaterial {
   const { map } = base;
   const isLabel = LABEL_MATERIALS.has(base.name) && map !== null;
-  const colorNode = map ? texture(map).rgb : vec3(base.color.r, base.color.g, base.color.b);
+  const colorNode = map ? texture(map).rgb : uniform(base.color.clone()).rgb;
   const alphaNode = isLabel ? texture(map).r : baseAlpha(base);
   const material = new MeshDefaultMaterial({ colorNode, alphaNode, transparent: isLabel || base.transparent });
   material.name = base.name;
   material.premultipliedAlpha = isLabel;
   material.map = map;
   return material;
+}
+
+const NORMAL_GRADIENT_SCALE = 0.4;
+const GRADIENT_AXIS = { uv: 0, normal: 1 } as const;
+
+function gradientAlong(
+  top: THREE.ColorRepresentation,
+  bottom: THREE.ColorRepresentation,
+  axis: number,
+): THREE.Node<'vec3'> {
+  const isAlongNormal = uniform(axis).equal(GRADIENT_AXIS.normal);
+  const factor = isAlongNormal.select(normalWorld.y.abs().mul(NORMAL_GRADIENT_SCALE), uv().y);
+  return mix(uniform(new THREE.Color(top)), uniform(new THREE.Color(bottom)), factor);
+}
+
+export function gradientColor(top: THREE.ColorRepresentation, bottom: THREE.ColorRepresentation): THREE.Node<'vec3'> {
+  return gradientAlong(top, bottom, GRADIENT_AXIS.uv);
+}
+
+export function normalGradientColor(
+  top: THREE.ColorRepresentation,
+  bottom: THREE.ColorRepresentation,
+): THREE.Node<'vec3'> {
+  return gradientAlong(top, bottom, GRADIENT_AXIS.normal);
 }
 
 const PALETTE = 'palette';
@@ -105,7 +129,8 @@ export class Materials {
       uniform(new THREE.Color(outer)),
       uv().sub(0.5).length().mul(RADIAL_GRADIENT_SCALE),
     );
-    const baseColor = isNormalized ? gradient.div(luminance(gradient)) : gradient;
+    const normalization = uniform(Number(isNormalized));
+    const baseColor = gradient.div(mix(float(1), luminance(gradient), normalization));
     const intensityUniform = uniform(intensity);
     const material = new THREE.MeshBasicNodeMaterial({ transparent: true });
     material.name = name;
@@ -124,8 +149,7 @@ export class Materials {
   }
 
   createGradient(name: string, top: THREE.ColorRepresentation, bottom: THREE.ColorRepresentation): THREE.Material {
-    const colorNode = mix(uniform(new THREE.Color(top)), uniform(new THREE.Color(bottom)), uv().y);
-    const material = new MeshDefaultMaterial({ colorNode });
+    const material = new MeshDefaultMaterial({ colorNode: gradientColor(top, bottom) });
     material.name = name;
     this.#named.set(name, material);
     return material;

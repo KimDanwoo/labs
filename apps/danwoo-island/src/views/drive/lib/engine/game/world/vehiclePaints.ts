@@ -72,6 +72,7 @@ export function createPaints(model: THREE.Object3D): Partial<Record<PaintName, T
   const black = materials.createGradient('blackGradient', '#626262', '#262526');
   const isIsland = model.name === 'islandBoxySUV';
   return {
+    coral: materials.createGradient('islandCoral', '#ff9384', '#df5f58'),
     red,
     orange,
     white,

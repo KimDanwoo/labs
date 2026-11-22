@@ -29,6 +29,7 @@ type CycleOverrideValues<P extends Record<keyof P, CycleValue>> = Partial<P> & {
 export interface CyclesOptions<P extends Record<keyof P, CycleValue>, N extends string> {
   durationSeconds: number;
   forcedProgress: number | null;
+  startProgress?: number;
   keyframes: readonly Keyframe<P>[];
   intervals?: readonly Interval<N>[];
 }

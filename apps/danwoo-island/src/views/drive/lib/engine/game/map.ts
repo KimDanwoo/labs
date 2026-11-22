@@ -73,6 +73,7 @@ export class WorldMap {
     const { respawns } = getGame();
     this.#pins = ISLAND_PLACES.map((place) => {
       const element = createPinElement(place, () => this.#select(place));
+      element.addEventListener('dblclick', () => this.#travelTo(place));
       this.#pinsElement.append(element);
       const anchor = respawns.getByName(place.respawnName).position.clone().setY(PIN_LIFT);
       return { place, element, anchor };
@@ -82,6 +83,7 @@ export class WorldMap {
 
   #placeItem(place: IslandPlace): HTMLElement {
     const button = createPlaceButton(place, () => this.#select(place, { isPanning: true }));
+    button.addEventListener('dblclick', () => this.#travelTo(place));
     this.#chips.set(place, button);
     return createElement('li', '', [button]);
   }

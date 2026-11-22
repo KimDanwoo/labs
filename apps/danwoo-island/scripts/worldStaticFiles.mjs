@@ -19,6 +19,13 @@ const UNUSED_STATIC_DIRECTORIES = [
   'respawns',
   'ui/previews',
   'draco/gltf',
+  'career',
+  'timeMachine',
+  'achievements',
+  'floor',
+  'foliage',
+  'sounds/hits/pins',
+  'sounds/rolling',
 ];
 
 const UNUSED_STATIC_FILES = new Set([
@@ -30,7 +37,6 @@ const UNUSED_STATIC_FILES = new Set([
   'draco/draco_encoder.js',
   'draco/gltf/draco_encoder.js',
   'social/share-image.png',
-  'foliage/foliageSDF.ktx',
   'birchTrees/birchTreesVisual-compressed.glb',
   'cherryTrees/cherryTreesVisual-compressed.glb',
   'vehicle/defaultAntenna-compressed.glb',

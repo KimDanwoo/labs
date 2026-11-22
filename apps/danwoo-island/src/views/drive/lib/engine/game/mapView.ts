@@ -55,6 +55,8 @@ export function placeOnScreen(
   if (placements.get(element) === placement) return;
   placements.set(element, placement);
   element.classList.toggle(HIDDEN_CLASS, !isVisible);
-  element.classList.toggle(LABEL_LEFT_CLASS, x > width - LABEL_FLIP_MARGIN);
+  const isNearRightEdge = x > width - LABEL_FLIP_MARGIN;
+  const hasLeftLabel = isNearRightEdge || element.dataset.labelSide === 'left';
+  element.classList.toggle(LABEL_LEFT_CLASS, hasLeftLabel);
   if (isVisible) element.style.transform = placement;
 }
