@@ -2,6 +2,7 @@ import { color, float, Fn, frontFacing, If, max, mix, normalWorld, positionWorld
 import * as THREE from 'three/webgpu';
 
 import { getGame } from '@views/drive/lib/engine/game/gameContext';
+import { discardOverVehicle } from '@views/drive/lib/engine/game/world/vehicleSeeThrough';
 
 type ColorNode = THREE.Node<'vec3'>;
 type FloatNode = THREE.Node<'float'>;
@@ -20,6 +21,7 @@ export interface MeshDefaultMaterialOptions {
   hasFog?: boolean;
   hasWater?: boolean;
   hasReveal?: boolean;
+  hasSeeThrough?: boolean;
   colorNode?: ColorNode;
   normalNode?: THREE.Node<'vec3'>;
   alphaNode?: FloatNode;
@@ -33,6 +35,7 @@ interface Features {
   hasFog: boolean;
   hasWater: boolean;
   hasReveal: boolean;
+  hasSeeThrough: boolean;
 }
 
 const DEFAULT_ALPHA_TEST = 0.1;
@@ -63,12 +66,15 @@ function resolveFeatures(options: MeshDefaultMaterialOptions): Features {
     hasFog: options.hasFog ?? true,
     hasWater: options.hasWater ?? true,
     hasReveal: options.hasReveal ?? true,
+    hasSeeThrough: options.hasSeeThrough ?? false,
   };
 }
 
 export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial {
   readonly shadedOutput: THREE.Node<'vec4'>;
   readonly #features: Features;
+  readonly #options: MeshDefaultMaterialOptions;
+  #solidTwin: MeshDefaultMaterial | null = null;
   readonly #colorNode: ColorNode;
   readonly #normalNode: THREE.Node<'vec3'>;
   readonly #alphaNode: FloatNode;
@@ -77,6 +83,7 @@ export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial {
 
   constructor(options: MeshDefaultMaterialOptions = {}) {
     super();
+    this.#options = options;
     this.#applyRenderOptions(options);
     this.#features = resolveFeatures(options);
     this.#colorNode = options.colorNode ?? vec3(1);
@@ -88,6 +95,16 @@ export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial {
     if (this.#features.hasDropShadows) this.receivedShadowNode = this.#catchShadow();
     this.shadedOutput = Fn(() => this.#output())();
     this.outputNode = this.shadedOutput;
+  }
+
+  solid(): MeshDefaultMaterial {
+    if (!this.#features.hasSeeThrough) return this;
+    if (this.#solidTwin) return this.#solidTwin;
+    const twin = new MeshDefaultMaterial({ ...this.#options, hasSeeThrough: false });
+    twin.name = this.name;
+    twin.userData = { ...this.userData };
+    this.#solidTwin = twin;
+    return twin;
   }
 
   #applyRenderOptions(options: MeshDefaultMaterialOptions): void {
@@ -114,7 +131,8 @@ export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial {
 
   #output(): THREE.Node<'vec4'> {
     const { lighting, fog } = getGame();
-    const { hasCoreShadows, hasDropShadows, hasLightBounce, hasFog, hasWater, hasReveal } = this.#features;
+    const { hasCoreShadows, hasDropShadows, hasLightBounce, hasFog, hasWater, hasReveal, hasSeeThrough } =
+      this.#features;
     const baseColor = this.#colorNode.toVar();
     const outputColor = this.#colorNode.toVar();
     const normal = this.#orientedNormal();
@@ -145,6 +163,7 @@ export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial {
     if (hasFog) outputColor.assign(fog.strength.mix(outputColor, fog.color));
 
     this.#alphaNode.lessThan(this.alphaTest).discard();
+    if (hasSeeThrough) discardOverVehicle();
 
     if (hasReveal) outputColor.assign(revealNode(outputColor));
 

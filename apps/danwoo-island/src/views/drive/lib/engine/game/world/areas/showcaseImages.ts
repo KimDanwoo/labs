@@ -67,7 +67,7 @@ export class ShowcaseImages {
       });
       return mix(currentColor, previousColor, step(progress, reveal));
     })();
-    const material = new MeshDefaultMaterial({ colorNode, hasWater: false });
+    const material = new MeshDefaultMaterial({ colorNode, hasWater: false, hasSeeThrough: true });
     const base = material.shadedOutput;
     material.outputNode = Fn(() => vec4(mix(base.rgb, colorNode, this.#shades.images.uniform), base.a))();
     return material;

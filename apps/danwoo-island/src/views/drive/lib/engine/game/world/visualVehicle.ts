@@ -10,6 +10,7 @@ import { clamp, remapClamp } from '@views/drive/lib/engine/game/utilities/maths'
 import { createBoxyVehicle } from '@views/drive/lib/engine/game/world/boxyVehicle';
 import { FlightRotors } from '@views/drive/lib/engine/game/world/flightRotors';
 import { bindBlinkers, createPaints } from '@views/drive/lib/engine/game/world/vehiclePaints';
+import { updateVehicleSight } from '@views/drive/lib/engine/game/world/vehicleSeeThrough';
 import {
   createAntenna,
   createWheels,
@@ -30,6 +31,13 @@ import {
   type VisualWheel,
 } from '@views/drive/lib/engine/game/world/visualVehicleParts';
 import { WheelFloats } from '@views/drive/lib/engine/game/world/wheelFloats';
+
+function keepSolid(part: THREE.Object3D): void {
+  part.traverse((child) => {
+    const isSeeThroughMesh = child instanceof THREE.Mesh && child.material instanceof MeshDefaultMaterial;
+    if (isSeeThroughMesh) child.material = child.material.solid();
+  });
+}
 
 export class VisualVehicle {
   readonly screenPosition = new THREE.Vector2(0, 0);
@@ -82,6 +90,8 @@ export class VisualVehicle {
     this.#mixEnergyGlow();
     this.#paints = createPaints(this.#model);
     this.changePaint(game.options.paintName);
+
+    for (const part of [this.#chassis, ...this.#wheels.map(({ container }) => container)]) keepSolid(part);
 
     game.ticker.events.on('tick', this.#tick, TICK_ORDER.visualVehicle);
   }
@@ -172,6 +182,11 @@ export class VisualVehicle {
     const projected = new THREE.Vector3().setFromMatrixPosition(this.#chassis.matrixWorld).project(game.view.camera);
     this.screenPosition.x = projected.x * 0.5 + 0.5;
     this.screenPosition.y = projected.y * -0.5 + 0.5;
+    updateVehicleSight({
+      screen: this.screenPosition,
+      depth: game.view.depthOf(game.player.position),
+      cameraRadius: game.view.spherical.radius.current,
+    });
   }
 
   #updateLights(): void {

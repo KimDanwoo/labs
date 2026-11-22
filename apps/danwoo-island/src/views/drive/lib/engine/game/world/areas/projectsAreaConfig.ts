@@ -72,6 +72,7 @@ export function fireCharcoal(
       alphaNode,
       hasWater: false,
       hasLightBounce: false,
+      hasSeeThrough: true,
     }),
   );
 }

@@ -25,7 +25,7 @@ import { rebuildVillageProps } from '@views/drive/lib/engine/game/world/islandVi
 
 const PARTICLE_COUNT = 100;
 const STILL_FOAM = 1.35;
-const WATERFALL_MATERIAL = { hasLightBounce: false, hasWater: false, hasReveal: false } as const;
+const WATERFALL_MATERIAL = { hasLightBounce: false, hasWater: false, hasReveal: false, hasSeeThrough: true } as const;
 
 type GeometryObject = THREE.Object3D & { geometry: THREE.BufferGeometry };
 

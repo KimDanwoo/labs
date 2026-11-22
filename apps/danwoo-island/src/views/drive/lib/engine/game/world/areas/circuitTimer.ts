@@ -1,3 +1,4 @@
+import { isClearOfVehicleSight } from '@views/drive/lib/engine/game/world/vehicleSeeThrough';
 import gsap from 'gsap';
 import * as THREE from 'three/webgpu';
 
@@ -48,6 +49,7 @@ export class CircuitTimer {
     this.#texture.magFilter = THREE.LinearFilter;
     this.#texture.generateMipmaps = false;
     const material = new THREE.MeshBasicNodeMaterial({ alphaMap: this.#texture, alphaTest: 0.5 });
+    material.maskNode = isClearOfVehicleSight();
     const mesh = new THREE.Mesh(new THREE.PlaneGeometry(DIGITS.ratio, 1), material);
     mesh.scale.setScalar(MESH_SCALE);
     group.add(mesh);

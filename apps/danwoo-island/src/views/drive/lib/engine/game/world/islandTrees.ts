@@ -1,24 +1,5 @@
 import { alea } from 'seedrandom';
-import {
-  attribute,
-  color,
-  Fn,
-  mix,
-  positionLocal,
-  positionView,
-  screenCoordinate,
-  screenSize,
-  screenUV,
-  select,
-  sin,
-  smoothstep,
-  step,
-  texture,
-  uniform,
-  uv,
-  vec2,
-  vec3,
-} from 'three/tsl';
+import { attribute, color, Fn, mix, positionLocal, select, sin, texture, uniform, uv, vec3 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import { getGame } from '@views/drive/lib/engine/game/gameContext';
@@ -26,13 +7,13 @@ import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/mesh
 import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
 import { PALETTE_SLOTS } from '@views/drive/lib/engine/game/world/islandMaterials';
 import { type IslandModelKey, islandModelGeometry } from '@views/drive/lib/engine/game/world/islandModels';
+import { isInFrontOfVehicle, vehicleOpening } from '@views/drive/lib/engine/game/world/vehicleSeeThrough';
 
 interface TreeSpecies {
   readonly model: IslandModelKey;
   readonly trunkRadius: number;
   readonly baseOffsetX: number;
   readonly swayStart: number;
-  readonly crownStart: number;
   readonly scaleRange: readonly [number, number];
 }
 
@@ -43,10 +24,7 @@ interface TreeGrove {
 
 const TRUNK_HALF_HEIGHT = 2.5;
 const SWAY = { wind: 0.35, flutter: 0.06, flutterSpeed: 1.7, curve: 1.5 } as const;
-const SEE_THROUGH_RADIUS = 4;
-const SEE_THROUGH_SOFT_START = 0.6;
 const SEE_THROUGH_DEPTH_MARGIN = 1;
-const DITHER = { scale: 52.9829189, x: 0.06711056, y: 0.00583715 } as const;
 const SWAY_MARGIN = 0.5;
 const CULL_CELL_SIZE = 32;
 const LEAF_SLOTS = { deep: 9, light: 12 } as const;
@@ -57,14 +35,13 @@ export const PALM: TreeSpecies = {
   trunkRadius: 0.26,
   baseOffsetX: 0.9,
   swayStart: 1.5,
-  crownStart: 4.3,
   scaleRange: [1.1, 1.35],
 };
 
 export const JUNGLE_SPECIES: readonly TreeSpecies[] = [
-  { model: 'bananaTree', trunkRadius: 0.3, baseOffsetX: 0, swayStart: 1.2, crownStart: 3.2, scaleRange: [1.05, 1.3] },
-  { model: 'monsteraClump', trunkRadius: 0.5, baseOffsetX: 0, swayStart: 0.4, crownStart: 0.9, scaleRange: [1, 1.25] },
-  { model: 'plumeriaTree', trunkRadius: 0.3, baseOffsetX: 0, swayStart: 2, crownStart: 2.7, scaleRange: [1.1, 1.35] },
+  { model: 'bananaTree', trunkRadius: 0.3, baseOffsetX: 0, swayStart: 1.2, scaleRange: [1.05, 1.3] },
+  { model: 'monsteraClump', trunkRadius: 0.5, baseOffsetX: 0, swayStart: 0.4, scaleRange: [1, 1.25] },
+  { model: 'plumeriaTree', trunkRadius: 0.3, baseOffsetX: 0, swayStart: 2, scaleRange: [1.1, 1.35] },
 ];
 
 export function mixGroves(species: readonly TreeSpecies[], references: readonly THREE.Object3D[]): TreeGrove[] {
@@ -76,10 +53,7 @@ export function mixGroves(species: readonly TreeSpecies[], references: readonly 
   }));
 }
 
-const LEAF_SLOT_SET = new Set<number>(Object.values(LEAF_SLOTS));
-const isLeaf = (u: number): boolean => LEAF_SLOT_SET.has(Math.floor(u * PALETTE_SLOTS));
-
-function speciesGeometry({ model, baseOffsetX, swayStart, crownStart }: TreeSpecies): THREE.BufferGeometry {
+function speciesGeometry({ model, baseOffsetX, swayStart }: TreeSpecies): THREE.BufferGeometry {
   const geometry = islandModelGeometry(model);
   geometry.computeBoundingBox();
   const bottom = geometry.boundingBox?.min.y ?? 0;
@@ -87,18 +61,13 @@ function speciesGeometry({ model, baseOffsetX, swayStart, crownStart }: TreeSpec
   geometry.computeBoundingBox();
 
   const positions = geometry.getAttribute('position');
-  const uvs = geometry.getAttribute('uv');
   const top = geometry.boundingBox?.max.y ?? 1;
   const sway = new Float32Array(positions.count);
-  const crown = new Float32Array(positions.count);
   for (let index = 0; index < positions.count; index += 1) {
     const height = positions.getY(index);
     sway[index] = THREE.MathUtils.clamp((height - swayStart) / (top - swayStart), 0, 1) ** SWAY.curve;
-    const isCrown = height > crownStart || isLeaf(uvs.getX(index));
-    crown[index] = Number(isCrown);
   }
   geometry.setAttribute('sway', new THREE.BufferAttribute(sway, 1));
-  geometry.setAttribute('crown', new THREE.BufferAttribute(crown, 1));
   return geometry;
 }
 
@@ -132,9 +101,7 @@ function addTrunkColliders(references: readonly THREE.Object3D[], radius: number
 
 export class IslandTrees {
   seeThroughMultiplier = 1;
-  readonly #seeThroughPosition = uniform(vec2());
-  readonly #seeThroughRadius = uniform(0);
-  readonly #vehicleDepth = uniform(0);
+  readonly #seeThroughRatio = uniform(1);
 
   constructor(groves: readonly TreeGrove[]) {
     const game = getGame();
@@ -165,23 +132,7 @@ export class IslandTrees {
   #material(): MeshDefaultMaterial {
     const game = getGame();
     const sway = attribute('sway', 'float');
-    const crown = attribute('crown', 'float');
-    const alphaNode = Fn(() => {
-      const toVehicle = screenUV.sub(this.#seeThroughPosition).mul(vec2(screenSize.x.div(screenSize.y), 1));
-      const opening = smoothstep(
-        this.#seeThroughRadius.mul(SEE_THROUGH_SOFT_START),
-        this.#seeThroughRadius,
-        toVehicle.length(),
-      );
-      const dither = screenCoordinate.x
-        .mul(DITHER.x)
-        .add(screenCoordinate.y.mul(DITHER.y))
-        .fract()
-        .mul(DITHER.scale)
-        .fract();
-      const isInFront = step(positionView.z.negate(), this.#vehicleDepth.add(SEE_THROUGH_DEPTH_MARGIN));
-      return mix(1, step(dither, opening), crown.mul(isInFront));
-    })();
+    const alphaNode = mix(1, vehicleOpening(this.#seeThroughRatio), isInFrontOfVehicle(SEE_THROUGH_DEPTH_MARGIN));
     const slot = uv().x.mul(PALETTE_SLOTS).floor();
     const paletteColor = texture(game.texture('paletteTexture')).rgb;
     const colorNode = select(
@@ -205,11 +156,6 @@ export class IslandTrees {
   }
 
   update(): void {
-    const { world, view, player } = getGame();
-    const screenPosition = world.visualVehicle?.screenPosition;
-    if (screenPosition) this.#seeThroughPosition.value.copy(screenPosition);
-    this.#vehicleDepth.value = view.depthOf(player.position);
-    const radius = view.spherical.radius.current;
-    this.#seeThroughRadius.value = (SEE_THROUGH_RADIUS / radius) * this.seeThroughMultiplier;
+    this.#seeThroughRatio.value = this.seeThroughMultiplier;
   }
 }
