@@ -2,7 +2,6 @@ import {
   atan,
   attribute,
   cameraPosition,
-  float,
   Fn,
   mix,
   mod,
@@ -23,10 +22,7 @@ import { getGame } from '@views/drive/lib/engine/game/gameContext';
 import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
 import { QUALITY } from '@views/drive/lib/engine/game/quality';
 import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
-import { placedInArea } from '@views/drive/lib/engine/game/world/layout/areaPlacement';
 
-const LANDING_CLEARING = placedInArea('landing', new THREE.Vector3(58.4, 0, 32.4));
-const GRASS_CLEARINGS = [{ x: LANDING_CLEARING.x, z: LANDING_CLEARING.z, radius: 2.4 }] as const;
 const SUBDIVISIONS_BY_QUALITY = { [QUALITY.high]: 200, [QUALITY.low]: 140 } as const;
 const SURFACE_IDEAL = 2000;
 const BLADE = { width: 0.22, height: 0.48, heightRandomness: 0.55, lean: 0.9 } as const;
@@ -127,17 +123,7 @@ export class Grass {
     const heightRandomness = uniform(BLADE.heightRandomness);
 
     const terrainData = game.terrain.terrainNode(bladePosition);
-    const clearing = GRASS_CLEARINGS.reduce<THREE.Node<'float'>>(
-      (amount, { x, z, radius }) =>
-        amount.mul(
-          bladePosition
-            .sub(vec2(x, z))
-            .length()
-            .smoothstep(radius * 0.8, radius),
-        ),
-      float(1),
-    );
-    const grassAmount = terrainData.g.mul(clearing);
+    const grassAmount = terrainData.g;
     const hidden = step(terrainData.g.sub(0.4), HIDDEN_THRESHOLD);
 
     const material = new MeshDefaultMaterial({
