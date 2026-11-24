@@ -1,73 +1,86 @@
 import { CELL_COUNT, DIRECTIONS, STONE, WIN_LENGTH } from '@views/gomoku/config/board';
-import { cellAt, colOf, isInside, rowOf } from '@views/gomoku/lib/coords';
+import { lineThrough, offsetCell, type Direction } from '@views/gomoku/lib/boardLines';
+import { colOf, rowOf } from '@views/gomoku/lib/coords';
+import { WINDOWS, WINDOWS_AT } from '@views/gomoku/lib/lines';
 import type { Stone } from '@views/gomoku/model/types/gomoku';
-
-interface MutableBoard {
-  [cell: number]: number;
-}
-
-type Direction = (typeof DIRECTIONS)[number];
 
 const FOUR = WIN_LENGTH - 1;
 const DOUBLE = 2;
 
-const reach = (cells: MutableBoard, from: number, rowStep: number, colStep: number) => {
-  let row = rowOf(from) + rowStep;
-  let col = colOf(from) + colStep;
-  let count = 0;
-  const isSameStone = (): boolean => isInside(row, col) && cells[cellAt(row, col)] === cells[from];
-  while (isSameStone()) {
-    count += 1;
-    row += rowStep;
-    col += colStep;
-  }
-  return { count, isOpen: isInside(row, col) && cells[cellAt(row, col)] === STONE.EMPTY };
-};
-
-const lineShape = (cells: MutableBoard, cell: number, [rowStep, colStep]: Direction) => {
-  const back = reach(cells, cell, -rowStep, -colStep);
-  const front = reach(cells, cell, rowStep, colStep);
-  return { length: back.count + front.count + 1, isOpen: back.isOpen && front.isOpen };
-};
-
-const gapAt = (cells: MutableBoard, cell: number, [rowStep, colStep]: Direction, offset: number): number | null => {
-  const row = rowOf(cell) + rowStep * offset;
-  const col = colOf(cell) + colStep * offset;
-  const isGap = offset !== 0 && isInside(row, col) && cells[cellAt(row, col)] === STONE.EMPTY;
-  return isGap ? cellAt(row, col) : null;
-};
-
-const isOpenThree = (cells: MutableBoard, cell: number, direction: Direction): boolean => {
-  let canOpenFour = false;
-  for (let offset = -FOUR; offset <= FOUR; offset += 1) {
-    const gap = gapAt(cells, cell, direction, offset);
-    if (gap === null) continue;
-    cells[gap] = cells[cell]!;
-    const shape = lineShape(cells, cell, direction);
+const fourCount = (cells: number[], cell: number): number => {
+  const fours = new Set<string>();
+  for (const index of WINDOWS_AT[cell] ?? []) {
+    const window = WINDOWS[index]!;
+    const own = window.filter((point) => cells[point] === STONE.BLACK);
+    const gap = window.find((point) => cells[point] === STONE.EMPTY);
+    const canComplete = own.length === FOUR && gap !== undefined;
+    if (!canComplete) continue;
+    const first = window[0]!;
+    const second = window[1]!;
+    const direction: Direction = [rowOf(second) - rowOf(first), colOf(second) - colOf(first)];
+    cells[gap] = STONE.BLACK;
+    const isFive = lineThrough(cells, gap, direction).length === WIN_LENGTH;
     cells[gap] = STONE.EMPTY;
-    if (shape.length >= WIN_LENGTH) return false;
-    const isOpenFour = shape.length === FOUR && shape.isOpen;
-    canOpenFour ||= isOpenFour;
+    if (isFive) fours.add(own.join(','));
   }
-  return canOpenFour;
+  return fours.size;
 };
 
-export const isDoubleThree = (cells: MutableBoard, cell: number, stone: Stone): boolean => {
-  cells[cell] = stone;
-  const threes = DIRECTIONS.filter((direction) => isOpenThree(cells, cell, direction)).length;
-  cells[cell] = STONE.EMPTY;
-  return threes >= DOUBLE;
+const isOpenEnd = (cells: number[], end: number, direction: Direction): boolean => {
+  const gap = offsetCell(end, direction, 1);
+  if (gap === null) return false;
+  if (cells[gap] !== STONE.EMPTY) return false;
+  const beyond = offsetCell(gap, direction, 1);
+  return beyond === null || cells[beyond] !== STONE.BLACK;
 };
+
+const isStraightFour = (cells: number[], line: number[], direction: Direction): boolean => {
+  if (line.length !== FOUR) return false;
+  const reverse: Direction = [-direction[0], -direction[1]];
+  return isOpenEnd(cells, line[0]!, reverse) && isOpenEnd(cells, line[FOUR - 1]!, direction);
+};
+
+const hasFive = (cells: number[], cell: number): boolean =>
+  DIRECTIONS.some((direction) => lineThrough(cells, cell, direction).length === WIN_LENGTH);
+
+const canExtendThree = (cells: number[], cell: number, direction: Direction): boolean => {
+  for (let offset = -FOUR; offset <= FOUR; offset += 1) {
+    const gap = offsetCell(cell, direction, offset);
+    const canPlace = gap !== null && cells[gap] === STONE.EMPTY;
+    if (!canPlace) continue;
+    cells[gap] = STONE.BLACK;
+    const line = lineThrough(cells, cell, direction);
+    const hasStraightFour = line.includes(gap) && isStraightFour(cells, line, direction);
+    const canExtend = hasStraightFour && !hasFive(cells, gap) && !isForbiddenBlack(cells, gap);
+    cells[gap] = STONE.EMPTY;
+    if (canExtend) return true;
+  }
+  return false;
+};
+
+function isForbiddenBlack(cells: number[], cell: number): boolean {
+  if (hasFive(cells, cell)) return false;
+  const hasOverline = DIRECTIONS.some((direction) => lineThrough(cells, cell, direction).length > WIN_LENGTH);
+  if (hasOverline) return true;
+  if (fourCount(cells, cell) >= DOUBLE) return true;
+  let threes = 0;
+  for (const direction of DIRECTIONS) {
+    if (canExtendThree(cells, cell, direction)) threes += 1;
+    if (threes >= DOUBLE) return true;
+  }
+  return false;
+}
 
 export const isForbidden = (cells: ArrayLike<number>, cell: number, stone: Stone): boolean => {
+  if (stone === STONE.WHITE) return false;
   const board = Array.from(cells);
   board[cell] = stone;
-  const isFive = DIRECTIONS.some((direction) => lineShape(board, cell, direction).length >= WIN_LENGTH);
-  return !isFive && isDoubleThree(board, cell, stone);
+  return isForbiddenBlack(board, cell);
 };
 
 export const forbiddenCells = (cells: ArrayLike<number>, stone: Stone): Set<number> => {
   const found = new Set<number>();
+  if (stone === STONE.WHITE) return found;
   for (let cell = 0; cell < CELL_COUNT; cell += 1) {
     const isBanned = cells[cell] === STONE.EMPTY && isForbidden(cells, cell, stone);
     if (isBanned) found.add(cell);
