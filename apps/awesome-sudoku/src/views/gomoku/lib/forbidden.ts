@@ -90,7 +90,8 @@ export const isForbidden = (cells: ArrayLike<number>, cell: number, stone: Stone
     }
     if (neighbors >= 2) axes++;
   }
-  if (!crowded && axes < 2) return false;
+  const hasInsufficientThreats = !crowded && axes < 2;
+  if (hasInsufficientThreats) return false;
   const board = Array.from(cells);
 
   board[cell] = stone;

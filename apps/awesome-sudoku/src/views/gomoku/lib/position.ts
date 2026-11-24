@@ -166,11 +166,13 @@ export const hasUnblockableFour = (pos: Position, stone: Stone): boolean => {
   return [...candidates].some((cell) => {
     const gaps = new Set<number>();
     for (const window of WINDOWS_AT[cell]!) {
-      if (pos.counts[stone]![window] !== FOUR - 1 || pos.counts[rival]![window] !== 0) continue;
+      const isBlockedWindow = pos.counts[stone]![window] !== FOUR - 1 || pos.counts[rival]![window] !== 0;
+      if (isBlockedWindow) continue;
       const gap = WINDOWS[window]!.find((other) => other !== cell && pos.cells[other] === STONE.EMPTY);
       if (gap !== undefined) gaps.add(gap);
     }
-    if (gaps.size < 2 || isForbidden(pos.cells, cell, stone)) return false;
+    const isUnusableMove = gaps.size < 2 || isForbidden(pos.cells, cell, stone);
+    if (isUnusableMove) return false;
     shift(pos, cell, stone, 1);
     try {
       return !hasCompletion(pos, rival) && completionCells(pos, stone).length >= 2;

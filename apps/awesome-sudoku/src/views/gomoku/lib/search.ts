@@ -32,7 +32,14 @@ export interface SearchLimits {
 }
 
 type Exit =
-  'opening' | 'immediate-win' | 'only-move' | 'no-candidate' | 'forcing-win' | 'mate-score' | 'timeout' | 'target';
+  | 'opening'
+  | 'immediate-win'
+  | 'only-move'
+  | 'no-candidate'
+  | 'forcing-win'
+  | 'mate-score'
+  | 'timeout'
+  | 'target';
 
 export interface SearchResult {
   cell: number;
@@ -134,18 +141,19 @@ const boundOf = (value: number, bounds: Bounds): SearchEntry['bound'] => {
 
 const lookup = (ctx: SearchContext, stone: Stone): SearchEntry | undefined => {
   const entry = ctx.table.get(ctx.pos.hash ^ stone);
-  return entry?.board === ctx.pos.key && entry.stone === stone ? entry : undefined;
+  const isMatch = entry?.board === ctx.pos.key && entry.stone === stone;
+  return isMatch ? entry : undefined;
+};
+
+const scoreLeaf = (ctx: SearchContext, stone: Stone, ply: number): Choice => {
+  const hasForcedWin = ply <= MAX_PLY - 3 && hasUnblockableFour(ctx.pos, stone);
+  return { move: -1, value: hasForcedWin ? WIN_SCORE - ply - 2 : evaluate(ctx.pos, stone) };
 };
 
 const searchChildren = (ctx: SearchContext, stone: Stone, bounds: Bounds): Choice => {
   const isForced = hasCompletion(ctx.pos, rivalOf(stone));
   const isLeaf = bounds.ply >= MAX_PLY || (!isForced && bounds.depth <= 0);
-  if (isLeaf) {
-    if (bounds.ply <= MAX_PLY - 3 && hasUnblockableFour(ctx.pos, stone)) {
-      return { move: -1, value: WIN_SCORE - bounds.ply - 2 };
-    }
-    return { move: -1, value: evaluate(ctx.pos, stone) };
-  }
+  if (isLeaf) return scoreLeaf(ctx, stone, bounds.ply);
   const moves = isForced ? blockingMoves(ctx.pos, stone) : rankCandidates(ctx.pos, stone, INNER_WIDTH);
   if (moves.length === 0) return { move: -1, value: isForced ? bounds.ply - WIN_SCORE : 0 };
   const preferred = lookup(ctx, stone)?.move;
@@ -217,7 +225,8 @@ const rootMoves = (ctx: SearchContext, stone: Stone): number[] => {
     if (expired(ctx)) break;
     shift(pos, move, stone, 1);
     try {
-      if (!hasCompletion(pos, rival) && !hasUnblockableFour(pos, rival)) safe.push(move);
+      const isSafe = !hasCompletion(pos, rival) && !hasUnblockableFour(pos, rival);
+      if (isSafe) safe.push(move);
     } finally {
       shift(pos, move, stone, -1);
     }
