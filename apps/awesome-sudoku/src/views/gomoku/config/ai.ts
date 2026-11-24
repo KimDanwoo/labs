@@ -1,18 +1,18 @@
 export const THINK_MS = 2500;
 
-export const MAX_DEPTH = 18;
+export const MAX_DEPTH = 20;
 
-export const MAX_PLY = 40;
+export const MAX_PLY = 100;
+
+export const UI_THINK_MS = 32;
 
 export const ROOT_WIDTH = 24;
 
 export const INNER_WIDTH = 12;
 
-export const TIME_CHECK_MASK = 63;
-
 export const MAX_TABLE_ENTRIES = 50_000;
 
-export const FORCING_DEPTH = 16;
+export const FORCING_DEPTH = MAX_PLY / 2;
 
 export const FORCING_BUDGET_RATIO = 0.3;
 

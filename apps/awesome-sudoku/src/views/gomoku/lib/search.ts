@@ -8,10 +8,9 @@ import {
   ROOT_WIDTH,
   SEARCH_BOUND,
   THINK_MS,
-  TIME_CHECK_MASK,
   WIN_SCORE,
 } from '@views/gomoku/config/ai';
-import { CENTER_CELL } from '@views/gomoku/config/board';
+import { CELL_COUNT, CENTER_CELL } from '@views/gomoku/config/board';
 import { rivalOf } from '@views/gomoku/lib/coords';
 import { isForbidden } from '@views/gomoku/lib/forbidden';
 import { findForcingMove } from '@views/gomoku/lib/forcingSearch';
@@ -20,6 +19,7 @@ import {
   createPosition,
   evaluate,
   hasCompletion,
+  hasUnblockableFour,
   rankCandidates,
   shift,
   type Position,
@@ -31,15 +31,46 @@ export interface SearchLimits {
   maxDepth: number;
 }
 
+type Exit =
+  | 'opening'
+  | 'immediate-win'
+  | 'only-move'
+  | 'no-candidate'
+  | 'forcing-win'
+  | 'mate-score'
+  | 'timeout'
+  | 'target';
+
+export interface SearchResult {
+  cell: number;
+  stats: {
+    reason: Exit;
+    targetDepth: number;
+    selectiveCap: number;
+    completedDepth: number;
+    deepestPly: number;
+    searchPly: number;
+    forcingPly: number;
+    nodes: number;
+    elapsedMs: number;
+  };
+}
+
 interface SearchContext {
+  completedDepth: number;
+  deepestPly: number;
+  reason: Exit;
+  history: Int32Array;
   pos: Position;
   deadline: number;
   nodes: number;
   isExpired: boolean;
-  table: Map<bigint, SearchEntry>;
+  table: Map<number, SearchEntry>;
 }
 
 interface SearchEntry {
+  board: bigint;
+  stone: Stone;
   depth: number;
   value: number;
   bound: (typeof SEARCH_BOUND)[keyof typeof SEARCH_BOUND];
@@ -60,10 +91,9 @@ interface Choice {
 
 const DEFAULT_LIMITS: SearchLimits = { budgetMs: THINK_MS, maxDepth: MAX_DEPTH };
 
-const tick = (ctx: SearchContext): void => {
-  ctx.nodes += 1;
-  const isCheckpoint = (ctx.nodes & TIME_CHECK_MASK) === 0;
-  if (isCheckpoint) ctx.isExpired = performance.now() > ctx.deadline;
+const expired = (ctx: SearchContext): boolean => {
+  ctx.isExpired ||= performance.now() >= ctx.deadline;
+  return ctx.isExpired;
 };
 
 const blockingMoves = (pos: Position, stone: Stone): number[] =>
@@ -77,6 +107,7 @@ interface SearchBranch {
 const pickBest = (ctx: SearchContext, stone: Stone, { moves, bounds }: SearchBranch): Choice => {
   let best: Choice = { move: moves[0] ?? -1, value: -Infinity };
   for (const move of moves) {
+    if (expired(ctx)) break;
     shift(ctx.pos, move, stone, 1);
     const value = -negamax(ctx, rivalOf(stone), {
       depth: bounds.depth,
@@ -85,9 +116,12 @@ const pickBest = (ctx: SearchContext, stone: Stone, { moves, bounds }: SearchBra
       ply: bounds.ply + 1,
     });
     shift(ctx.pos, move, stone, -1);
+    if (expired(ctx)) break;
     if (value > best.value) best = { move, value };
-    const isCutoff = best.value >= bounds.beta || ctx.isExpired;
-    if (isCutoff) break;
+    if (best.value >= bounds.beta) {
+      ctx.history[stone * CELL_COUNT + move]! += (bounds.depth + 1) ** 2;
+      break;
+    }
   }
   return best;
 };
@@ -105,29 +139,49 @@ const boundOf = (value: number, bounds: Bounds): SearchEntry['bound'] => {
   return value >= bounds.beta ? SEARCH_BOUND.LOWER : SEARCH_BOUND.EXACT;
 };
 
+const lookup = (ctx: SearchContext, stone: Stone): SearchEntry | undefined => {
+  const entry = ctx.table.get(ctx.pos.hash ^ stone);
+  const isMatch = entry?.board === ctx.pos.key && entry.stone === stone;
+  return isMatch ? entry : undefined;
+};
+
+const scoreLeaf = (ctx: SearchContext, stone: Stone, ply: number): Choice => {
+  const hasForcedWin = ply <= MAX_PLY - 3 && hasUnblockableFour(ctx.pos, stone);
+  return { move: -1, value: hasForcedWin ? WIN_SCORE - ply - 2 : evaluate(ctx.pos, stone) };
+};
+
 const searchChildren = (ctx: SearchContext, stone: Stone, bounds: Bounds): Choice => {
   const isForced = hasCompletion(ctx.pos, rivalOf(stone));
   const isLeaf = bounds.ply >= MAX_PLY || (!isForced && bounds.depth <= 0);
-  if (isLeaf) return { move: -1, value: evaluate(ctx.pos, stone) };
+  if (isLeaf) return scoreLeaf(ctx, stone, bounds.ply);
   const moves = isForced ? blockingMoves(ctx.pos, stone) : rankCandidates(ctx.pos, stone, INNER_WIDTH);
   if (moves.length === 0) return { move: -1, value: isForced ? bounds.ply - WIN_SCORE : 0 };
-  const key = (ctx.pos.key << 2n) | BigInt(stone);
-  const preferred = ctx.table.get(key)?.move;
-  const ordered = [...moves.filter((move) => move === preferred), ...moves.filter((move) => move !== preferred)];
+  const preferred = lookup(ctx, stone)?.move;
+  const offset = stone * CELL_COUNT;
+  const ordered = moves.sort(
+    (a, b) => Number(b === preferred) - Number(a === preferred) || ctx.history[offset + b]! - ctx.history[offset + a]!,
+  );
   const depth = isForced ? bounds.depth : bounds.depth - 1;
   return pickBest(ctx, stone, { moves: ordered, bounds: { ...bounds, depth } });
 };
 
 function negamax(ctx: SearchContext, stone: Stone, bounds: Bounds): number {
+  ctx.nodes += 1;
+  ctx.deepestPly = Math.max(ctx.deepestPly, bounds.ply);
+  if (expired(ctx)) return 0;
   if (hasCompletion(ctx.pos, stone)) return WIN_SCORE - bounds.ply;
-  tick(ctx);
-  if (ctx.isExpired) return 0;
-  const key = (ctx.pos.key << 2n) | BigInt(stone);
-  const cached = cachedValue(ctx.table.get(key), bounds);
+  const cached = cachedValue(lookup(ctx, stone), bounds);
   if (cached !== null) return cached;
   const choice = searchChildren(ctx, stone, bounds);
   const canStore = !ctx.isExpired && ctx.table.size < MAX_TABLE_ENTRIES;
-  if (canStore) ctx.table.set(key, { ...choice, depth: bounds.depth, bound: boundOf(choice.value, bounds) });
+  if (canStore)
+    ctx.table.set(ctx.pos.hash ^ stone, {
+      board: ctx.pos.key,
+      stone,
+      ...choice,
+      depth: bounds.depth,
+      bound: boundOf(choice.value, bounds),
+    });
   return choice.value;
 }
 
@@ -141,37 +195,92 @@ const deepen = (ctx: SearchContext, stone: Stone, { moves, maxDepth }: Deepening
   for (let depth = 0; depth < maxDepth && ordered.length > 1; depth += 1) {
     const bounds = { depth, alpha: -Infinity, beta: Infinity, ply: 0 };
     const { move, value } = pickBest(ctx, stone, { moves: ordered, bounds });
-    if (ctx.isExpired) break;
+    if (expired(ctx)) {
+      ctx.reason = 'timeout';
+      break;
+    }
+    ctx.completedDepth = depth + 1;
     ordered = [move, ...ordered.filter((other) => other !== move)];
-    if (Math.abs(value) >= WIN_SCORE - MAX_PLY) break;
+    if (Math.abs(value) >= WIN_SCORE - MAX_PLY) {
+      ctx.reason = 'mate-score';
+      break;
+    }
   }
   return ordered;
 };
 
-const rootMoves = (pos: Position, stone: Stone): number[] => {
+const rootMoves = (ctx: SearchContext, stone: Stone): number[] => {
+  const { pos } = ctx;
   const rival = rivalOf(stone);
-  if (hasCompletion(pos, stone)) return completionCells(pos, stone).slice(0, 1);
+  if (hasCompletion(pos, stone)) {
+    ctx.reason = 'immediate-win';
+    return completionCells(pos, stone).slice(0, 1);
+  }
   if (hasCompletion(pos, rival)) return blockingMoves(pos, stone);
-  return rankCandidates(pos, stone, ROOT_WIDTH);
+  const ranked = rankCandidates(pos, stone, ROOT_WIDTH);
+  if (!hasUnblockableFour(pos, rival)) return ranked;
+
+  const safe: number[] = [];
+  for (const move of rankCandidates(pos, stone, CELL_COUNT)) {
+    if (expired(ctx)) break;
+    shift(pos, move, stone, 1);
+    try {
+      const isSafe = !hasCompletion(pos, rival) && !hasUnblockableFour(pos, rival);
+      if (isSafe) safe.push(move);
+    } finally {
+      shift(pos, move, stone, -1);
+    }
+    if (safe.length === ROOT_WIDTH) break;
+  }
+  return safe.length > 0 ? safe : ranked;
 };
 
-export const chooseMove = (cells: ArrayLike<number>, stone: Stone, limits: SearchLimits = DEFAULT_LIMITS): number => {
-  const pos = createPosition(cells);
-  if (pos.stones === 0) return CENTER_CELL;
+export const searchMove = (
+  cells: ArrayLike<number>,
+  stone: Stone,
+  limits: SearchLimits = DEFAULT_LIMITS,
+): SearchResult => {
   const started = performance.now();
+  const targetDepth = Math.max(0, Math.min(MAX_DEPTH, Math.floor(limits.maxDepth)));
+  const pos = createPosition(cells);
   const ctx: SearchContext = {
     pos,
     deadline: started + limits.budgetMs,
     nodes: 0,
     isExpired: false,
     table: new Map(),
+    completedDepth: 0,
+    deepestPly: 0,
+    reason: 'target',
+    history: new Int32Array(CELL_COUNT * 3),
   };
-  const moves = rootMoves(pos, stone);
-  if (moves.length > 1) {
-    const forcingBudget = Math.min(FORCING_BUDGET_MS, limits.budgetMs * FORCING_BUDGET_RATIO);
-    const forcing = findForcingMove(pos, stone, started + forcingBudget);
-    if (forcing !== null) return forcing;
-  }
-  const ordered = deepen(ctx, stone, { moves, maxDepth: limits.maxDepth });
-  return ordered[0] ?? rankCandidates(pos, stone, 1)[0] ?? -1;
+  const forcingStats = { deepestPly: 0 };
+  const finish = (cell: number, reason: Exit): SearchResult => ({
+    cell,
+    stats: {
+      reason,
+      targetDepth,
+      selectiveCap: MAX_PLY,
+      completedDepth: ctx.completedDepth,
+      nodes: ctx.nodes,
+      searchPly: ctx.deepestPly,
+      forcingPly: forcingStats.deepestPly,
+      deepestPly: Math.max(ctx.deepestPly, forcingStats.deepestPly),
+      elapsedMs: performance.now() - started,
+    },
+  });
+  if (pos.stones === 0) return finish(CENTER_CELL, 'opening');
+  const moves = rootMoves(ctx, stone);
+  if (!moves.length) return finish(rankCandidates(pos, stone, 1)[0] ?? -1, 'no-candidate');
+  if (ctx.reason === 'immediate-win') return finish(moves[0]!, ctx.reason);
+  if (expired(ctx)) return finish(moves[0]!, 'timeout');
+  if (moves.length === 1) return finish(moves[0]!, 'only-move');
+  const forcingBudget = Math.min(FORCING_BUDGET_MS, limits.budgetMs * FORCING_BUDGET_RATIO);
+  const forcing = findForcingMove(pos, stone, started + forcingBudget, forcingStats);
+  if (forcing !== null) return finish(forcing, 'forcing-win');
+  const ordered = deepen(ctx, stone, { moves, maxDepth: targetDepth });
+  return finish(ordered[0]!, ctx.reason);
 };
+
+export const chooseMove = (cells: ArrayLike<number>, stone: Stone, limits: SearchLimits = DEFAULT_LIMITS): number =>
+  searchMove(cells, stone, limits).cell;

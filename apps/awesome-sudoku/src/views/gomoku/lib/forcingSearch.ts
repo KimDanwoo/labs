@@ -5,7 +5,12 @@ import { completionCells, forcingCandidates, hasCompletion, shift, type Position
 import { findWinLine } from '@views/gomoku/lib/winLine';
 import type { Stone } from '@views/gomoku/model/types/gomoku';
 
+export interface ForcingStats {
+  deepestPly: number;
+}
+
 interface ForcingContext {
+  stats?: ForcingStats;
   pos: Position;
   stone: Stone;
   deadline: number;
@@ -15,6 +20,8 @@ const continuesAttack = (ctx: ForcingContext, move: number, depth: number): bool
   const { pos, stone } = ctx;
   const rival = rivalOf(stone);
   shift(pos, move, stone, 1);
+  const ply = 2 * (FORCING_DEPTH - depth) + 1;
+  if (ctx.stats) ctx.stats.deepestPly = Math.max(ctx.stats.deepestPly, ply);
   const threats = completionCells(pos, stone);
   const isForcing = threats.length > 0 && !hasCompletion(pos, rival);
   let hasWin = false;
@@ -24,6 +31,7 @@ const continuesAttack = (ctx: ForcingContext, move: number, depth: number): bool
     if (isUnblockable) hasWin = true;
     else {
       shift(pos, block, rival, 1);
+      if (ctx.stats) ctx.stats.deepestPly = Math.max(ctx.stats.deepestPly, ply + 1);
       const canContinue = findWinLine(pos.cells, block) === null && depth > 1;
       if (canContinue) hasWin = forcingMove(ctx, depth - 1) !== null;
       shift(pos, block, rival, -1);
@@ -34,6 +42,7 @@ const continuesAttack = (ctx: ForcingContext, move: number, depth: number): bool
 };
 
 function forcingMove(ctx: ForcingContext, depth: number): number | null {
+  if (performance.now() >= ctx.deadline) return null;
   const moves = forcingCandidates(ctx.pos, ctx.stone);
   for (const move of moves) {
     if (performance.now() >= ctx.deadline) return null;
@@ -42,5 +51,5 @@ function forcingMove(ctx: ForcingContext, depth: number): number | null {
   return null;
 }
 
-export const findForcingMove = (pos: Position, stone: Stone, deadline: number): number | null =>
-  forcingMove({ pos, stone, deadline }, FORCING_DEPTH);
+export const findForcingMove = (pos: Position, stone: Stone, deadline: number, stats?: ForcingStats): number | null =>
+  forcingMove({ pos, stone, deadline, stats }, FORCING_DEPTH);

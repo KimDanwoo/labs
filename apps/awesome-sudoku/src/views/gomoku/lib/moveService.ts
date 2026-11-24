@@ -1,3 +1,4 @@
+import { MAX_DEPTH, UI_THINK_MS } from '@views/gomoku/config/ai';
 import type { MoveRequest, MoveResponse } from '@views/gomoku/lib/gomoku.worker';
 import { chooseMove } from '@views/gomoku/lib/search';
 import type { Stone } from '@views/gomoku/model/types/gomoku';
@@ -40,7 +41,7 @@ const getWorker = (): Worker | null => {
 };
 
 const thinkInPlace = (cells: readonly number[], stone: Stone): Promise<number> =>
-  new Promise((resolve) => resolve(chooseMove(cells, stone)));
+  new Promise((resolve) => resolve(chooseMove(cells, stone, { maxDepth: MAX_DEPTH, budgetMs: UI_THINK_MS })));
 
 export const requestMove = (cells: readonly number[], stone: Stone): Promise<number> => {
   const active = getWorker();

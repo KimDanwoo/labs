@@ -12,9 +12,23 @@ export interface Position {
   counts: readonly Uint8Array[];
   score: number[];
   fours: number[];
+  openThrees: Set<number>[];
   stones: number;
   key: bigint;
+  hash: number;
 }
+
+const MASKS = [0, 1, 2].map((stone) =>
+  Array.from({ length: CELL_COUNT }, (_, cell) => BigInt(stone) << BigInt(cell * 2)),
+);
+const HASHES = [0, 1, 2].map((stone) =>
+  Array.from({ length: CELL_COUNT }, (_, cell) => {
+    let value = (stone * CELL_COUNT + cell + 1) | 0;
+    value = Math.imul(value ^ (value >>> 16), 0x85ebca6b);
+    value = Math.imul(value ^ (value >>> 13), 0xc2b2ae35);
+    return value ^ (value >>> 16);
+  }),
+);
 
 const FOUR = WIN_LENGTH - 1;
 
@@ -27,6 +41,8 @@ const shiftWindow = (pos: Position, window: number, stone: Stone, delta: 1 | -1)
   pos.counts[stone]![window] = after;
   const rivalCount = pos.counts[rival]![window]!;
   if (rivalCount === 0) {
+    if (before === FOUR - 1) pos.openThrees[stone]!.delete(window);
+    if (after === FOUR - 1) pos.openThrees[stone]!.add(window);
     pos.score[stone]! += WINDOW_WEIGHT[after]! - WINDOW_WEIGHT[before]!;
     pos.fours[stone]! += isFour(after) - isFour(before);
     return;
@@ -34,12 +50,17 @@ const shiftWindow = (pos: Position, window: number, stone: Stone, delta: 1 | -1)
   const isStillBlocked = before !== 0 && after !== 0;
   if (isStillBlocked) return;
   const revive = after === 0 ? 1 : -1;
+  if (rivalCount === FOUR - 1) {
+    if (after === 0) pos.openThrees[rival]!.add(window);
+    else pos.openThrees[rival]!.delete(window);
+  }
   pos.score[rival]! += revive * WINDOW_WEIGHT[rivalCount]!;
   pos.fours[rival]! += revive * isFour(rivalCount);
 };
 
 export const shift = (pos: Position, cell: number, stone: Stone, delta: 1 | -1): void => {
-  pos.key ^= BigInt(stone) << BigInt(cell * 2);
+  pos.key ^= MASKS[stone]![cell]!;
+  pos.hash ^= HASHES[stone]![cell]!;
   pos.cells[cell] = delta === 1 ? stone : STONE.EMPTY;
   pos.stones += delta;
   for (const window of WINDOWS_AT[cell]!) shiftWindow(pos, window, stone, delta);
@@ -53,8 +74,10 @@ export const createPosition = (cells: ArrayLike<number>): Position => {
     counts: [new Uint8Array(0), new Uint8Array(WINDOWS.length), new Uint8Array(WINDOWS.length)],
     score: [0, 0, 0],
     fours: [0, 0, 0],
+    openThrees: [new Set(), new Set(), new Set()],
     stones: 0,
     key: 0n,
+    hash: 0,
   };
   for (let cell = 0; cell < CELL_COUNT; cell += 1) {
     const stone = cells[cell];
@@ -132,3 +155,29 @@ export const rankCandidates = (pos: Position, stone: Stone, width: number): numb
 
 export const evaluate = (pos: Position, stone: Stone): number =>
   pos.score[stone]! * MOVER_EDGE - pos.score[rivalOf(stone)]!;
+
+export const hasUnblockableFour = (pos: Position, stone: Stone): boolean => {
+  const rival = rivalOf(stone);
+  if (pos.openThrees[stone]!.size < 2) return false;
+  const candidates = new Set<number>();
+  for (const window of pos.openThrees[stone]!) {
+    for (const cell of WINDOWS[window]!) if (pos.cells[cell] === STONE.EMPTY) candidates.add(cell);
+  }
+  return [...candidates].some((cell) => {
+    const gaps = new Set<number>();
+    for (const window of WINDOWS_AT[cell]!) {
+      const isBlockedWindow = pos.counts[stone]![window] !== FOUR - 1 || pos.counts[rival]![window] !== 0;
+      if (isBlockedWindow) continue;
+      const gap = WINDOWS[window]!.find((other) => other !== cell && pos.cells[other] === STONE.EMPTY);
+      if (gap !== undefined) gaps.add(gap);
+    }
+    const isUnusableMove = gaps.size < 2 || isForbidden(pos.cells, cell, stone);
+    if (isUnusableMove) return false;
+    shift(pos, cell, stone, 1);
+    try {
+      return !hasCompletion(pos, rival) && completionCells(pos, stone).length >= 2;
+    } finally {
+      shift(pos, cell, stone, -1);
+    }
+  });
+};

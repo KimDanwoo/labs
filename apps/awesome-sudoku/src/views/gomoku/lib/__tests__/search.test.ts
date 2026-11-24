@@ -2,8 +2,8 @@ import { CELL_COUNT, STONE } from '@views/gomoku/config/board';
 import { cellsOf } from '@views/gomoku/lib/board';
 import { cellAt, rivalOf, stoneAtPly } from '@views/gomoku/lib/coords';
 import { isForbidden } from '@views/gomoku/lib/forbidden';
-import { completionCells, createPosition, rankCandidates } from '@views/gomoku/lib/position';
-import { chooseMove } from '@views/gomoku/lib/search';
+import { completionCells, createPosition, hasUnblockableFour, rankCandidates } from '@views/gomoku/lib/position';
+import { chooseMove, searchMove } from '@views/gomoku/lib/search';
 import { findWinLine } from '@views/gomoku/lib/winLine';
 import type { Stone } from '@views/gomoku/model/types/gomoku';
 import { describe, expect, it } from 'vitest';
@@ -32,6 +32,77 @@ const playOut = (engine: Stone): Stone | null => {
 };
 
 describe('chooseMove', () => {
+  it('counts only completed iterations and distinguishes the configured horizon', () => {
+    const cells = board([[7, 7]], [[8, 8]]);
+    const { stats } = searchMove(cells, STONE.BLACK, { budgetMs: 2500, maxDepth: 2 });
+    expect(stats.reason).toBe('target');
+    expect(stats.completedDepth).toBe(2);
+    expect(stats.deepestPly).toBe(2);
+    const interrupted = searchMove(cells, STONE.BLACK, { budgetMs: 0, maxDepth: 100 });
+    expect(interrupted.stats.reason).toBe('timeout');
+    expect(interrupted.stats.targetDepth).toBe(20);
+    expect(interrupted.stats.selectiveCap).toBe(100);
+    expect(interrupted.stats.completedDepth).toBe(0);
+    expect(cells[interrupted.cell]).toBe(STONE.EMPTY);
+  });
+
+  it('reports tactical probes separately from root search iterations', () => {
+    const cells = board(
+      [[7, 2]],
+      [
+        [7, 3],
+        [7, 4],
+        [7, 6],
+        [5, 5],
+        [8, 5],
+      ],
+    );
+    const { stats } = searchMove(cells, STONE.WHITE);
+    expect(stats.reason).toBe('forcing-win');
+    expect(stats.completedDepth).toBe(0);
+    expect(stats.searchPly).toBe(0);
+    expect(stats.forcingPly).toBeGreaterThan(1);
+    expect(stats.deepestPly).toBe(stats.forcingPly);
+  });
+
+  it('실전 기보에서 백의 양방향 열린 4로 이어진 수를 피한다', () => {
+    const replay = [
+      [8, 8], [9, 9], [10, 8], [7, 8], [10, 9], [10, 7], [8, 6], [7, 9],
+      [8, 7], [8, 9], [11, 9], [5, 9], [6, 9], [9, 7], [9, 8], [11, 10],
+      [7, 6], [6, 5], [8, 5], [8, 4], [10, 10], [13, 7], [6, 7], [5, 8],
+      [12, 7], [11, 8], [9, 6], [10, 6], [9, 4], [10, 3], [10, 5], [8, 3],
+    ]; // prettier-ignore
+    const history = replay.map(([row, col]) => cellAt(row! - 1, col! - 1));
+    const move = chooseMove(cellsOf(history), STONE.BLACK, LIMITS);
+    expect(move).toBe(cellAt(10, 5));
+    const whiteSetup = cellAt(4, 5);
+    const lostPosition = createPosition(cellsOf([...history, cellAt(11, 8), whiteSetup]));
+    expect(hasUnblockableFour(lostPosition, STONE.WHITE)).toBe(true);
+    const repairedPosition = createPosition(cellsOf([...history, move, whiteSetup]));
+    expect(completionCells(repairedPosition, STONE.BLACK).length).toBeGreaterThan(0);
+  });
+
+  it('열린 4 탐지 시 수비 측의 즉시 승리를 우선하고 판을 원복한다', () => {
+    const white: [number, number][] = [
+      [7, 5],
+      [7, 6],
+      [7, 7],
+    ];
+    const black: [number, number][] = [
+      [0, 0],
+      [0, 1],
+      [0, 2],
+      [0, 3],
+    ];
+    const withCounterWin = createPosition(board(black, white));
+    const state = { cells: Array.from(withCounterWin.cells), key: withCounterWin.key, stones: withCounterWin.stones };
+    expect(hasUnblockableFour(withCounterWin, STONE.WHITE)).toBe(false);
+    expect(Array.from(withCounterWin.cells)).toEqual(state.cells);
+    expect(withCounterWin.key).toBe(state.key);
+    expect(withCounterWin.stones).toBe(state.stones);
+    expect(hasUnblockableFour(createPosition(board(black.slice(0, 2), white)), STONE.WHITE)).toBe(true);
+  });
+
   it('빈 판이면 가운데에 둔다', () => {
     expect(chooseMove(board([], []), STONE.BLACK, LIMITS)).toBe(cellAt(7, 7));
   });

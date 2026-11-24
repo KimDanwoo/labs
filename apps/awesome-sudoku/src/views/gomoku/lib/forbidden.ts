@@ -7,6 +7,12 @@ import type { Stone } from '@views/gomoku/model/types/gomoku';
 const FOUR = WIN_LENGTH - 1;
 const DOUBLE = 2;
 
+const AXES = Array.from({ length: CELL_COUNT }, (_, cell) =>
+  DIRECTIONS.map((direction) =>
+    [-4, -3, -2, -1, 1, 2, 3, 4].map((n) => offsetCell(cell, direction, n)).filter((p): p is number => p !== null),
+  ),
+);
+
 const fourCount = (cells: number[], cell: number): number => {
   const fours = new Set<string>();
   for (const index of WINDOWS_AT[cell] ?? []) {
@@ -73,7 +79,21 @@ function isForbiddenBlack(cells: number[], cell: number): boolean {
 
 export const isForbidden = (cells: ArrayLike<number>, cell: number, stone: Stone): boolean => {
   if (stone === STONE.WHITE) return false;
+  let axes = 0;
+  let crowded = false;
+  for (const axis of AXES[cell]!) {
+    let neighbors = 0;
+    for (const other of axis) if (cells[other] === STONE.BLACK) neighbors++;
+    if (neighbors >= 4) {
+      crowded = true;
+      break;
+    }
+    if (neighbors >= 2) axes++;
+  }
+  const hasInsufficientThreats = !crowded && axes < 2;
+  if (hasInsufficientThreats) return false;
   const board = Array.from(cells);
+
   board[cell] = stone;
   return isForbiddenBlack(board, cell);
 };
