@@ -20,8 +20,8 @@ const continuesAttack = (ctx: ForcingContext, move: number, depth: number): bool
   let hasWin = false;
   if (isForcing) {
     const block = threats[0]!;
-    const cannotBlock = threats.length > 1 || isForbidden(pos.cells, block, rival);
-    if (cannotBlock) hasWin = true;
+    const isUnblockable = threats.length > 1 || isForbidden(pos.cells, block, rival);
+    if (isUnblockable) hasWin = true;
     else {
       shift(pos, block, rival, 1);
       const canContinue = findWinLine(pos.cells, block) === null && depth > 1;
