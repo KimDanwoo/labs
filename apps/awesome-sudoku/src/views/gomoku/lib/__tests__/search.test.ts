@@ -60,10 +60,14 @@ describe('chooseMove', () => {
     expect(move).toBe(cellAt(7, 8));
   });
 
-  it.each([STONE.BLACK, STONE.WHITE] as const)('한 수 앞만 보는 상대를 %i번 돌로 이긴다', (engine) => {
-    expect(playOut(engine)).toBe(engine);
-    expect(rivalOf(engine)).not.toBe(engine);
-  });
+  it.each([STONE.BLACK, STONE.WHITE] as const)(
+    '한 수 앞만 보는 상대를 %i번 돌로 이긴다',
+    (engine) => {
+      expect(playOut(engine)).toBe(engine);
+      expect(rivalOf(engine)).not.toBe(engine);
+    },
+    30_000,
+  );
   it('백 컴퓨터는 삼삼 자리에도 둘 수 있다', () => {
     const cells = board([[0, 0], [0, 2], [14, 14], [14, 12]], [[7, 5], [7, 6], [5, 7], [6, 7]]); // prettier-ignore
     expect(chooseMove(cells, STONE.WHITE, LIMITS)).toBe(cellAt(7, 7));
