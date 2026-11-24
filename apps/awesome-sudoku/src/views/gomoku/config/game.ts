@@ -2,6 +2,7 @@ export const GAME_ACTION = {
   PLACE: 'place',
   UNDO: 'undo',
   RESET: 'reset',
+  SELECT_STONE: 'selectStone',
 } as const;
 
 export const OUTCOME = {

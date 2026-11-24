@@ -8,10 +8,6 @@ export const CENTER_CELL = (CELL_COUNT - 1) / 2;
 
 export const STONE = { EMPTY: 0, BLACK: 1, WHITE: 2 } as const;
 
-export const PLAYER_STONE = STONE.BLACK;
-
-export const COMPUTER_STONE = STONE.WHITE;
-
 export const DIRECTIONS = [
   [0, 1],
   [1, 0],

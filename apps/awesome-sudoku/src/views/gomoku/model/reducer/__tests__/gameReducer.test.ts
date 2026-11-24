@@ -25,6 +25,24 @@ describe('gameReducer', () => {
     expect(place(done, 19, STONE.WHITE)).toBe(done);
   });
 
+  it('백을 고르면 판을 비우고 초기 흑 착수는 무르지 않는다', () => {
+    const started = place(INITIAL_STATE, 0, STONE.BLACK);
+    const selected = gameReducer(started, { type: GAME_ACTION.SELECT_STONE, stone: STONE.WHITE });
+    expect(selected).toEqual({ ...INITIAL_STATE, playerStone: STONE.WHITE });
+    const first = place(selected, 112, STONE.BLACK);
+    expect(gameReducer(first, { type: GAME_ACTION.UNDO })).toBe(first);
+    expect(gameReducer(first, { type: GAME_ACTION.RESET })).toEqual(selected);
+  });
+
+  it('백의 무르기는 컴퓨터의 첫 흑돌을 보존한다', () => {
+    const selected = gameReducer(INITIAL_STATE, { type: GAME_ACTION.SELECT_STONE, stone: STONE.WHITE });
+    const first = place(selected, 112, STONE.BLACK);
+    const two = place(first, 113, STONE.WHITE);
+    const three = place(two, 114, STONE.BLACK);
+    expect(gameReducer(two, { type: GAME_ACTION.UNDO }).moves).toEqual([112]);
+    expect(gameReducer(three, { type: GAME_ACTION.UNDO }).moves).toEqual([112]);
+  });
+
   it('무르면 내 차례로 돌아온다', () => {
     const two = place(place(INITIAL_STATE, 0, STONE.BLACK), 1, STONE.WHITE);
     const three = place(two, 2, STONE.BLACK);

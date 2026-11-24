@@ -1,8 +1,9 @@
 import { ATTACK_WEIGHT, DEFEND_WEIGHT, MOVER_EDGE, WINDOW_WEIGHT } from '@views/gomoku/config/ai';
 import { CELL_COUNT, STONE, WIN_LENGTH } from '@views/gomoku/config/board';
 import { rivalOf } from '@views/gomoku/lib/coords';
-import { isDoubleThree } from '@views/gomoku/lib/forbidden';
+import { isForbidden } from '@views/gomoku/lib/forbidden';
 import { NEAR, WINDOWS, WINDOWS_AT } from '@views/gomoku/lib/lines';
+import { findWinLine } from '@views/gomoku/lib/winLine';
 import type { Stone } from '@views/gomoku/model/types/gomoku';
 
 export interface Position {
@@ -12,6 +13,7 @@ export interface Position {
   score: number[];
   fours: number[];
   stones: number;
+  key: bigint;
 }
 
 const FOUR = WIN_LENGTH - 1;
@@ -37,6 +39,7 @@ const shiftWindow = (pos: Position, window: number, stone: Stone, delta: 1 | -1)
 };
 
 export const shift = (pos: Position, cell: number, stone: Stone, delta: 1 | -1): void => {
+  pos.key ^= BigInt(stone) << BigInt(cell * 2);
   pos.cells[cell] = delta === 1 ? stone : STONE.EMPTY;
   pos.stones += delta;
   for (const window of WINDOWS_AT[cell]!) shiftWindow(pos, window, stone, delta);
@@ -51,6 +54,7 @@ export const createPosition = (cells: ArrayLike<number>): Position => {
     score: [0, 0, 0],
     fours: [0, 0, 0],
     stones: 0,
+    key: 0n,
   };
   for (let cell = 0; cell < CELL_COUNT; cell += 1) {
     const stone = cells[cell];
@@ -70,7 +74,17 @@ export const completionCells = (pos: Position, stone: Stone): number[] => {
     const gap = cells.find((cell) => pos.cells[cell] === STONE.EMPTY);
     if (gap !== undefined) found.add(gap);
   });
-  return [...found];
+  return [...found].filter((cell) => {
+    pos.cells[cell] = stone;
+    const hasWin = findWinLine(pos.cells, cell) !== null;
+    pos.cells[cell] = STONE.EMPTY;
+    return hasWin;
+  });
+};
+
+export const hasCompletion = (pos: Position, stone: Stone): boolean => {
+  if (pos.fours[stone]! === 0) return false;
+  return stone === STONE.WHITE || completionCells(pos, stone).length > 0;
 };
 
 const cellScore = (pos: Position, cell: number, stone: Stone): number => {
@@ -86,6 +100,19 @@ const cellScore = (pos: Position, cell: number, stone: Stone): number => {
   return score;
 };
 
+export const forcingCandidates = (pos: Position, stone: Stone): number[] => {
+  const found = new Set<number>();
+  const three = FOUR - 1;
+  WINDOWS.forEach((cells, window) => {
+    const canForce = pos.counts[stone]![window] === three && pos.counts[rivalOf(stone)]![window] === 0;
+    if (!canForce) return;
+    cells.filter((cell) => pos.cells[cell] === STONE.EMPTY).forEach((cell) => found.add(cell));
+  });
+  return [...found]
+    .sort((a, b) => cellScore(pos, b, stone) - cellScore(pos, a, stone))
+    .filter((cell) => !isForbidden(pos.cells, cell, stone));
+};
+
 export const rankCandidates = (pos: Position, stone: Stone, width: number): number[] => {
   const ranked: number[] = [];
   for (let cell = 0; cell < CELL_COUNT; cell += 1) {
@@ -98,7 +125,7 @@ export const rankCandidates = (pos: Position, stone: Stone, width: number): numb
   for (const packed of ranked) {
     if (picked.length === width) break;
     const cell = packed % CELL_COUNT;
-    if (!isDoubleThree(pos.cells, cell, stone)) picked.push(cell);
+    if (!isForbidden(pos.cells, cell, stone)) picked.push(cell);
   }
   return picked;
 };

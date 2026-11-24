@@ -1,7 +1,6 @@
 import { cn } from '@shared/lib/cn';
 import { STONE } from '@views/gomoku/config/board';
-import { STONE_CLASS } from '@views/gomoku/config/stone';
-import { cellLabel } from '@views/gomoku/lib/board';
+import { cellLabel, stoneClassOf } from '@views/gomoku/lib/board';
 import { useGomokuContext } from '@views/gomoku/model/hooks/useGomokuContext';
 import { LuX } from 'react-icons/lu';
 
@@ -10,7 +9,7 @@ interface GomokuCellProps {
 }
 
 export function GomokuCell({ cell }: GomokuCellProps) {
-  const { cells, forbidden, lastMove, winLine, isLocked, place } = useGomokuContext();
+  const { cells, forbidden, lastMove, winLine, isLocked, place, playerStone } = useGomokuContext();
   const stone = cells[cell] ?? STONE.EMPTY;
   const isForbidden = forbidden.has(cell);
   const isBlocked = isLocked || isForbidden || stone !== STONE.EMPTY;
@@ -30,7 +29,7 @@ export function GomokuCell({ cell }: GomokuCellProps) {
       <span
         className={cn(
           'size-[88%] rounded-full transition-opacity',
-          STONE_CLASS[stone],
+          stoneClassOf(stone, playerStone),
           isForbidden && 'hidden',
           winLine?.includes(cell) && 'ring-2 ring-accent',
         )}

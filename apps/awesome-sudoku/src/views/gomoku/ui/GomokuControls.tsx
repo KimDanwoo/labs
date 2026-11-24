@@ -1,6 +1,7 @@
 import { IconButton } from '@shared/ui/icon-button';
 import { GOMOKU_COPY } from '@views/gomoku/config/copy';
 import { useGomokuContext } from '@views/gomoku/model/hooks/useGomokuContext';
+import { GomokuColorSelect } from '@views/gomoku/ui/GomokuColorSelect';
 import { LuPlus, LuUndo2 } from 'react-icons/lu';
 
 export function GomokuControls() {
@@ -8,6 +9,7 @@ export function GomokuControls() {
 
   return (
     <div className="flex w-full max-w-[560px] flex-col items-center gap-4">
+      <GomokuColorSelect />
       <div className="flex gap-3">
         <IconButton.Root type="button" className="w-18" onClick={undo} disabled={!canUndo}>
           <IconButton.Icon>

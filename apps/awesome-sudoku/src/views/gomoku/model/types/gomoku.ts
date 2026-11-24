@@ -6,6 +6,7 @@ export type Stone = Exclude<Cell, typeof STONE.EMPTY>;
 export type Outcome = (typeof OUTCOME)[keyof typeof OUTCOME];
 
 export interface GameState {
+  playerStone: Stone;
   moves: readonly number[];
   winLine: readonly number[] | null;
 }
@@ -13,4 +14,5 @@ export interface GameState {
 export type GameAction =
   | { type: typeof GAME_ACTION.PLACE; cell: number; stone: Stone }
   | { type: typeof GAME_ACTION.UNDO }
+  | { type: typeof GAME_ACTION.SELECT_STONE; stone: Stone }
   | { type: typeof GAME_ACTION.RESET };

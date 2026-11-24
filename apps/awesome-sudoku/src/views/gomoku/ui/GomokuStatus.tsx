@@ -1,10 +1,10 @@
-import { GOMOKU_COPY, OUTCOME_TITLE } from '@views/gomoku/config/copy';
+import { GOMOKU_COPY, MY_TURN, OUTCOME_TITLE } from '@views/gomoku/config/copy';
 import { OUTCOME } from '@views/gomoku/config/game';
 import { useGomokuContext } from '@views/gomoku/model/hooks/useGomokuContext';
 
 export function GomokuStatus() {
-  const { outcome, isThinking } = useGomokuContext();
-  const turnText = isThinking ? GOMOKU_COPY.thinking : GOMOKU_COPY.myTurn;
+  const { outcome, isThinking, playerStone } = useGomokuContext();
+  const turnText = isThinking ? GOMOKU_COPY.thinking : MY_TURN[playerStone];
 
   return (
     <p
