@@ -26,6 +26,10 @@ python3 scripts/guess-word/build_data.py --vectors head400k.vec --nikl nikl.utf8
 
 `--device`는 Apple Silicon이면 `mps`, 그 밖에는 `cpu`나 `cuda`다.
 
+## 데이터를 바꾼 뒤
+
+정답이나 유사도가 바뀌면 브라우저에 남은 기록(이전 점수, 맞힌 상태)이 새 데이터와 맞지 않는다. `src/views/guess-word/config/game.ts`의 `GUESS_STORAGE_KEY` 버전(`:v2` → `:v3`)을 올려 모든 사용자의 기록을 새로 시작하게 한다.
+
 ## 두 모델을 섞는 이유
 
 - fastText만 쓰면 웹에서 함께 쓰인 단어가 가까워 잡음이 많다(그림자 → 조작단, 심연).

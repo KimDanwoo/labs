@@ -2,7 +2,7 @@
 
 import { normalizeGuess, type RankHint } from '@entities/guess-word';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { GUESS_QUERY_KEY, GUESS_STATUS } from '@views/guess-word/config/game';
+import { GUESS_QUERY_KEY } from '@views/guess-word/config/game';
 import { noticeKindOf, requestGuess, requestHints } from '@views/guess-word/lib/guessApi';
 import {
   addGuess,
@@ -27,7 +27,8 @@ export interface GuessWordGame {
   input: string;
   notice: Notice | null;
   isGuessing: boolean;
-  isPlaying: boolean;
+  isResultOpen: boolean;
+  handleResultClose: () => void;
   handleInputChange: (event: ChangeEvent<HTMLInputElement>) => void;
   handleSubmit: (event: SubmitEvent<HTMLFormElement>) => void;
 }
@@ -37,6 +38,7 @@ export function useGuessWordGame(): GuessWordGame {
   const [reportedDay, setReportedDay] = useState<number | null>(null);
   const [input, setInput] = useState('');
   const [notice, setNotice] = useState<Notice | null>(null);
+  const [isResultOpen, setIsResultOpen] = useState(false);
   const hintsQuery = useQuery({
     queryKey: GUESS_QUERY_KEY.hints(reportedDay),
     queryFn: requestHints,
@@ -57,9 +59,12 @@ export function useGuessWordGame(): GuessWordGame {
       setStored((previous: unknown) => addGuess(parseRecord(previous, result.day), result));
       setInput('');
       setNotice(null);
+      if (result.isAnswer) setIsResultOpen(true);
     },
     onError: (error, word) => setNotice({ kind: noticeKindOf(error), word }),
   });
+
+  const handleResultClose = () => setIsResultOpen(false);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => setInput(event.target.value);
 
@@ -80,7 +85,8 @@ export function useGuessWordGame(): GuessWordGame {
     input,
     notice,
     isGuessing: guessMutation.isPending,
-    isPlaying: record.status === GUESS_STATUS.PLAYING,
+    isResultOpen,
+    handleResultClose,
     handleInputChange,
     handleSubmit,
   };
