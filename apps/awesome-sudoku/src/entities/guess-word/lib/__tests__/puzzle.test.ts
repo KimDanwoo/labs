@@ -1,5 +1,10 @@
 import { buildPuzzle, createWordData } from '@entities/guess-word/lib/puzzle';
-import { createWordVectors, nearestNeighbors, toDisplaySimilarity } from '@entities/guess-word/lib/similarity';
+import {
+  createWordVectors,
+  foldSenses,
+  nearestNeighbors,
+  toDisplaySimilarity,
+} from '@entities/guess-word/lib/similarity';
 import { describe, expect, it } from 'vitest';
 
 const DIMENSIONS = 2;
@@ -7,7 +12,7 @@ const WORDS = ['정답', '가깝다', '중간', '멀다', '반대'];
 const VALUES = Int8Array.from([100, 0, 90, 10, 50, 50, 0, 100, -100, 0]);
 
 function wordData(answers: string[] = ['정답']) {
-  return createWordData(WORDS, answers, createWordVectors(VALUES, DIMENSIONS));
+  return createWordData(WORDS, answers, createWordVectors(VALUES, DIMENSIONS), []);
 }
 
 describe('similarity', () => {
@@ -21,9 +26,20 @@ describe('similarity', () => {
   });
 });
 
+describe('foldSenses', () => {
+  it('뜻이 여러 개인 단어는 정답과 가장 가까운 뜻의 유사도를 쓴다', () => {
+    const rows = Float32Array.from([1, 0.1, 0.2, 0.9, 0.05]);
+    expect(Array.from(foldSenses(rows, 3, [1, 2]))).toEqual([1, Math.fround(0.9), Math.fround(0.2)]);
+  });
+});
+
 describe('createWordData', () => {
   it('어휘에 없는 정답이 있으면 실패한다', () => {
     expect(() => wordData(['없는말'])).toThrow('없는말');
+  });
+
+  it('뜻별 벡터의 단어가 어휘에 없으면 실패한다', () => {
+    expect(() => createWordData(WORDS, ['정답'], createWordVectors(VALUES, DIMENSIONS), ['없는말'])).toThrow('없는말');
   });
 });
 

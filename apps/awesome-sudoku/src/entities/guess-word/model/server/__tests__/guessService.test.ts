@@ -55,4 +55,13 @@ describe('guessService (실제 데이터)', () => {
       word: answers[answerIndex(1, answers.length)],
     });
   });
+
+  it('뜻이 여러 개인 단어는 정답과 가까운 뜻으로 계산한다(그림자 ↔ 해=태양)', async () => {
+    const sun = await guessWord('해', NOW);
+    const star = await guessWord('태양', NOW);
+    const isMissing = 'error' in sun || 'error' in star;
+    if (isMissing) throw new Error('해·태양이 어휘에 있어야 한다');
+    expect(sun.rank).not.toBeNull();
+    expect(sun.similarity).toBeGreaterThanOrEqual(star.similarity - 5);
+  });
 });

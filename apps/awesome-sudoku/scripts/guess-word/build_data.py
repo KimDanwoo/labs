@@ -52,7 +52,42 @@ WEB_COMPOUND_SUFFIXES = {
 WEB_COMPOUND_ALLOWED = {
     "웹사이트", "개인정보", "포털사이트", "공동구매", "재구매", "통신판매", "방문판매", "예약판매", "비추천",
 }
-OUTPUT_FILES = ("words.txt", "vectors.bin", "answers.txt")
+OUTPUT_FILES = ("words.txt", "vectors.bin", "answers.txt", "senses.txt")
+WORD_SENSES = {
+    "해": [["태양", "햇빛", "햇살"]],
+    "달": [["보름달", "달빛", "초승달"], ["월말", "월급", "날짜"]],
+    "눈": [["눈동자", "눈꺼풀", "시력"], ["눈송이", "폭설", "눈사람"]],
+    "배": [["선박", "항구", "돛단배"], ["배꼽", "복부", "뱃살"], ["사과", "과일", "배나무"]],
+    "말": [["언어", "대화", "낱말"], ["승마", "망아지", "조랑말"]],
+    "밤": [["야간", "한밤중", "저녁"], ["밤나무", "도토리", "열매"]],
+    "차": [["자동차", "승용차", "운전"], ["녹차", "홍차", "찻잔"]],
+    "비": [["빗물", "장마", "소나기"]],
+    "불": [["화재", "불꽃", "모닥불"]],
+    "물": [["식수", "강물", "수돗물"]],
+    "발": [["발가락", "발목", "발바닥"]],
+    "손": [["손가락", "손목", "손바닥"]],
+    "코": [["콧물", "콧구멍", "코끝"]],
+    "이": [["치아", "잇몸", "충치"]],
+    "목": [["목구멍", "목덜미", "어깨"]],
+    "돌": [["바위", "자갈", "돌멩이"]],
+    "별": [["별빛", "밤하늘", "은하수"]],
+    "길": [["도로", "골목", "오솔길"]],
+    "집": [["주택", "가정", "보금자리"]],
+    "산": [["등산", "봉우리", "산골"]],
+    "강": [["하천", "강물", "강가"]],
+    "땅": [["토지", "흙", "대지"]],
+    "금": [["황금", "보석", "은"]],
+    "철": [["강철", "쇠", "금속"], ["계절", "제철", "환절기"]],
+    "초": [["양초", "촛불", "촛대"], ["초침", "시계", "순간"]],
+    "병": [["질병", "환자", "병원"], ["유리병", "술병", "물병"]],
+    "줄": [["밧줄", "끈", "노끈"]],
+    "벌": [["꿀벌", "벌집", "말벌"], ["처벌", "형벌", "징계"]],
+    "새": [["참새", "비둘기", "날개"]],
+    "꿈": [["악몽", "잠", "희망"]],
+    "굴": [["동굴", "구멍", "땅굴"], ["조개", "전복", "해산물"]],
+    "김": [["김밥", "미역", "해초"], ["수증기", "입김", "증기"]],
+    "다리": [["허벅지", "무릎", "종아리"], ["교량", "육교", "돌다리"]],
+}
 LATIN_LETTER = re.compile(r"[A-Za-z]")
 LOANWORD_THRESHOLD = 0.95
 LOANWORD_MAX_ITERATIONS = 3000
@@ -256,6 +291,17 @@ def combine(context_vectors, semantic_vectors, words):
     return np.concatenate([context, semantic], axis=1)
 
 
+def sense_rows(vectors, words):
+    index_by_word = {word: index for index, word in enumerate(words)}
+    missing = [anchor for senses in WORD_SENSES.values() for anchors in senses for anchor in anchors if anchor not in index_by_word]
+    missing += [word for word in WORD_SENSES if word not in index_by_word]
+    if missing:
+        raise SystemExit(f"뜻별 벡터의 단어가 어휘에 없다: {missing}")
+    entries = [(word, anchors) for word, senses in WORD_SENSES.items() for anchors in senses]
+    rows = [vectors[[index_by_word[anchor] for anchor in anchors]].mean(axis=0) for _word, anchors in entries]
+    return entries, np.stack(rows)
+
+
 def quantize(vectors):
     scale = INT8_SCALE / np.abs(vectors).max(axis=1, keepdims=True)
     return np.clip(np.round(vectors * scale), -INT8_SCALE, INT8_SCALE).astype(np.int8)
@@ -295,13 +341,15 @@ def frozen_answers(path, answers, vocabulary, is_loan):
     return frozen
 
 
-def write_outputs(out, words, vectors, answers):
+def write_outputs(out, words, vectors, answers, senses):
     out.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=out.parent) as staging_name:
         staging = Path(staging_name)
         (staging / "words.txt").write_text("\n".join(words) + "\n", encoding="utf-8")
         vectors.tofile(staging / "vectors.bin")
         (staging / "answers.txt").write_text("\n".join(answers) + "\n", encoding="utf-8")
+        sense_lines = [f"{word}\t{','.join(anchors)}" for word, anchors in senses]
+        (staging / "senses.txt").write_text("\n".join(sense_lines) + "\n", encoding="utf-8")
         for name in OUTPUT_FILES:
             shutil.move(str(staging / name), str(out / name))
 
@@ -323,7 +371,9 @@ def main():
     candidates = pick_answers(kiwi, nikl_nouns, vocabulary, read_nikl_multi_pos_words(args.nikl))
     answers = frozen_answers(out / "answers.txt", candidates, vocabulary, is_loan)
     semantic = reduce_dimensions(embed_semantic(words, args.device), SEMANTIC_DIMENSIONS)
-    write_outputs(out, words, quantize(combine(vectors, semantic, words)), answers)
+    combined = combine(vectors, semantic, words)
+    senses, extra_rows = sense_rows(combined, words)
+    write_outputs(out, words, quantize(np.concatenate([combined, extra_rows])), answers, senses)
     print(f"words={len(words)} answers={len(answers)}")
 
 
