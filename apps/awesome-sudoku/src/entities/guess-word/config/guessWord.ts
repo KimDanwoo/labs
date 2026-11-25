@@ -26,6 +26,10 @@ export const GUESS_WORD_INPUT = {
   pattern: /^[가-힣]{1,8}$/,
 } as const;
 
+export const GUESS_WORD_ALIASES: ReadonlyArray<{ pattern: RegExp; replacement: string }> = [
+  { pattern: /^([월화수목금토일])(요일날|욜)$/, replacement: '$1요일' },
+];
+
 export const GUESS_WORD_ERROR = {
   INVALID: 'invalid-word',
   UNKNOWN: 'unknown-word',

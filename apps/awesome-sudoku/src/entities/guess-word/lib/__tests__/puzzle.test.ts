@@ -1,6 +1,7 @@
 import { buildPuzzle, createWordData } from '@entities/guess-word/lib/puzzle';
 import {
   createWordVectors,
+  elementwiseMax,
   foldSenses,
   nearestNeighbors,
   toDisplaySimilarity,
@@ -30,6 +31,25 @@ describe('foldSenses', () => {
   it('뜻이 여러 개인 단어는 정답과 가장 가까운 뜻의 유사도를 쓴다', () => {
     const rows = Float32Array.from([1, 0.1, 0.2, 0.9, 0.05]);
     expect(Array.from(foldSenses(rows, 3, [1, 2]))).toEqual([1, Math.fround(0.9), Math.fround(0.2)]);
+  });
+});
+
+describe('elementwiseMax', () => {
+  it('같은 위치끼리 가장 큰 값을 고른다', () => {
+    const merged = elementwiseMax([Float32Array.from([1, 0, 0.5]), Float32Array.from([0, 2, 0.25])]);
+    expect(Array.from(merged)).toEqual([1, 2, 0.5]);
+  });
+});
+
+describe('정답이 다의어일 때', () => {
+  it('정답의 다른 뜻과 가까운 단어도 그 뜻의 유사도를 받는다', () => {
+    const values = Int8Array.from([100, 0, 0, 100, -100, 0, 0, 100]);
+    const data = createWordData(['정답', '다른뜻단어', '먼말'], ['정답'], createWordVectors(values, DIMENSIONS), [
+      '정답',
+    ]);
+    const puzzle = buildPuzzle(data, 1);
+    expect(puzzle.similarities[1]).toBeCloseTo(1);
+    expect(puzzle.similarities[2]).toBeCloseTo(0);
   });
 });
 
