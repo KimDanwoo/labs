@@ -17,6 +17,8 @@ export const GUESS_WORD_DATA = {
   words: 'words.txt',
   answers: 'answers.txt',
   vectors: 'vectors.bin',
+  senses: 'senses.txt',
+  senseSeparator: '\t',
   dimensions: 556,
 } as const;
 

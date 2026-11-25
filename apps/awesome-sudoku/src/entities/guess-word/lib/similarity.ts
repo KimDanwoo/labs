@@ -38,6 +38,14 @@ export function similaritiesTo({ values, norms, dimensions }: WordVectors, targe
   });
 }
 
+export function foldSenses(rowSimilarities: Float32Array, wordCount: number, senseOwners: number[]): Float32Array {
+  const similarities = rowSimilarities.slice(0, wordCount);
+  senseOwners.forEach((owner, sense) => {
+    similarities[owner] = Math.max(valueAt(similarities, owner), valueAt(rowSimilarities, wordCount + sense));
+  });
+  return similarities;
+}
+
 export function nearestNeighbors(similarities: Float32Array, target: number, limit: number): number[] {
   return Array.from(similarities.keys())
     .filter((index) => index !== target)

@@ -13,18 +13,27 @@ async function readLines(fileName: string): Promise<string[]> {
   return text.split('\n').filter((line) => line.length > 0);
 }
 
-async function readVectors(wordCount: number): Promise<Int8Array> {
+async function readSenseWords(): Promise<string[]> {
+  const lines = await readLines(GUESS_WORD_DATA.senses);
+  return lines.map((line) => line.split(GUESS_WORD_DATA.senseSeparator)[0] ?? '');
+}
+
+async function readVectors(rowCount: number): Promise<Int8Array> {
   const buffer = await readFile(path.join(DATA_DIRECTORY, GUESS_WORD_DATA.vectors));
   const values = new Int8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
-  const isMatchingSize = values.length === wordCount * GUESS_WORD_DATA.dimensions;
-  if (!isMatchingSize) throw new Error(`벡터 크기(${values.length})가 단어 수(${wordCount})와 맞지 않는다.`);
+  const isMatchingSize = values.length === rowCount * GUESS_WORD_DATA.dimensions;
+  if (!isMatchingSize) throw new Error(`벡터 크기(${values.length})가 행 수(${rowCount})와 맞지 않는다.`);
   return values;
 }
 
 async function readWordData(): Promise<WordData> {
-  const [words, answers] = await Promise.all([readLines(GUESS_WORD_DATA.words), readLines(GUESS_WORD_DATA.answers)]);
-  const vectors = createWordVectors(await readVectors(words.length), GUESS_WORD_DATA.dimensions);
-  return createWordData(words, answers, vectors);
+  const [words, answers, senseWords] = await Promise.all([
+    readLines(GUESS_WORD_DATA.words),
+    readLines(GUESS_WORD_DATA.answers),
+    readSenseWords(),
+  ]);
+  const values = await readVectors(words.length + senseWords.length);
+  return createWordData(words, answers, createWordVectors(values, GUESS_WORD_DATA.dimensions), senseWords);
 }
 
 export function loadWordData(): Promise<WordData> {
