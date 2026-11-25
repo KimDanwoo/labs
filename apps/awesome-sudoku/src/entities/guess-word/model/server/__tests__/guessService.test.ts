@@ -1,10 +1,11 @@
-import { GUESS_WORD_ERROR, GUESS_WORD_RANK } from '@entities/guess-word/config/guessWord';
+import { GUESS_WORD_ERROR, GUESS_WORD_RANK, GUESS_WORD_TIME } from '@entities/guess-word/config/guessWord';
 import { answerIndex } from '@entities/guess-word/lib/puzzleDay';
 import { guessWord, todayHints, yesterdayAnswer } from '@entities/guess-word/model/server/guessService';
 import { loadWordData } from '@entities/guess-word/model/server/loadWordData';
 import { describe, expect, it } from 'vitest';
 
 const NOW = new Date('2026-11-25T03:00:00Z');
+const NOON_OFFSET_MS = 3 * 60 * 60 * 1000;
 
 describe('guessService (실제 데이터)', () => {
   it('정답을 맞히면 유사도 100과 정답 표시를 준다', async () => {
@@ -57,8 +58,13 @@ describe('guessService (실제 데이터)', () => {
   });
 
   it('뜻이 여러 개인 단어는 정답과 가까운 뜻으로 계산한다(그림자 ↔ 해=태양)', async () => {
-    const sun = await guessWord('해', NOW);
-    const star = await guessWord('태양', NOW);
+    const { answers } = await loadWordData();
+    const shadowDay = answers.indexOf('그림자') + 1;
+    const shadowNoon = new Date(
+      GUESS_WORD_TIME.firstDayUtcMs + (shadowDay - 1) * GUESS_WORD_TIME.dayMs + NOON_OFFSET_MS,
+    );
+    const sun = await guessWord('해', shadowNoon);
+    const star = await guessWord('태양', shadowNoon);
     const isMissing = 'error' in sun || 'error' in star;
     if (isMissing) throw new Error('해·태양이 어휘에 있어야 한다');
     expect(sun.rank).not.toBeNull();
