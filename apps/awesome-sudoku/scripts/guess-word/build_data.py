@@ -6,6 +6,7 @@ from pathlib import Path
 
 import numpy as np
 from kiwipiepy import Kiwi
+from sentence_transformers import SentenceTransformer
 
 DIMENSIONS = 300
 HANGUL_WORD = re.compile(r"^[가-힣]{1,8}$")
@@ -30,6 +31,10 @@ ANSWER_STOPWORDS = {
 }
 SHUFFLE_SEED = 20261125
 INT8_SCALE = 127
+SEMANTIC_MODEL = "BAAI/bge-m3"
+SEMANTIC_DIMENSIONS = 256
+SEMANTIC_BATCH_SIZE = 512
+CONTEXT_WEIGHT = 0.6
 
 
 def parse_args():
@@ -38,6 +43,7 @@ def parse_args():
     parser.add_argument("--nikl", required=True)
     parser.add_argument("--out", required=True)
     parser.add_argument("--max-words", type=int, default=50000)
+    parser.add_argument("--device", default="cpu")
     return parser.parse_args()
 
 
@@ -132,8 +138,30 @@ def read_noun_vectors(path, kiwi, nikl_nouns, non_nouns, max_words):
     return words, np.stack(vectors)
 
 
+def unit_rows(vectors):
+    return vectors / np.linalg.norm(vectors, axis=1, keepdims=True)
+
+
+def embed_semantic(words, device):
+    model = SentenceTransformer(SEMANTIC_MODEL, device=device)
+    vectors = model.encode(words, batch_size=SEMANTIC_BATCH_SIZE, normalize_embeddings=True, convert_to_numpy=True)
+    return vectors.astype(np.float32)
+
+
+def reduce_dimensions(vectors, dimensions):
+    _u, _s, components = np.linalg.svd(vectors - vectors.mean(axis=0), full_matrices=False)
+    return vectors @ components[:dimensions].T
+
+
+def combine(context_vectors, semantic_vectors):
+    context = unit_rows(context_vectors) * np.sqrt(CONTEXT_WEIGHT)
+    semantic = unit_rows(semantic_vectors) * np.sqrt(1 - CONTEXT_WEIGHT)
+    return np.concatenate([context, semantic], axis=1)
+
+
 def quantize(vectors):
-    return np.clip(np.round(vectors * INT8_SCALE), -INT8_SCALE, INT8_SCALE).astype(np.int8)
+    scale = INT8_SCALE / np.abs(vectors).max(axis=1, keepdims=True)
+    return np.clip(np.round(vectors * scale), -INT8_SCALE, INT8_SCALE).astype(np.int8)
 
 
 def read_nikl_multi_pos_words(path):
@@ -181,7 +209,8 @@ def main():
     words, vectors = read_noun_vectors(args.vectors, kiwi, nikl_nouns, non_nouns, args.max_words)
     vocabulary = set(words)
     (out / "words.txt").write_text("\n".join(words) + "\n", encoding="utf-8")
-    quantize(vectors).tofile(out / "vectors.bin")
+    semantic = reduce_dimensions(embed_semantic(words, args.device), SEMANTIC_DIMENSIONS)
+    quantize(combine(vectors, semantic)).tofile(out / "vectors.bin")
     answers = write_answers_once(out / "answers.txt", pick_answers(kiwi, nikl_nouns, vocabulary, read_nikl_multi_pos_words(args.nikl)), vocabulary)
     print(f"words={len(words)} answers={len(answers)}")
 
