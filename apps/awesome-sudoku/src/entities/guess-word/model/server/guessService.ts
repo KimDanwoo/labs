@@ -1,14 +1,14 @@
-import { GUESS_WORD_ERROR } from '@entities/guess-word/config/guessWord';
+import { GUESS_WORD_ERROR, GUESS_WORD_TIME } from '@entities/guess-word/config/guessWord';
 import { isValidGuess, normalizeGuess } from '@entities/guess-word/lib/guessInput';
 import { buildPuzzle, type Puzzle, type WordData } from '@entities/guess-word/lib/puzzle';
-import { puzzleDay } from '@entities/guess-word/lib/puzzleDay';
+import { answerIndex, puzzleDay } from '@entities/guess-word/lib/puzzleDay';
 import { toDisplaySimilarity } from '@entities/guess-word/lib/similarity';
 import { loadWordData } from '@entities/guess-word/model/server/loadWordData';
 import type {
-  AnswerResult,
   GuessErrorBody,
   GuessResult,
   HintsResult,
+  YesterdayResult,
 } from '@entities/guess-word/model/types/guessWord';
 
 let cachedPuzzle: Puzzle | undefined;
@@ -40,7 +40,9 @@ export async function todayHints(now: Date): Promise<HintsResult> {
   return { day: puzzle.day, hints: puzzle.hints };
 }
 
-export async function todayAnswer(now: Date): Promise<AnswerResult> {
-  const { data, puzzle } = await todayPuzzle(now);
-  return { day: puzzle.day, word: data.words[puzzle.answer] ?? '' };
+export async function yesterdayAnswer(now: Date): Promise<YesterdayResult> {
+  const data = await loadWordData();
+  const day = puzzleDay(now) - 1;
+  if (day < GUESS_WORD_TIME.firstPuzzleDay) return { day, word: null };
+  return { day, word: data.answers[answerIndex(day, data.answers.length)] ?? null };
 }

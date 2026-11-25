@@ -5,7 +5,6 @@ import {
   emptyRecord,
   latestDay,
   parseRecord,
-  revealAnswer,
   solvedTries,
   sortBySimilarity,
   storedDay,
@@ -54,17 +53,6 @@ describe('addGuess', () => {
   });
 });
 
-describe('revealAnswer', () => {
-  it('포기하면 정답을 공개하고, 이미 맞힌 기록은 그대로 둔다', () => {
-    expect(revealAnswer(emptyRecord(3), { day: 3, word: '사랑' })).toMatchObject({
-      status: GUESS_STATUS.GAVE_UP,
-      answer: '사랑',
-    });
-    const solved = addGuess(emptyRecord(3), result('사랑', 100, true));
-    expect(revealAnswer(solved, { day: 3, word: '사랑' })).toBe(solved);
-  });
-});
-
 describe('sortBySimilarity', () => {
   it('유사도가 높은 순으로, 같으면 먼저 입력한 순으로 정렬한다', () => {
     const record = [result('a', 10), result('b', 30), result('c', 10)].reduce(addGuess, emptyRecord(3));
@@ -104,5 +92,12 @@ describe('날짜 기준', () => {
   it('저장된 기록의 날짜를 읽고, 형식이 다르면 null을 준다', () => {
     expect(storedDay({ day: 5 })).toBe(5);
     expect(storedDay('broken')).toBeNull();
+  });
+});
+
+describe('포기 기능 제거 이전 기록', () => {
+  it('포기 상태로 저장된 기록은 정답을 지우고 진행 중으로 읽는다', () => {
+    const stored = { day: 3, guesses: [], status: 'gave-up', answer: '사랑' };
+    expect(parseRecord(stored, 3)).toEqual(emptyRecord(3));
   });
 });

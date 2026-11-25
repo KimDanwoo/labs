@@ -5,12 +5,13 @@ export {
   GUESS_WORD_NO_STORE,
   GUESS_WORD_RANK,
 } from '@entities/guess-word/config/guessWord';
-export { isValidGuess, normalizeGuess } from '@entities/guess-word/lib/guessInput';
+export { isValidGuess, normalizeGuess, readGuessWord } from '@entities/guess-word/lib/guessInput';
 export type {
-  AnswerResult,
   GuessErrorBody,
+  GuessRequestBody,
   GuessResult,
   GuessWordError,
   HintsResult,
   RankHint,
+  YesterdayResult,
 } from '@entities/guess-word/model/types/guessWord';

@@ -17,6 +17,9 @@ catalog:
   # state
   jotai: ^3.0.2
 
+  # security
+  botid: ^1.5.13
+
   # 3d (life-simulation 앱)
   three: 0.187.0
   '@react-three/fiber': 9.8.2

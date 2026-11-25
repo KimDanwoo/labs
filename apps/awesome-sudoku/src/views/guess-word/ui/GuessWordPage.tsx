@@ -11,7 +11,7 @@ export function GuessWordPage() {
         <GuessWord.Form />
         <GuessWord.Latest />
         <GuessWord.List />
-        <GuessWord.GiveUp />
+        <GuessWord.Yesterday />
         <GuessWord.About />
         <GuessWord.ResultSheet />
       </main>

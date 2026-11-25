@@ -5,6 +5,7 @@ export const GUESS_WORD_TIME = {
   dayMs: DAY_MS,
   kstOffsetMs: KST_OFFSET_MS,
   firstDayUtcMs: Date.UTC(2026, 10, 25),
+  firstPuzzleDay: 1,
 } as const;
 
 export const GUESS_WORD_RANK = {
@@ -26,11 +27,13 @@ export const GUESS_WORD_INPUT = {
 export const GUESS_WORD_ERROR = {
   INVALID: 'invalid-word',
   UNKNOWN: 'unknown-word',
+  BOT: 'bot',
 } as const;
 
 export const GUESS_WORD_ERROR_STATUS = {
   [GUESS_WORD_ERROR.INVALID]: 400,
   [GUESS_WORD_ERROR.UNKNOWN]: 404,
+  [GUESS_WORD_ERROR.BOT]: 403,
 } as const;
 
 export const GUESS_WORD_NO_STORE = { 'Cache-Control': 'no-store' } as const;
@@ -38,6 +41,6 @@ export const GUESS_WORD_NO_STORE = { 'Cache-Control': 'no-store' } as const;
 export const GUESS_WORD_API = {
   guess: '/api/guess-word',
   hints: '/api/guess-word/hints',
-  answer: '/api/guess-word/answer',
-  wordParam: 'word',
+  yesterday: '/api/guess-word/yesterday',
+  guessMethod: 'POST',
 } as const;
