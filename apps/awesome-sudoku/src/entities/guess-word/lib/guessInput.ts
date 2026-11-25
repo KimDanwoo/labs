@@ -1,7 +1,11 @@
-import { GUESS_WORD_INPUT } from '@entities/guess-word/config/guessWord';
+import { GUESS_WORD_ALIASES, GUESS_WORD_INPUT } from '@entities/guess-word/config/guessWord';
+
+function applyAliases(word: string): string {
+  return GUESS_WORD_ALIASES.reduce((current, { pattern, replacement }) => current.replace(pattern, replacement), word);
+}
 
 export function normalizeGuess(raw: string): string {
-  return raw.normalize('NFC').replace(/\s+/g, '');
+  return applyAliases(raw.normalize('NFC').replace(/\s+/g, ''));
 }
 
 export function readGuessWord(body: unknown): string {

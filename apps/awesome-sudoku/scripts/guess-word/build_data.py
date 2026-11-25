@@ -19,10 +19,12 @@ HOMONYM_SUFFIX = re.compile(r"\d+$")
 NOUN_TAG = "NNG"
 NOUN_PREFIX_TAG = "XPN"
 NOUN_SUFFIX_TAG = "XSN"
-NOUN_FORMING_SUFFIXES = {"성", "적", "화", "자", "가", "인", "님", "감", "력", "론", "식", "제", "기", "권", "사", "율", "량", "품", "장", "관", "실", "원", "법", "체", "형"}
+NOUN_FORMING_SUFFIXES = {"성", "적", "화", "자", "가", "인", "님", "감", "력", "론", "식", "제", "기", "권", "사", "율", "률", "량", "품", "장", "관", "실", "원", "법", "체", "형", "생"}
 ANALYSIS_CANDIDATES = 3
 COMPOUND_MAX_LENGTH = 5
-AMBIGUITY_MAX_SCORE_GAP = 3.0
+AMBIGUITY_MAX_SCORE_GAP = 4.0
+NOUN_ALLOWED = {"과로", "세배", "조형", "연막"}
+LOANWORD_FALSE_POSITIVES = {"타인", "파손", "파업", "파면", "피임", "메아리", "쓰르라미", "트림"}
 PARTICLE_CHECK_MIN_LENGTH = 4
 TRAILING_PARTICLES = ("에서", "에게", "으로", "의", "에", "을", "를", "은", "는")
 NIKL_NON_NOUN_TAGS = {"동", "형", "부", "관", "감", "대", "수", "보"}
@@ -53,41 +55,9 @@ WEB_COMPOUND_ALLOWED = {
     "웹사이트", "개인정보", "포털사이트", "공동구매", "재구매", "통신판매", "방문판매", "예약판매", "비추천",
 }
 OUTPUT_FILES = ("words.txt", "vectors.bin", "answers.txt", "senses.txt")
-WORD_SENSES = {
-    "해": [["태양", "햇빛", "햇살"]],
-    "달": [["보름달", "달빛", "초승달"], ["월말", "월급", "날짜"]],
-    "눈": [["눈동자", "눈꺼풀", "시력"], ["눈송이", "폭설", "눈사람"]],
-    "배": [["선박", "항구", "돛단배"], ["배꼽", "복부", "뱃살"], ["사과", "과일", "배나무"]],
-    "말": [["언어", "대화", "낱말"], ["승마", "망아지", "조랑말"]],
-    "밤": [["야간", "한밤중", "저녁"], ["밤나무", "도토리", "열매"]],
-    "차": [["자동차", "승용차", "운전"], ["녹차", "홍차", "찻잔"]],
-    "비": [["빗물", "장마", "소나기"]],
-    "불": [["화재", "불꽃", "모닥불"]],
-    "물": [["식수", "강물", "수돗물"]],
-    "발": [["발가락", "발목", "발바닥"]],
-    "손": [["손가락", "손목", "손바닥"]],
-    "코": [["콧물", "콧구멍", "코끝"]],
-    "이": [["치아", "잇몸", "충치"]],
-    "목": [["목구멍", "목덜미", "어깨"]],
-    "돌": [["바위", "자갈", "돌멩이"]],
-    "별": [["별빛", "밤하늘", "은하수"]],
-    "길": [["도로", "골목", "오솔길"]],
-    "집": [["주택", "가정", "보금자리"]],
-    "산": [["등산", "봉우리", "산골"]],
-    "강": [["하천", "강물", "강가"]],
-    "땅": [["토지", "흙", "대지"]],
-    "금": [["황금", "보석", "은"]],
-    "철": [["강철", "쇠", "금속"], ["계절", "제철", "환절기"]],
-    "초": [["양초", "촛불", "촛대"], ["초침", "시계", "순간"]],
-    "병": [["질병", "환자", "병원"], ["유리병", "술병", "물병"]],
-    "줄": [["밧줄", "끈", "노끈"]],
-    "벌": [["꿀벌", "벌집", "말벌"], ["처벌", "형벌", "징계"]],
-    "새": [["참새", "비둘기", "날개"]],
-    "꿈": [["악몽", "잠", "희망"]],
-    "굴": [["동굴", "구멍", "땅굴"], ["조개", "전복", "해산물"]],
-    "김": [["김밥", "미역", "해초"], ["수증기", "입김", "증기"]],
-    "다리": [["허벅지", "무릎", "종아리"], ["교량", "육교", "돌다리"]],
-}
+WORD_SENSES_FILE = Path(__file__).with_name("word_senses.tsv")
+SENSE_FIELD_SEPARATOR = "	"
+SENSE_ANCHOR_SEPARATOR = ","
 LATIN_LETTER = re.compile(r"[A-Za-z]")
 LOANWORD_THRESHOLD = 0.95
 LOANWORD_MAX_ITERATIONS = 3000
@@ -169,6 +139,8 @@ def train_loanword_classifier(loan_labels):
 
 
 def is_loanword(word, loan_labels, loan_probability):
+    if word in LOANWORD_FALSE_POSITIVES:
+        return False
     if word in loan_labels:
         return loan_labels[word]
     has_foreign_syllable = any(syllable in FOREIGN_SYLLABLES for syllable in word)
@@ -252,7 +224,8 @@ def read_noun_vectors(path, kiwi, nikl_nouns, non_nouns, is_loan, max_words):
             continue
         if is_vocabulary_noise(kiwi, word, nikl_nouns):
             continue
-        is_noun = word in nikl_nouns or (not is_particle_form and is_common_noun(kiwi, word))
+        is_listed_noun = word in nikl_nouns or word in NOUN_ALLOWED
+        is_noun = is_listed_noun or (not is_particle_form and is_common_noun(kiwi, word))
         if not is_noun or is_loan(word):
             continue
         vector = unit_vector(values)
@@ -291,13 +264,20 @@ def combine(context_vectors, semantic_vectors, words):
     return np.concatenate([context, semantic], axis=1)
 
 
+def read_word_senses():
+    entries = []
+    for line in WORD_SENSES_FILE.read_text(encoding="utf-8").splitlines():
+        word, anchors = line.split(SENSE_FIELD_SEPARATOR)
+        entries.append((word, anchors.split(SENSE_ANCHOR_SEPARATOR)))
+    return entries
+
+
 def sense_rows(vectors, words):
     index_by_word = {word: index for index, word in enumerate(words)}
-    missing = [anchor for senses in WORD_SENSES.values() for anchors in senses for anchor in anchors if anchor not in index_by_word]
-    missing += [word for word in WORD_SENSES if word not in index_by_word]
+    entries = read_word_senses()
+    missing = sorted({term for word, anchors in entries for term in [word, *anchors] if term not in index_by_word})
     if missing:
         raise SystemExit(f"뜻별 벡터의 단어가 어휘에 없다: {missing}")
-    entries = [(word, anchors) for word, senses in WORD_SENSES.items() for anchors in senses]
     rows = [vectors[[index_by_word[anchor] for anchor in anchors]].mean(axis=0) for _word, anchors in entries]
     return entries, np.stack(rows)
 

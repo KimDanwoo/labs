@@ -46,6 +46,11 @@ export function foldSenses(rowSimilarities: Float32Array, wordCount: number, sen
   return similarities;
 }
 
+export function elementwiseMax(arrays: Float32Array[]): Float32Array {
+  const [first = new Float32Array(), ...rest] = arrays;
+  return first.map((value, index) => Math.max(value, ...rest.map((array) => valueAt(array, index))));
+}
+
 export function nearestNeighbors(similarities: Float32Array, target: number, limit: number): number[] {
   return Array.from(similarities.keys())
     .filter((index) => index !== target)

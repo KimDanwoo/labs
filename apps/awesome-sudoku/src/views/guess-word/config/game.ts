@@ -17,7 +17,7 @@ export const RANK_TONE = {
   FAR: 'far',
 } as const;
 
-export const GUESS_STORAGE_KEY = 'awesome-sudoku:guess-word:v2';
+export const GUESS_STORAGE_KEY = 'awesome-sudoku:guess-word:v3';
 
 export const GUESS_QUERY_KEY = {
   hints: (day: number | null) => ['guess-word', 'hints', day] as const,

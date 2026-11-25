@@ -6,6 +6,15 @@ describe('normalizeGuess', () => {
     expect(normalizeGuess(' 사 랑 ')).toBe('사랑');
     expect(normalizeGuess('사랑'.normalize('NFD'))).toBe('사랑');
   });
+
+  it.each([
+    ['수요일날', '수요일'],
+    ['토요일날', '토요일'],
+    ['금욜', '금요일'],
+    ['요일날', '요일날'],
+  ])('같은 뜻의 다른 표기 %s는 %s로 맞춘다', (raw, expected) => {
+    expect(normalizeGuess(raw)).toBe(expected);
+  });
 });
 
 describe('isValidGuess', () => {
