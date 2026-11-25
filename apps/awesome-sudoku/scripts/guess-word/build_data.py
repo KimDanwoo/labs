@@ -8,7 +8,10 @@ from pathlib import Path
 
 import numpy as np
 from kiwipiepy import Kiwi
+from scipy.sparse import hstack
 from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.linear_model import LogisticRegression
 
 DIMENSIONS = 300
 HANGUL_WORD = re.compile(r"^[가-힣]{1,8}$")
@@ -50,6 +53,18 @@ WEB_COMPOUND_ALLOWED = {
     "웹사이트", "개인정보", "포털사이트", "공동구매", "재구매", "통신판매", "방문판매", "예약판매", "비추천",
 }
 OUTPUT_FILES = ("words.txt", "vectors.bin", "answers.txt")
+LATIN_LETTER = re.compile(r"[A-Za-z]")
+LOANWORD_THRESHOLD = 0.95
+LOANWORD_MAX_ITERATIONS = 3000
+JAMO_NGRAM_SIZES = (1, 2, 3)
+HANGUL_BASE = 0xAC00
+HANGUL_SYLLABLE_COUNT = 11172
+JAMO_ONSET_SPAN = 588
+JAMO_CODA_COUNT = 28
+FOREIGN_SYLLABLES = set(
+    "브츠플케텔페블션클센링뉴팅슈엔팀웨쇼렌콘콜릴캐엘컴턴폰킹룸샤텐폴닝컬램렉셔릭셀딩롤큐몬벤템델톤펜틱뷰픽럭랙켓셜웹엑젤덴윈킨닉뮤텍멘빅헬엠믹퓨밍"
+    "틴컵팩듀틸앤섹랭멜펠캠뱅핸넥즌탠핀랩콤겐쿨튜켄밴샌웰룹셰핫갤닛벳쥬앨앱픈딜톨챔샵팝펀윌앰쉐츄쿼렐밸캔캡봇롬햄샷텀넬폼썸펙옵뷔븐댄캘깅닐킬펫헨뤼휠힙늄킷딕딘켈슐쯔젝셉킥밋"
+)
 
 
 def parse_args():
@@ -78,6 +93,51 @@ def read_nikl_nouns(path):
         if tag == "명":
             nouns.setdefault(word, grade)
     return nouns
+
+
+def read_nikl_loan_labels(path):
+    labels = {}
+    for line in Path(path).read_text(encoding="utf-8").splitlines()[1:]:
+        cells = line.split("\t")
+        if len(cells) < 5:
+            continue
+        word = unicodedata.normalize("NFC", HOMONYM_SUFFIX.sub("", cells[1]))
+        labels[word] = labels.get(word, False) or bool(LATIN_LETTER.search(cells[3]))
+    return labels
+
+
+def jamo_units(word):
+    units = []
+    for syllable in word:
+        code = ord(syllable) - HANGUL_BASE
+        is_hangul = 0 <= code < HANGUL_SYLLABLE_COUNT
+        units += [f"o{code // JAMO_ONSET_SPAN}", f"v{code % JAMO_ONSET_SPAN // JAMO_CODA_COUNT}", f"c{code % JAMO_CODA_COUNT}"] if is_hangul else [syllable]
+    return units
+
+
+def jamo_ngrams(word):
+    units = jamo_units(word)
+    return [" ".join(units[i : i + size]) for size in JAMO_NGRAM_SIZES for i in range(len(units) - size + 1)]
+
+
+def train_loanword_classifier(loan_labels):
+    words = list(loan_labels)
+    jamo_features = CountVectorizer(analyzer=jamo_ngrams).fit(words)
+    char_features = CountVectorizer(analyzer="char", ngram_range=(1, 2)).fit(words)
+
+    def featurize(batch):
+        return hstack([jamo_features.transform(batch), char_features.transform(batch)]).tocsr()
+
+    model = LogisticRegression(max_iter=LOANWORD_MAX_ITERATIONS, class_weight="balanced")
+    model.fit(featurize(words), [loan_labels[word] for word in words])
+    return lambda word: model.predict_proba(featurize([word]))[0, 1]
+
+
+def is_loanword(word, loan_labels, loan_probability):
+    if word in loan_labels:
+        return loan_labels[word]
+    has_foreign_syllable = any(syllable in FOREIGN_SYLLABLES for syllable in word)
+    return has_foreign_syllable or loan_probability(word) >= LOANWORD_THRESHOLD
 
 
 def read_nikl_non_nouns(path, nikl_nouns):
@@ -147,7 +207,7 @@ def unit_vector(values):
     return vector / norm if norm > 0 else None
 
 
-def read_noun_vectors(path, kiwi, nikl_nouns, non_nouns, max_words):
+def read_noun_vectors(path, kiwi, nikl_nouns, non_nouns, is_loan, max_words):
     words, vectors, read_words = [], [], set()
     for word, values in read_hangul_entries(path):
         is_duplicate = word in read_words
@@ -158,7 +218,9 @@ def read_noun_vectors(path, kiwi, nikl_nouns, non_nouns, max_words):
         if is_vocabulary_noise(kiwi, word, nikl_nouns):
             continue
         is_noun = word in nikl_nouns or (not is_particle_form and is_common_noun(kiwi, word))
-        vector = unit_vector(values) if is_noun else None
+        if not is_noun or is_loan(word):
+            continue
+        vector = unit_vector(values)
         if vector is None:
             continue
         words.append(word)
@@ -223,10 +285,10 @@ def pick_answers(kiwi, nikl_nouns, vocabulary, multi_pos_words):
     return candidates
 
 
-def frozen_answers(path, answers, vocabulary):
+def frozen_answers(path, answers, vocabulary, is_loan):
     if not path.exists():
         return answers
-    frozen = path.read_text(encoding="utf-8").split()
+    frozen = [word for word in path.read_text(encoding="utf-8").split() if not is_loan(word)]
     missing = [word for word in frozen if word not in vocabulary]
     if missing:
         raise SystemExit(f"정답 목록에 어휘에 없는 단어가 있다: {missing[:10]}")
@@ -250,10 +312,16 @@ def main():
     nikl_nouns = read_nikl_nouns(args.nikl)
     non_nouns = read_nikl_non_nouns(args.nikl, nikl_nouns)
     kiwi = Kiwi()
-    words, vectors = read_noun_vectors(args.vectors, kiwi, nikl_nouns, non_nouns, args.max_words)
+    loan_labels = read_nikl_loan_labels(args.nikl)
+    loan_probability = train_loanword_classifier(loan_labels)
+
+    def is_loan(word):
+        return is_loanword(word, loan_labels, loan_probability)
+
+    words, vectors = read_noun_vectors(args.vectors, kiwi, nikl_nouns, non_nouns, is_loan, args.max_words)
     vocabulary = set(words)
     candidates = pick_answers(kiwi, nikl_nouns, vocabulary, read_nikl_multi_pos_words(args.nikl))
-    answers = frozen_answers(out / "answers.txt", candidates, vocabulary)
+    answers = frozen_answers(out / "answers.txt", candidates, vocabulary, is_loan)
     semantic = reduce_dimensions(embed_semantic(words, args.device), SEMANTIC_DIMENSIONS)
     write_outputs(out, words, quantize(combine(vectors, semantic, words)), answers)
     print(f"words={len(words)} answers={len(answers)}")
