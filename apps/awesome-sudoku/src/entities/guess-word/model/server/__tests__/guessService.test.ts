@@ -24,6 +24,12 @@ describe('guessService (실제 데이터)', () => {
     expect(await guessWord('예쁘다', NOW)).toEqual({ day: 1, error: GUESS_WORD_ERROR.UNKNOWN });
   });
 
+  it('외래어는 어휘에 없어 unknown을 준다', async () => {
+    for (const word of ['컴퓨터', '버스', '쉐도우']) {
+      expect(await guessWord(word, NOW)).toEqual({ day: 1, error: GUESS_WORD_ERROR.UNKNOWN });
+    }
+  });
+
   it('힌트는 1위·10위·1000위 순서로 유사도가 내려간다', async () => {
     const { hints } = await todayHints(NOW);
     expect(hints.map(({ rank }) => rank)).toEqual([...GUESS_WORD_RANK.hints]);
@@ -33,7 +39,7 @@ describe('guessService (실제 데이터)', () => {
   });
 
   it('1000위 안 단어는 순위가, 나머지는 null이 온다', async () => {
-    const results = await Promise.all(['사랑', '컴퓨터', '바다', '김치찌개'].map((word) => guessWord(word, NOW)));
+    const results = await Promise.all(['사랑', '하늘', '바다', '김치찌개'].map((word) => guessWord(word, NOW)));
     for (const result of results) {
       if ('error' in result) throw new Error(result.error);
       const isRanked = result.rank !== null;

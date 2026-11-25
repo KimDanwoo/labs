@@ -26,7 +26,7 @@ export const GUESS_WORD_COPY = {
 
 export const NOTICE_TEXT: Record<NoticeKind, (word: string) => string> = {
   [NOTICE_KIND.INVALID]: () => '한글 단어 하나만 입력할 수 있어요 (8자 이하).',
-  [NOTICE_KIND.UNKNOWN]: (word) => `'${word}'은(는) 사전에 없거나 명사가 아니에요.`,
+  [NOTICE_KIND.UNKNOWN]: (word) => `'${word}'은(는) 사전에 없거나, 명사가 아니거나, 외래어예요.`,
   [NOTICE_KIND.DUPLICATE]: (word) => `'${word}'은(는) 이미 입력했어요.`,
   [NOTICE_KIND.NETWORK]: () => '서버와 연결하지 못했어요. 잠시 후 다시 시도해 주세요.',
   [NOTICE_KIND.BOT]: () => '자동 입력으로 보여서 막았어요. 새로고침한 뒤 직접 입력해 주세요.',
@@ -45,6 +45,7 @@ export const RESULT_TITLE: Record<GuessStatus, string> = {
 
 export const GUESS_WORD_RULES = [
   '명사만 입력할 수 있어요. 동사·형용사·부사와 대부분의 고유명사는 받지 않아요.',
+  '외래어는 안 돼요. 버스·컴퓨터·러브처럼 외국어에서 온 말과, 개발팀처럼 외래어가 섞인 말은 입력할 수 없어요.',
   '유사도는 두 단어가 뜻과 쓰임이 얼마나 가까운지를 -100~100으로 나타내요. 정답은 100이에요.',
   '정답과 가장 가까운 1000개 단어 안에 들면 순위가 보여요. 1위가 정답 다음으로 가까운 단어예요.',
   '문제는 하루에 하나, 한국 시간 자정에 바뀌어요. 포기는 없고, 정답은 다음 날 「어제의 정답」으로 공개돼요.',
