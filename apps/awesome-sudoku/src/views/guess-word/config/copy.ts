@@ -45,7 +45,7 @@ export const RESULT_TITLE: Record<GuessStatus, string> = {
 
 export const GUESS_WORD_RULES = [
   '명사만 입력할 수 있어요. 동사·형용사·부사와 대부분의 고유명사는 받지 않아요.',
-  '유사도는 단어의 뜻이 얼마나 가까운지를 -100~100으로 나타내요. 정답은 100이에요.',
+  '유사도는 두 단어가 뜻과 쓰임이 얼마나 가까운지를 -100~100으로 나타내요. 정답은 100이에요.',
   '정답과 가장 가까운 1000개 단어 안에 들면 순위가 보여요. 1위가 정답 다음으로 가까운 단어예요.',
   '문제는 하루에 하나, 한국 시간 자정에 바뀌어요. 포기는 없고, 정답은 다음 날 「어제의 정답」으로 공개돼요.',
 ] as const;
@@ -54,6 +54,10 @@ export const GUESS_WORD_CREDITS = [
   {
     label: '단어 벡터: fastText 한국어 벡터 (Facebook AI Research, CC BY-SA 3.0)',
     href: 'https://fasttext.cc/docs/en/crawl-vectors.html',
+  },
+  {
+    label: '의미 벡터: BGE-M3 (BAAI, MIT)',
+    href: 'https://huggingface.co/BAAI/bge-m3',
   },
   {
     label: '정답 목록: 국립국어원 「한국어 학습용 어휘 목록」 (공공누리 제1유형)',
