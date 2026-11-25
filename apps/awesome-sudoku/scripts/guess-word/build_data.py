@@ -1,6 +1,8 @@
 import argparse
 import random
 import re
+import shutil
+import tempfile
 import unicodedata
 from pathlib import Path
 
@@ -35,6 +37,19 @@ SEMANTIC_MODEL = "BAAI/bge-m3"
 SEMANTIC_DIMENSIONS = 256
 SEMANTIC_BATCH_SIZE = 512
 CONTEXT_WEIGHT = 0.6
+BOUND_FORMS = {
+    "뒷", "윗", "아랫", "머릿", "나뭇", "바닷", "뱃", "앳", "잇", "웃", "놋", "멧", "밧", "릇", "끗", "릿", "룻",
+    "무랏", "코잇", "힛", "닷",
+}
+WEB_COMPOUND_MIN_LENGTH = 3
+WEB_COMPOUND_SUFFIXES = {
+    "명", "팁", "정보", "방법", "후기", "리뷰", "추천", "소개", "안내", "문의", "목록", "순위", "사이트", "블로그",
+    "이벤트", "가격", "할인", "판매", "구매", "모음", "종류", "노하우", "꿀팁", "총정리",
+}
+WEB_COMPOUND_ALLOWED = {
+    "웹사이트", "개인정보", "포털사이트", "공동구매", "재구매", "통신판매", "방문판매", "예약판매", "비추천",
+}
+OUTPUT_FILES = ("words.txt", "vectors.bin", "answers.txt")
 
 
 def parse_args():
@@ -102,6 +117,19 @@ def is_noun_with_particle(word, read_words):
     return any(word.endswith(particle) and word[: -len(particle)] in read_words for particle in TRAILING_PARTICLES)
 
 
+def is_web_compound(kiwi, word):
+    if len(word) < WEB_COMPOUND_MIN_LENGTH or word in WEB_COMPOUND_ALLOWED:
+        return False
+    tokens = kiwi.tokenize(word)
+    return len(tokens) >= 2 and tokens[-1].form in WEB_COMPOUND_SUFFIXES
+
+
+def is_vocabulary_noise(kiwi, word, nikl_nouns):
+    if word in nikl_nouns:
+        return False
+    return word in BOUND_FORMS or is_web_compound(kiwi, word)
+
+
 def read_hangul_entries(path):
     with open(path, encoding="utf-8") as file:
         next(file)
@@ -127,6 +155,8 @@ def read_noun_vectors(path, kiwi, nikl_nouns, non_nouns, max_words):
         read_words.add(word)
         if is_duplicate or word in non_nouns:
             continue
+        if is_vocabulary_noise(kiwi, word, nikl_nouns):
+            continue
         is_noun = word in nikl_nouns or (not is_particle_form and is_common_noun(kiwi, word))
         vector = unit_vector(values) if is_noun else None
         if vector is None:
@@ -138,8 +168,12 @@ def read_noun_vectors(path, kiwi, nikl_nouns, non_nouns, max_words):
     return words, np.stack(vectors)
 
 
-def unit_rows(vectors):
-    return vectors / np.linalg.norm(vectors, axis=1, keepdims=True)
+def unit_rows(vectors, words):
+    norms = np.linalg.norm(vectors, axis=1, keepdims=True)
+    invalid = np.flatnonzero(~np.isfinite(norms[:, 0]) | (norms[:, 0] == 0))
+    if invalid.size > 0:
+        raise SystemExit(f"정규화할 수 없는 벡터가 있다: {[words[i] for i in invalid[:10]]}")
+    return vectors / norms
 
 
 def embed_semantic(words, device):
@@ -149,13 +183,14 @@ def embed_semantic(words, device):
 
 
 def reduce_dimensions(vectors, dimensions):
-    _u, _s, components = np.linalg.svd(vectors - vectors.mean(axis=0), full_matrices=False)
-    return vectors @ components[:dimensions].T
+    centered = vectors - vectors.mean(axis=0)
+    _u, _s, components = np.linalg.svd(centered, full_matrices=False)
+    return centered @ components[:dimensions].T
 
 
-def combine(context_vectors, semantic_vectors):
-    context = unit_rows(context_vectors) * np.sqrt(CONTEXT_WEIGHT)
-    semantic = unit_rows(semantic_vectors) * np.sqrt(1 - CONTEXT_WEIGHT)
+def combine(context_vectors, semantic_vectors, words):
+    context = unit_rows(context_vectors, words) * np.sqrt(CONTEXT_WEIGHT)
+    semantic = unit_rows(semantic_vectors, words) * np.sqrt(1 - CONTEXT_WEIGHT)
     return np.concatenate([context, semantic], axis=1)
 
 
@@ -188,30 +223,39 @@ def pick_answers(kiwi, nikl_nouns, vocabulary, multi_pos_words):
     return candidates
 
 
-def write_answers_once(path, answers, vocabulary):
-    if path.exists():
-        frozen = path.read_text(encoding="utf-8").split()
-        missing = [word for word in frozen if word not in vocabulary]
-        if missing:
-            raise SystemExit(f"정답 목록에 어휘에 없는 단어가 있다: {missing[:10]}")
-        return frozen
-    path.write_text("\n".join(answers) + "\n", encoding="utf-8")
-    return answers
+def frozen_answers(path, answers, vocabulary):
+    if not path.exists():
+        return answers
+    frozen = path.read_text(encoding="utf-8").split()
+    missing = [word for word in frozen if word not in vocabulary]
+    if missing:
+        raise SystemExit(f"정답 목록에 어휘에 없는 단어가 있다: {missing[:10]}")
+    return frozen
+
+
+def write_outputs(out, words, vectors, answers):
+    out.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=out.parent) as staging_name:
+        staging = Path(staging_name)
+        (staging / "words.txt").write_text("\n".join(words) + "\n", encoding="utf-8")
+        vectors.tofile(staging / "vectors.bin")
+        (staging / "answers.txt").write_text("\n".join(answers) + "\n", encoding="utf-8")
+        for name in OUTPUT_FILES:
+            shutil.move(str(staging / name), str(out / name))
 
 
 def main():
     args = parse_args()
     out = Path(args.out)
-    out.mkdir(parents=True, exist_ok=True)
     nikl_nouns = read_nikl_nouns(args.nikl)
     non_nouns = read_nikl_non_nouns(args.nikl, nikl_nouns)
     kiwi = Kiwi()
     words, vectors = read_noun_vectors(args.vectors, kiwi, nikl_nouns, non_nouns, args.max_words)
     vocabulary = set(words)
-    (out / "words.txt").write_text("\n".join(words) + "\n", encoding="utf-8")
+    candidates = pick_answers(kiwi, nikl_nouns, vocabulary, read_nikl_multi_pos_words(args.nikl))
+    answers = frozen_answers(out / "answers.txt", candidates, vocabulary)
     semantic = reduce_dimensions(embed_semantic(words, args.device), SEMANTIC_DIMENSIONS)
-    quantize(combine(vectors, semantic)).tofile(out / "vectors.bin")
-    answers = write_answers_once(out / "answers.txt", pick_answers(kiwi, nikl_nouns, vocabulary, read_nikl_multi_pos_words(args.nikl)), vocabulary)
+    write_outputs(out, words, quantize(combine(vectors, semantic, words)), answers)
     print(f"words={len(words)} answers={len(answers)}")
 
 
