@@ -1,211 +1,73 @@
 # Danwoo Lab
 
-> 내가 만든 프로젝트들을 모아 소개하는 포트폴리오 허브 + 작은 실험 앱들을 담는 **모노레포**.
+pnpm·turbo 모노레포. 공통 규칙의 단일 원본은 이 파일이고 Codex·Claude 모두 이 파일을 따른다. 도구별 문서에 같은 규칙을 중복 정의하지 않는다.
 
-> **Next.js 16 주의**: 학습 데이터와 다른 breaking change가 있을 수 있음. 코드 작성 전 `apps/<app>/node_modules/next/dist/docs/` 확인.
+Next.js 16은 학습 데이터와 다른 breaking change가 있을 수 있다. 코드를 쓰기 전에 `apps/<app>/node_modules/next/dist/docs/`를 확인한다.
 
-## 스택 & 런타임
+## 앱 구조 결정
 
-- **TurboRepo + pnpm workspace(catalog)** 모노레포
-- Next.js 16 (App Router) + React 19 + TypeScript 5 + Tailwind CSS 4
-- **Node 24 고정**: `engine-strict=true`(`.npmrc`), `.nvmrc`=24, pnpm 9.12.1
+- 공유 UI 패키지·공유 디자인 토큰은 없다. 공유하는 것은 서체(`@repo/fonts`)와 기본 룰(`DESIGN_RULES.md`)뿐이다. 버튼·카드 같은 컴포넌트도 앱의 `src/shared/ui`에 두고, 다른 앱에 필요하면 복사해서 고친다.
+- 크기·간격·색은 앱의 `src/app/styles/theme.css`·`colors.css`가 소유한다. 다른 앱 값을 맞추려고 공유 패키지를 만들지 않는다.
+- 새 앱은 기존 앱 구성(공유 tsconfig·ESLint·`@repo/security-headers`·FSD 별칭·catalog)을 따르고 `pnpm check:architecture`로 확인한다.
+- 화면 전환은 App Router URL로 한다. atom으로 화면을 전환하지 않는다.
 
-## 모노레포 구조
+## FSD (앱 내부, 공식 FSD 2.1 기준)
 
-```
-apps/
-  hub/                # 포트폴리오 허브
-  fe-deep/            # 프론트엔드 학습 플랫폼
-  awesome-sudoku/     # 스도쿠
-  soundlab/           # 음악 플레이어
-  komorebi/           # 픽셀 아트 산책
-  prairie/            # 3D 초원
-  danwoo-island/      # 포트폴리오 섬 드라이브(folio-2025 포크)
-packages/             # 공유 서체 + 공유 설정
-  fonts/  @repo/fonts             # 마루부리 서체(fonts.css)
-  config/  @config/tsconfig         # 공유 tsconfig(base / next)
-  eslint-config/  @repo/eslint-config    # 공유 ESLint(flat): next + FSD 경계 강제
-  prettier-config/ @repo/prettier-config # 공유 Prettier
-  security-headers/ @repo/security-headers # 앱 공통 CSP·보안 헤더
-```
+- Next 라우팅 `apps/<app>/app/`(src 밖, 얇게)과 FSD `app` 레이어 `apps/<app>/src/app/`(providers·전역 스타일)은 별개다. FSD `pages` 레이어는 `views`로 부른다. 별칭 `@app/`은 `src/app/`을 가리킨다.
+- `widgets` 레이어는 쓰지 않는다. 한 화면 전용 블록은 그 view에, 여러 화면이 쓰는 동작은 `features`에, 앱 전체 레이아웃은 `src/app`에 둔다.
+- 먼저 쓰는 화면의 `views/<화면>`에 둔다. `features`·`entities`로 내리는 건 지금 실제로 여러 화면이 쓸 때만이고, 쓰는 곳이 하나뿐이면 view로 되돌린다. 예외로 `src/app`(provider)이나 Next 라우트 파일(`sitemap.ts`·`route.ts`)도 함께 쓰는 도메인 코드는 화면이 하나여도 `entities`에 두되, 그 바깥 파일이 실제로 가져다 쓰는 것만 둔다.
+- 서버 전용 코드(fs, `next/headers`, `server-only`)는 `index.server.ts`로만 내보내고 `index.ts`에 섞지 않는다. Server Action은 `model/actions/`에 둔다.
+- 테스트는 대상 옆 `__tests__/`에 둔다. 브라우저 테스트는 앱 루트 `e2e/*.spec.ts`.
+- 슬라이스 안에서도 별칭 전체 경로로 import하고 자기 `index.ts`는 거치지 않는다. 상대경로는 `harness/no-relative-import`가 막는다. `vi.mock`의 문자열 경로는 직접 별칭으로 쓰고, Worker·자산의 `new URL`은 기존 상대경로를 유지한다.
+- 인라인 규칙 끄기 주석은 무시된다(`noInlineConfig`). 불가피한 예외는 앱 `eslint.config.mjs`에 이름 있는 파일 목록으로 둔다.
 
-## 모노레포 핵심 규칙
+## 합성 컴포넌트 (Root + Part)
 
-1. **의존성 버전은 catalog 단일 관리**: 모든 버전은 `pnpm-workspace.yaml`의 `catalog:`에 두고 각 `package.json`은 `"catalog:"`로 참조. 워크스페이스 간 참조는 `"workspace:*"`. **package.json에 raw 버전을 박지 않는다.** 버전 변경은 catalog 한 곳만 수정 후 `pnpm install`.
+화면 상태를 props로 중간 컴포넌트가 릴레이하지 않는다. `<StudySession.Root session={session}>` 안에 `<StudySession.Header />`, `<StudySession.Card>…</StudySession.Card>`를 나열한다. 기준 예는 fe-deep `views/learn`, komorebi `views/walk`, awesome-sudoku `shared/ui/icon-button`.
 
-2. **디자인은 앱마다, 서체와 기본 룰만 공유**: 공유 디자인 시스템도 공유 토큰도 없다. 앱마다 느낌이 달라 크기·간격·색·컴포넌트를 앱이 소유한다. 기본 룰은 루트 [`DESIGN_RULES.md`](DESIGN_RULES.md)가 단일 원본이다.
-   - **공유는 서체뿐**: `@repo/fonts/fonts.css`(마루부리)를 앱 루트 레이아웃에서 import한다. 원하지 않는 앱은 쓰지 않는다.
-   - **크기·간격·반경·그림자·컨테이너 폭은 앱의 `src/app/styles/theme.css`에**(쓰는 앱만). 다른 앱 값을 맞추려고 공유 패키지를 만들지 않는다. 필요하면 복사해서 고친다.
-   - **색은 앱의 `src/app/styles/colors.css`에**: 라이트·다크 값, 다크 모드 variant, 색이 섞인 그림자(`shadow-glow`)를 앱이 소유한다. 장식색·카테고리색도 그 앱 CSS에 토큰으로 둔다.
-   - 스타일은 그 앱의 토큰 기반 Tailwind 유틸로: 색 `bg-primary`/`text-muted-foreground`, 간격 `px-lg`/`gap-3xl`, 반경 `rounded-md`, 그림자 `shadow-md` 등. **임의 hex/px 매직값 금지.**
-   - **굵기는 `font-normal`·`font-semibold`·`font-bold`만**(마루부리를 쓰는 앱): 마루부리가 400·600·700만 제공한다. `font-medium` 등은 500을 가진 고정폭 서체(`font-mono`)에만 쓴다.
-   - **`pnpm lint`가 강제한다**(`check-architecture.mjs`의 `validateDesignTokens`): `src/app/styles/theme.css`가 있는 앱에서 기본 팔레트 색 클래스, 임의 색 값(`bg-[#...]`), 서체에 없는 굵기를 막는다. 불가피하면 그 줄이나 윗줄에 `token-exception: 이유` 주석을 남긴다.
-   - **Tailwind v4 표기**(`validateTailwindNames`, Tailwind를 쓰는 앱의 ts/tsx): v3 시절 이름은 v4 표기로 쓴다 — `bg-gradient-to-*`→`bg-linear-to-*`, `flex-shrink`·`flex-grow`→`shrink`·`grow`, `aria-[current=true]:`→`aria-current:`, `/[0.03]`→`/3`. px 임의값(`size-[7px]`)은 그대로 둔다(스케일 표기로 바꾸지 않는다).
-   - 대비·포커스·누르는 영역·움직임 줄이기·화면 세 개 확인은 DESIGN_RULES.md의 체크리스트로 PR 전에 확인한다.
+- 모델 훅 `model/hooks/useXxx.ts`가 상태를 조립하고, context는 `model/store/xxxContext.ts`, 구독 훅은 `model/hooks/useXxxContext.ts`(Root 밖에서 쓰면 throw)에 둔다.
+- `XxxRoot.tsx`가 Provider를 연다. 기본은 Root가 모델 훅을 직접 호출한다(상태 변화가 context 구독자만 다시 그리게). 상위 흐름이 이미 모델을 들고 분기에 쓰면(fe-deep `LearnPage`) Root가 그 모델을 prop으로 받는다.
+- 파트는 `XxxPart.tsx` 한 파일에 하나씩, 묶음은 같은 폴더의 `xxx.ts`(shared 항목은 `index.ts`)에 `export const Xxx = { Root, Part… }`.
+- 파트 안의 하위 블록도 같은 context를 구독해도 된다. 상태를 들고 마운트·리셋 시점이 중요한 HUD·리프(`CompanionPanel`, `KeywordHints`)는 표시용 props를 그대로 받고, 마운트 조건·`key`는 파트가 갖는다.
+- 내용(아이콘·라벨·배지)은 prop이 아니라 children 파트로 조립한다. 버튼·입력 기본 속성은 `ComponentProps<'button'>`을 확장해 받는다.
 
-3. **새 앱은 기존 앱 구성을 따른다**: `apps/<name>`(소문자/숫자/하이픈)에 공유 tsconfig·ESLint(next + FSD)·`@repo/security-headers`·FSD 경로 별칭·catalog 의존성을 연결하고, `pnpm check:architecture`로 확인한다. `vercel.json`은 아래 배포 규칙을 따른다.
+## 스타일
 
-4. **TS 엄격 옵션 준수**(`@config/tsconfig`): `verbatimModuleSyntax` → 타입은 `import type`로. `noUncheckedIndexedAccess` → 인덱스 접근 결과는 `undefined` 가능성을 좁힌 뒤 사용. `any` 금지(`unknown`에서 좁히기).
+- 기준은 줄 수가 아니라 "다음 디자인 변경 때 몇 군데를 고치는가"다. 한 번만 쓰는 레이아웃 클래스는 `className`에 그대로 두고, 반복되는 모양은 앱 `shared/ui`의 공용 컴포넌트로 뺀다.
+- 변형 클래스는 분기마다 완성된 문자열로 고른다(`bg-${color}-500`처럼 조립하지 않는다). 복잡한 공용 프리미티브만 같은 파일에 `cva`를 쓰고 `styles.ts`로 옮기지 않는다.
+- 정적 `cn('a','b')`을 문자열로 합칠 때는 tailwind-merge가 지우던 충돌 클래스가 되살아나지 않는지 `twMerge`로 확인한다.
+- 상태·자식 선택자가 뒤엉킨 부분만 `ui/<이름>.module.css`로 뺀다. 모듈 안에서는 `@apply` 대신 `var(--color-primary)` 같은 테마 변수를 쓴다(`@apply`는 모듈마다 `@reference`가 필요하고 Tailwind가 모듈 수만큼 다시 돈다).
+- 인라인 `style`은 계산된 값에만 쓴다.
 
-## FSD 아키텍처 (앱 내부)
+## 린트 부채·하네스
 
-각 앱은 `apps/<app>/src/` 아래에 FSD로 구성한다. 기준은 공식 FSD 2.1이다. **공유 UI 패키지는 없다.** Button·Card 같은 표시 프리미티브도 각 앱의 `src/shared/ui`에 두고, 앱끼리 컴포넌트를 공유하지 않는다.
+- 컴포넌트 props·마크업은 `harness/max-props`·`harness/component-markup`으로 검사한다. 기존 위반은 다른 ESLint 위반과 함께 `eslint-suppressions.json`에만 둔다.
+- ESLint 위반은 앱별·루트 `eslint-suppressions.json`에만 둔다. 줄어들기만 한다. 고친 뒤 해당 폴더에서 `pnpm exec eslint . --prune-suppressions`로 정리하고, `--suppress-all`·`--suppress-rule`로 새 위반을 덧붙이지 않는다.
+- 품질·FSD 규칙은 `my-fe-harness/eslint`의 `quality()`·`fsd()`를 그대로 쓴다. 원본은 my-fe-harness 한 곳이며 버전은 `pnpm-workspace.yaml` catalog의 태그로 고정한다. 저장소 안에 규칙 사본을 만들지 않는다.
 
-**Next 라우팅과 FSD `app` 레이어는 분리한다 (합치기 금지).**
+## 커밋·브랜치
 
-- **`apps/<app>/app/`** (= `src/` **밖**): Next 라우팅 진입점. `layout.tsx`/`page.tsx`/`route.ts` + 파일 기반 메타데이터(`icon.*`/`opengraph-image.*` 등)만 둔다. **얇게** — 화면은 `views`, 전역 setup은 `src/app`에 위임한다.
-- **`apps/<app>/src/app/`** (= FSD `app` 레이어, **라우팅 아님**): `providers/`(전역 프로바이더 합성 루트), `globals.css`(전역 스타일), 앱 전체 레이아웃 등 앱 전역 setup. 라우팅 파일(page/layout)을 여기에 두지 않는다.
-- FSD `pages` 레이어는 Next와 이름이 겹쳐 `views`로 부른다(공식 권장 `_pages`·`_app` 대신 이 저장소는 `views`·`src/app`으로 통일).
-
-**레이어 의존성** (단방향, `@repo/eslint-config`의 `fsd.config.mjs` — my-fe-harness `fsd()` 프리셋 — 로 **lint 강제**): `app → views → features → entities → shared`
-
-- 하위 레이어는 상위를 import 불가. 같은 레이어의 다른 슬라이스 참조 금지. `@repo/fonts`는 루트 레이아웃에서 import한다.
-- **`widgets` 레이어는 쓰지 않는다.** 한 화면 전용 블록은 그 view에, 여러 화면에서 쓰는 동작은 `features`에, 앱 전체 레이아웃은 `src/app`에 둔다.
-- 위반 시 `pnpm lint`가 에러로 막는다. 인라인 규칙 끄기 주석(`eslint-disable` 등)은 무시된다(`noInlineConfig`) — 불가피한 예외는 앱 `eslint.config.mjs`에 이름 있는 파일 목록으로 둔다.
-
-**어디에 둘지 (pages-first)**: 먼저 쓰는 화면의 `views/<화면>`에 둔다. `features`·`entities`로 내리는 건 **지금 실제로 여러 화면에서 쓸 때만** 한다. 쓰는 곳이 하나뿐인 feature·entity는 그 view로 되돌린다. 화면이 하나뿐인 앱은 `src/app` + `views/<화면>` + (필요하면) `shared`만 가진다. 단, `src/app`(프로바이더 등)이나 Next 라우트 파일(`sitemap.ts`·`route.ts`·동적 라우트)도 함께 쓰는 도메인 코드는 views에서 가져올 수 없으므로 화면이 하나여도 `entities`에 둔다. 이때 `entities`에는 **그 바깥 파일이 실제로 가져다 쓰는 것만**(곡 목록·타입·URL 함수 등) 두고, 화면만 쓰는 상태·훅·UI는 view에 둔다. 프로바이더에 store 하나를 넘기려고 도메인 전체를 entities에 두지 않는다 — 프로바이더가 store를 직접 만들게 한다.
-
-**경로 별칭** (앱 `tsconfig.json`의 `paths`): `@app/` `@views/` `@features/` `@entities/` `@shared/` → `./src/<layer>/`. `@app/`은 **FSD app 레이어(`src/app/`)**를 가리킨다 — 루트 라우팅 `app/`은 Next 진입점이라 별칭이 없다.
-
-**슬라이스 구조와 공개 API**
-
-```
-apps/<app>/
-  app/                         # Next 라우팅 진입점(src 밖). 얇게.
-  src/
-    app/                       # FSD app 레이어: providers/, globals.css, 앱 레이아웃
-    views/home/
-      index.ts                 # 공개 API — 슬라이스의 유일한 출입구
-      index.server.ts          # 서버 전용 코드가 있을 때만
-      ui/                      # 컴포넌트 (HomeView.tsx 포함) + 필요할 때만 <이름>.module.css
-      model/                   # 상태·비즈니스 로직·타입 (model/hooks, model/store, model/types …)
-      api/                     # 백엔드 통신
-      lib/                     # 슬라이스 내부 보조 코드(알고리즘·그래픽)
-      config/                  # 설정·상수·그림 데이터
-      styles/                  # 이 슬라이스 전용 CSS 파일(.css만)
-    shared/
-      ui/ lib/ api/ config/    # 세그먼트만. 도메인 폴더 금지
-```
-
-- 세그먼트 이름은 `ui`·`model`·`api`·`lib`·`config`만 쓴다(목적 기준). CSS 파일만 담는 `styles/`는 예외로 둔다. 필요한 것만 만든다. `hooks`·`types`·`constants`·`services` 같은 종류 기준 이름은 세그먼트 **안**의 하위 폴더로만 쓴다. 슬라이스가 커지면 세그먼트 아래에 도메인 하위 폴더를 둔다(`ui/scene/`, `model/runner/`).
-- **밖에서는 슬라이스 루트로만 import한다**: `from '@entities/question'`, 서버 전용은 `from '@views/study/index.server'`. `@entities/question/model/types`처럼 안쪽 경로로 가져오지 않는다.
-- **슬라이스 안에서도 별칭 전체 경로**로 파일을 직접 import한다(`@features/game/ui/Card`, `@features/game/model/types/game`). 자기 `index.ts`를 거치지 않는다(순환 참조). `src` 안을 가리키는 상대경로(`./`·`../`)는 `pnpm lint`(`harness/no-relative-import`, `--fix`로 별칭 경로로 바뀜)가 막는다. 루트 `app/`·루트 파일이 상대경로로 `src`를 가져오는 것도 `fsd.config.mjs`가 막는다. `vi.mock('./…')` 같은 문자열 경로는 검사하지 않으니 직접 별칭으로 쓴다. Worker·에셋의 `new URL('./…', import.meta.url)`은 import가 아니라 그대로 둔다.
-- `index.ts`는 **밖에서 실제로 쓰는 것만**, 이름을 하나씩 적어 내보낸다. `export *` 금지. 타입은 `export type` 또는 `type` 한정자.
-- **세그먼트 안에 `index.ts`(배럴)를 두지 않는다.** 출입구는 슬라이스 루트 하나다.
-- `shared`는 `@shared/<세그먼트>/<항목>`으로 import한다(`@shared/lib/cn`, `@shared/ui/BottomSheet`). `shared/ui`·`shared/lib` 전체를 묶는 `index.ts`는 만들지 않는다(공식 권장 — 하나만 써도 전부 딸려 온다). `shared/api`·`shared/config`는 세그먼트 `index.ts` 하나로 묶어도 된다. shared 안에서도 다른 항목은 진입점으로만 가져온다.
-- **테스트는 대상 코드 옆 `__tests__/<대상>.test.ts`(컴포넌트는 `.test.tsx`)에 둔다**(`.mjs` 스크립트·설정 패키지의 테스트는 `.test.mjs`). `scripts/`에 모으지 않는다. 테스트는 대상 파일을 별칭 전체 경로로 직접 import해도 된다. 여러 테스트가 함께 쓰는 테스트 전용 헬퍼도 `__tests__/` 안에 `.test.` 없는 이름으로 둔다. 브라우저 테스트는 앱 루트 `e2e/*.spec.ts`다.
-
-**서버 경계**: 서버 전용 코드(파일시스템, `next/headers`, `server-only`)와 그것을 쓰는 서버 컴포넌트는 `index.server.ts`로만 내보낸다. 클라이언트가 쓰는 `index.ts`에 섞지 않는다. Server Action은 `'use server'` 모듈(`model/actions/`)에 두고 `index.ts`에서 내보내도 된다. 서버 전용 데이터 로딩은 `model/server/` 또는 `api/`에 둔다.
-
-**컴포넌트 인라인 선언 금지**: `views`·`features`·`entities`의 컴포넌트는 파일 하나에 하나씩, 이름과 파일명을 일치시켜 슬라이스의 `ui/` 세그먼트에 둔다.
-
-**Import 순서**: `prettier-plugin-organize-imports`가 저장/포맷 시 자동 정렬한다(수동 정렬 불필요, alphabetical). 큰 흐름은 내장 모듈 → 외부 패키지 → 절대경로(`@repo`/`@app`…`@shared`) → type import. `src` 밖(루트 `app/`·`e2e/`처럼 별칭이 없는 곳)만 상대경로를 쓴다.
-
-## 컴포넌트 분리 원칙
-
-- **부모는 분기·합성, 자식은 구독·실행**: 메인 뷰는 블록 조합만, 각 블록 컴포넌트가 필요한 데이터를 직접 가져온다.
-- **표시-only 컴포넌트는 표시용 데이터만 props로** 받는다(도메인 상태를 알지 않는다). 예: `Card`/`Button`(`@shared/ui`), `ProjectCard`(`project`만 받음).
-- **props를 늘리지 말고 합성 컴포넌트로 나눈다**: 화면 상태를 중간 컴포넌트가 props로 릴레이하지 않는다. 호출부는 화면 목차처럼 읽혀야 한다.
-  - 모양: `<StudySession.Root session={session}>` 안에 `<StudySession.Header />`·`<StudySession.Card>…</StudySession.Card>`를 나열한다(fe-deep `views/learn`, komorebi `views/walk`, awesome-sudoku `shared/ui/icon-button`이 기준 예).
-  - 자리: 모델 훅 `model/hooks/useXxx.ts`가 상태를 조립하고, context는 `model/store/xxxContext.ts`, 구독 훅은 `model/hooks/useXxxContext.ts`(Root 밖에서 쓰면 throw)에 둔다. `XxxRoot.tsx`가 Provider를 연다 — 기본은 Root가 모델 훅을 직접 호출하고(상태 변화가 context 구독자만 다시 그리게), 상위 흐름이 이미 모델을 들고 분기에 쓰면(fe-deep `LearnPage`) Root가 그 모델을 prop으로 받는다. 파트는 `XxxPart.tsx` 한 파일에 하나씩, 묶음은 같은 폴더의 `xxx.ts`(shared 항목은 `index.ts`)에 `export const Xxx = { Root, Part… }`로 둔다.
-  - 파트 안의 하위 블록(`AtlasGuides`, `DiscoveryList`)도 같은 context를 구독해도 된다. 상태를 들고 마운트·리셋 시점이 중요한 HUD·리프(`CompanionPanel`, `KeywordHints` 등)는 표시용 props를 그대로 받고, 마운트 조건·`key`는 파트가 갖는다.
-  - 내용(아이콘·라벨·배지·버튼 묶음)은 prop이 아니라 children 파트로 조립한다. 버튼·입력 기본 속성은 `ComponentProps<'button'>`을 확장해 받는다.
-  - `pnpm lint`가 강제한다(`harness/max-props`): 컴포넌트 props는 최대 5개(확장한 기본 속성은 세지 않음, `memo`·`forwardRef`로 감싼 컴포넌트 포함).
-- **한 컴포넌트에 마크업을 쌓지 않는다**: 화면 컴포넌트는 이름 붙은 구획(`HomeHero`, `HomeCategories`)을 나열하고, 각 구획이 필요한 데이터를 직접 가져와 해당할 때만 그린다(조건부 표시를 부모가 계산해 넘기지 않는다).
-  - `pnpm lint`가 강제한다(`harness/component-markup`): 컴포넌트 하나의 JSX 깊이 최대 5, HTML·three 요소(소문자 태그) 최대 15개.
-- **컴포넌트는 앱 안에 둔다**: 다른 앱에 같은 컴포넌트가 필요하면 그 앱으로 복사해 맞게 고친다. 공유 패키지로 올리지 않는다. 앱 안에서는 FSD 위치 규칙을 따른다.
-
-## 코드 정돈 규칙
-
-tsx 파일은 "무엇을 그리는가"만 담는다. 값·로직·스타일은 각자 자리로 보낸다.
-
-- **tsx 최상위에는 컴포넌트만**: 상수·설정 배열·조회 표는 슬라이스 `config/`로, 보조 함수는 `lib/`로 옮긴다. 컴포넌트를 값으로 갖는 표(섹션 → 컴포넌트)만 같은 `ui/`의 `.ts` 모듈에 둔다(`config/`가 `ui/`를 import하지 않게). Props `interface`는 컴포넌트 파일에 둔다.
-- **훅 분리**: 상태·효과·ref를 엮는 로직(`useEffect`가 있거나 훅 호출이 여러 개)은 `model/hooks/useXxx.ts`로 빼고, 컴포넌트는 훅을 부르고 그리기만 한다. 훅 하나는 책임 하나 — 커지면 쪼갠다.
-- **하드코딩 금지**: 조정하는 값(속도·시간·간격·임계값·개수)은 `config/`의 이름 있는 상수로 둔다. 상태·모드 비교는 `as const` 객체를 참조한다(`'playing'` 같은 문자열 리터럴 비교 금지). 좌표·형상처럼 숫자가 많은 그림 데이터는 숫자마다 이름 붙이지 않고 `config/`의 데이터 파일로 묶는다.
-- **스타일 — 기준은 줄 수가 아니라 "다음 디자인 변경 때 몇 군데를 고치는가"**:
-  - 한 번만 쓰는 레이아웃 클래스는 길어도 `className`에 그대로 둔다.
-  - 여러 곳에서 반복되는 모양은 공용 컴포넌트로 뺀다(`PageContainer`·`PageTitle`·`EmptyState`처럼 앱 `shared/ui`, 한 슬라이스 안이면 그 `ui/`).
-  - 상태·변형별 클래스는 컴포넌트 안에서 분기마다 완성된 문자열로 고른다(`isDark ? '…' : '…'`, `{ sm: '…', lg: '…' }[size]`). 클래스를 `bg-${color}-500`처럼 조립하지 않는다. 조합이 정말 복잡한 공용 프리미티브만 같은 파일에 `cva`를 쓴다(검사가 최상위 `cva()`를 허용한다). `styles.ts`로 클래스를 옮기지 않는다.
-  - 정적 문자열만 든 `cn('a', 'b')`을 문자열로 합칠 때는 tailwind-merge가 지우던 충돌 클래스(예: `font-mono`와 앱 전용 `font-*`)가 되살아나지 않는지 `twMerge`로 확인한다.
-  - 공용 컴포넌트로 뺀 뒤에도 상태·자식 선택자가 뒤엉켜 읽기 힘든 부분만 컴포넌트 옆 `ui/<이름>.module.css`로 분리한다. 모듈 안에서는 `@apply` 대신 테마 CSS 변수(`var(--color-primary)`)를 쓴다 — `@apply`는 모듈마다 `@reference`가 필요하고 Tailwind가 모듈 수만큼 다시 돈다([Tailwind: CSS modules](https://tailwindcss.com/docs/compatibility#css-modules)).
-  - 인라인 `style`은 계산된 값(위치·진행률·`config` 값으로 만든 등장 지연 등)에만 쓴다.
-  - 일반 CSS 파일은 앱 전역이면 `src/app/styles/`, 한 슬라이스 전용이면 그 슬라이스의 `styles/`에 둔다. `ui/`에는 `<이름>.module.css`만 둔다.
-- **반복되는 애니메이션은 모듈로**: 모달·시트·오버레이의 열림/닫힘처럼 여러 곳에서 같은 전환을 쓰면 훅(`useModal`, `useSheetPhase` 등)과 스타일·키프레임을 한 모듈로 만들어 함께 쓴다. 컴포넌트마다 전환 상태를 따로 구현하지 않는다.
-- **`pnpm lint`가 강제한다**(`check-architecture.mjs`의 `validateComponentModule`·`findMisplacedStyles`): 모든 앱 `src`의 tsx 최상위 비컴포넌트 선언과 자리를 벗어난 CSS 파일을 막는다. 훅 분리·반복 모양의 컴포넌트화는 리뷰에서 확인한다.
-- **함수 크기·숫자도 `pnpm lint`가 강제한다**(`@repo/eslint-config/quality.config.mjs` — my-fe-harness `quality()`를 그대로 쓴다. 규칙 원본은 my-fe-harness이고 버전은 `pnpm-workspace.yaml` catalog의 태그로 고정한다): 순환 복잡도 10, 블록 중첩 3, 함수 120줄, 컴포넌트 파일 250줄 이하. 컴포넌트·훅의 숫자는 `-1·0·1·2·100` 말고 `config/`의 이름 있는 상수로 둔다(`config/`·`constants`·테스트는 제외).
-  - `public/`·`vendor/`·`generated/`·`storybook-static/`·`.turbo/`·`*.min.js`는 lint 대상이 아니다(하네스 기본 잠금의 제외 목록).
-  - 컴포넌트 본문도 같은 설정이 막는다: `harness/component-body`(본문 최상위 함수는 `handleXxx`·`onXxx`만, 중첩 컴포넌트 금지), `harness/no-direct-effect`(`useEffect`·`useLayoutEffect` 직접 호출 금지, `error.tsx` 제외), `harness/no-store-passthrough`(구독한 스토어 값을 도메인 컴포넌트에 props로 넘기지 않는다).
-  - 기존 위반은 앱별·루트 `eslint-suppressions.json`에만 둔다(ESLint 일괄 억제). 줄어들기만 한다 — 새 위반이나 파일의 위반 수 증가는 실패하고, 고쳐서 남은 억제가 생겨도 실패한다. 고친 뒤 그 앱 폴더(루트 `scripts/`·`packages/`면 루트)에서 `pnpm exec eslint . --prune-suppressions`로 정리한다. `--suppress-all`·`--suppress-rule`로 새 위반을 덧붙이지 않는다.
-
-## 상태 관리 (도입 시)
-
-**상태가 필요해지면**: 비동기=React Query · 로컬=useState/useReducer · 전역=꼭 필요할 때만 Jotai. 전역 atom은 **쓰는 슬라이스의 `model/`**에 두고(여러 화면이 쓰게 되면 `entities`로 내린다) 컴포넌트가 직접 구독한다. dispatch/setState 콜백을 prop으로 내려보내지 않는다(prop drilling 금지).
-
-## 코드 컨벤션
-
-- Lint/포맷은 **공유 설정 패키지**로 통일한다. 앱 `eslint.config.mjs`는 `@repo/eslint-config`의 `next.eslint.config.mjs` + `fsd.config.mjs`를 spread하고, 루트 `package.json`의 `"prettier": "@repo/prettier-config"`로 포맷을 맞춘다. Prettier: singleQuote, trailingComma: all, **printWidth 120**, `prettier-plugin-organize-imports`(import 정렬 자동). 앱별로 규칙을 따로 두지 않는다.
-- 함수 컴포넌트만(`React.FC` 지양). 객체 계약(props 등)은 `interface`, 유니온·유틸리티 조합·별칭은 `type`.
-- **Enum-like 매직 스트링 금지**: status/variant/step 같은 literal union은 `as const` 객체로 빼고 타입을 거기서 파생. 사용처는 상수 참조만(비교·세팅 둘 다 매직 리터럴 금지).
-  ```ts
-  const VARIANT = { primary: '...', outline: '...' } as const;
-  export type ButtonVariant = keyof typeof VARIANT;
-  ```
-- 네이밍: 변수/함수 camelCase · 컴포넌트/타입 PascalCase · 상수 SCREAMING_SNAKE_CASE · boolean `is/has/should` · 핸들러 `handleXxx`/`onXxx` · 파일: 비컴포넌트 camelCase·컴포넌트 PascalCase · 디렉토리 kebab-case · 훅 `useXxx`.
-- 함수 1개=책임 1개. early return 적극. 중첩 3단계 초과 금지.
-- URL 라우팅: 화면 전환은 App Router URL 기반으로. atom으로 화면을 전환하지 않는다.
-- 금지: 미사용 코드(YAGNI) · 조급한 추상화 · 흐름 설명 주석(자명한 코드로) · 남은 `console.log` · `any`.
-
-## 커밋 컨벤션
-
-Conventional Commits + 한국어. 형식: `type(scope): 설명`. (`/commit` 슬래시 커맨드가 이 규칙대로 커밋한다.)
-
-- **type**: `feat`(기능) · `fix`(버그) · `refactor`(동작 불변 구조 개선) · `chore`(빌드·설정·의존성) · `docs`(문서) · `style`(포맷 등 비로직) · `test`(테스트).
-- **scope**: 앱/패키지 이름(`soundlab`·`komorebi`·`hub`·`fonts` 등). repo 전역이면 생략.
-- **설명**: 한국어·명령형·간결. 무엇을 왜 했는지. 부연이 필요하면 `— 이유/절충`으로 덧붙인다(예: `feat(soundlab): 곡 공유 링크에 재생 위치 포함`).
-- **원자적 커밋**: 한 커밋 = 한 논리적 변경. 서로 다른 앱/관심사가 섞이면 나눠서 커밋한다.
-- **`main` 직접 커밋 금지**: main에서 작업했더라도 커밋 전 `<type>/<kebab-요약>` 브랜치를 파고(`git switch -c`) 거기에 커밋한다. push는 요청 시에만.
-- 제목 끝 마침표 금지. 본문은 필요할 때만. AI 서명 푸터(`Co-Authored-By` 등)는 붙이지 않는다(기존 히스토리와 통일).
-
-## 스크립트 (루트에서)
-
-| 명령                      | 동작                                                              |
-| ------------------------- | ----------------------------------------------------------------- |
-| `pnpm dev`                | `turbo run dev` — 모든 앱 dev                                     |
-| `pnpm build`              | `turbo run build`                                                 |
-| `pnpm lint`               | 구조 검사 + 루트 `scripts/`·`packages/` ESLint + `turbo run lint` |
-| `pnpm check:architecture` | 워크스페이스 구조 검사                                            |
-| `pnpm typecheck`          | 전체 타입 검사                                                    |
-| `pnpm test`               | 공유 규칙·앱별 회귀 테스트                                        |
-| `pnpm format`             | Prettier 전체 포맷                                                |
-
-- 특정 앱만: `pnpm --filter hub dev`.
-- CI(`ci.yml`)는 lint·타입 검사·테스트에 더해 바뀐 앱의 배포 빌드까지 돌린다. soundlab은 빌드 직전에 SoundCloud에서 곡 목록을 받아 파일을 다시 쓰므로 CI 빌드에서 뺀다. 앱 전용 검증은 앱별 워크플로가 그 앱이 바뀐 PR에서만 돌린다: fe-deep e2e(`fe-deep.yml`). prairie e2e는 GPU 없는 러너에서 실제 화면을 검증하지 못해 자동화하지 않는다(로컬 GPU에서 `pnpm --filter prairie test:e2e`로 수동 실행).
+- 한국어 Conventional Commits(`type(scope): 설명`). 절차는 `/commit`(`.claude/commands/commit.md`)을 따른다.
+- `main`에 직접 커밋하지 않는다. `<type>/<kebab-요약>` 브랜치를 판 뒤 커밋하고, push는 요청 시에만 한다.
+- AI 서명 푸터(`Co-Authored-By` 등)는 붙이지 않는다. 기존 히스토리와 통일하며, 하네스 기본 지시보다 우선한다.
 - main은 GitHub ruleset으로 PR로만 반영한다. 로컬 git 훅은 쓰지 않는다.
+
+## CI
+
+- CI는 lint·타입 검사·테스트에 더해 바뀐 앱의 배포 빌드까지 돌린다. soundlab은 빌드 직전에 SoundCloud에서 곡 목록을 받아 파일을 다시 쓰므로 CI 빌드에서 뺀다.
+- 앱 전용 검증은 앱별 워크플로가 그 앱이 바뀐 PR에서만 돌린다(fe-deep e2e는 `fe-deep.yml`). prairie e2e는 GPU 없는 러너에서 화면을 검증하지 못해 자동화하지 않고, 로컬 GPU에서 `pnpm --filter prairie test:e2e`로 수동 실행한다.
 
 ## 배포 (Vercel)
 
-- 각 앱의 `vercel.json`은 `main` 브랜치만 자동 배포하도록 제한한다. 작업 브랜치와 PR에서는 GitHub CI만 실행한다.
-- Vercel 프로젝트의 Production Branch는 `main`, Root Directory는 해당 `apps/<앱>`으로 설정한다.
-- **Settings → Build and Deployment → Root Directory → Skip deployment**를 켠다. 해당 앱이나 의존하는 공유 패키지가 변경된 경우에만 배포한다. 워크스페이스 밖의 공통 파일 변경은 전체 앱에 영향을 줄 수 있다.
-- 기존 `ignoreCommand`는 빌드 단계의 보조 검사다. 이것만으로는 배포 횟수 한도를 절약할 수 없으므로 Vercel의 Skip deployment 설정이 필요하다.
-- **Settings → Deployment Checks → Add Checks → GitHub → `CI / verify`**를 켠다. Vercel이 `main` 배포를 빌드한 뒤 CI가 통과해야 운영 도메인에 연결한다. 급하면 배포 상세의 Force Promote로 넘긴다. CI는 저장소 전체 작업 하나라 다른 앱 실패도 함께 막는다.
-- **danwoo-island는 Skip deployment를 끈다.** 빌드가 `hub`(프로필·프로젝트·이미지)·`soundlab`(곡 목록)·`packages/fonts/fonts`를 직접 읽지만 package.json 의존성에는 없어서, Skip deployment는 이 변경을 섬과 무관하다고 본다. 대신 `vercel.json`의 `ignoreCommand`가 이 경로들까지 `git diff`로 확인한다. 직전 배포 커밋이 Vercel의 얕은 clone에 없으면 `git diff`가 오류(128)로 끝나 배포 실패가 되므로, 끝에 `|| exit 1`을 붙여 비교하지 못하면 빌드하게 한다.
-- 새 앱의 `vercel.json`에도 `main` 제한과 `"ignoreCommand": "npx turbo-ignore <앱>"`을 둔다. `pnpm check:architecture`가 `main` 제한, `ignoreCommand` 유무, `turbo-ignore`·`buildCommand --filter`가 자기 앱을 가리키는지 검사한다. Vercel에 새 프로젝트를 연결할 때 위 프로젝트 설정을 함께 적용한다.
+- 앱별 `vercel.json`은 `main`만 자동 배포하도록 제한한다. Production Branch `main`, Root Directory `apps/<앱>`.
+- Settings → Build and Deployment → Root Directory → Skip deployment를 켠다. `ignoreCommand`는 빌드 단계 보조 검사일 뿐 배포 횟수 한도를 아끼지 못한다.
+- Settings → Deployment Checks → GitHub → `CI / verify`를 켠다. CI가 통과해야 운영 도메인에 연결된다(급하면 Force Promote). CI는 저장소 전체 작업이라 다른 앱 실패도 함께 막는다.
+- danwoo-island는 Skip deployment를 끈다. 빌드가 `hub`·`soundlab`·`packages/fonts/fonts`를 직접 읽지만 package.json 의존성에는 없어 Skip deployment가 이 변경을 섬과 무관하다고 본다. 대신 `vercel.json`의 `ignoreCommand`가 이 경로들까지 `git diff`로 확인한다. 직전 배포 커밋이 Vercel의 얕은 clone에 없으면 `git diff`가 128로 끝나 배포가 실패하므로, 끝에 `|| exit 1`을 붙여 비교하지 못하면 빌드하게 한다.
 
-참고: [Git 배포 브랜치 제한](https://vercel.com/docs/project-configuration/git-configuration), [변경 없는 앱 건너뛰기](https://vercel.com/docs/monorepos#skipping-unaffected-projects).
+## 작업 규칙
 
-## 응답 스타일 (사용자 선호)
-
-- 응답은 **한국어**. 코드 변경 전 what·why 설명, 후 리뷰 포인트. 더 나은 대안이 있으면 항상 제시.
-- **추측 금지**(모르면 "모름"). 보안·성능 이슈는 명시 경고.
-
-## AI 작업 완료 조건
-
-- 이 파일이 Codex·Claude 등 모든 코딩 에이전트의 공통 규칙이다. 도구별 문서에 다른 아키텍처를 중복 정의하지 않는다.
-- `pnpm check:architecture`는 전체 워크스페이스의 catalog·`vercel.json` 배포 설정·경로 별칭·공유 설정·TypeScript 엄격 옵션·`any`·구조 규칙 우회·동적 import를 포함한 순환 참조·서버/클라이언트 경계를 검사한다. `pnpm lint`에서 자동 실행된다.
-- 공유 ESLint는 레이어 역참조, 슬라이스 교차 참조, 공개 API 우회, 세그먼트 구조, 컴포넌트 파일, 라우팅 위치, 전역 atom 위치를 검사한다. 공유 규칙 자체에도 회귀 테스트가 있다.
-- Server Action의 권한 검사는 화면·미들웨어와 독립적으로 수행한다. 관리자 DB 클라이언트 생성 전에 인증과 관리자 권한을 확인한다.
-- `'use client'`·`'use server'`는 모듈 맨 앞의 지시문이어야 한다. import를 그 앞에 추가하지 않는다.
-- 파일 이동 후 별칭 경로·공개 export·Web Worker URL·라우트 타입·테스트 경로를 함께 확인한다.
-- 기본 검증은 `pnpm lint`, `pnpm typecheck`, `pnpm test`다. 동작을 바꿨다면 해당 사용자 흐름의 브라우저 검증도 수행한다. 에이전트가 직접 하는 브라우저 검증(화면 확인·캡처·조작)은 ego-browser로 한다(`ego-browser skill`로 사용법 확인). Playwright는 CI에서 도는 `e2e/*.spec.ts`와 수집 스크립트에만 쓴다. 외부 DB에 쓰는 시드·마이그레이션은 검증 명령으로 실행하지 않는다.
+- Server Action의 권한 검사는 화면·미들웨어와 독립적으로 한다. 관리자 DB 클라이언트를 만들기 전에 인증과 관리자 권한을 확인한다.
+- 파일을 옮긴 뒤에는 별칭 경로·공개 export·Web Worker URL·라우트 타입·테스트 경로를 함께 확인한다.
+- 기본 검증은 `pnpm lint`·`pnpm typecheck`·`pnpm test`다. 동작을 바꿨다면 해당 사용자 흐름을 브라우저로도 확인한다. 직접 하는 브라우저 검증은 ego-browser로 하고, Playwright는 CI의 `e2e/*.spec.ts`와 수집 스크립트에만 쓴다.
+- 외부 DB에 쓰는 시드·마이그레이션은 검증 명령으로 실행하지 않는다.
 - 자동 검사가 통과한 범위와 실제 브라우저·외부 서비스에서 확인한 범위를 구분해 보고한다. 검증하지 않은 동작을 완벽하다고 표현하지 않는다.

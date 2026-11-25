@@ -2,7 +2,7 @@
 description: 변경사항을 프로젝트 커밋 컨벤션대로 원자적으로 커밋
 ---
 
-CLAUDE.md의 "커밋 컨벤션" 섹션을 source of truth로 삼아 커밋한다.
+AGENTS.md의 "커밋·브랜치" 섹션과 이 파일의 규칙을 기준으로 커밋한다.
 
 ## 절차
 
@@ -21,7 +21,7 @@ CLAUDE.md의 "커밋 컨벤션" 섹션을 source of truth로 삼아 커밋한다
 - 브랜치명: `<type>/<kebab-요약>` (커밋 type과 맞춤). 예: `feat/plco-invite-room`, `fix/gymlog-ranking`.
 - 브랜치 생성 후에도 push는 요청이 있을 때만 한다.
 
-## 규칙 (CLAUDE.md 커밋 컨벤션 요약)
+## 규칙 (type·scope 기준)
 
 - **type**: `feat` · `fix` · `refactor` · `chore` · `docs` · `style` · `test`
 - **scope**: 앱·패키지명(`hub`/`soundlab`/`komorebi`/`fonts` …), 전역이면 생략
