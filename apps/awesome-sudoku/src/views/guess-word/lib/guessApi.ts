@@ -1,10 +1,11 @@
 import {
   GUESS_WORD_API,
   GUESS_WORD_ERROR,
-  type AnswerResult,
   type GuessErrorBody,
+  type GuessRequestBody,
   type GuessResult,
   type HintsResult,
+  type YesterdayResult,
 } from '@entities/guess-word';
 import { NOTICE_KIND } from '@views/guess-word/config/game';
 import type { NoticeKind } from '@views/guess-word/model/types/guessWord';
@@ -12,6 +13,7 @@ import type { NoticeKind } from '@views/guess-word/model/types/guessWord';
 const ERROR_NOTICE: Record<string, NoticeKind> = {
   [GUESS_WORD_ERROR.INVALID]: NOTICE_KIND.INVALID,
   [GUESS_WORD_ERROR.UNKNOWN]: NOTICE_KIND.UNKNOWN,
+  [GUESS_WORD_ERROR.BOT]: NOTICE_KIND.BOT,
 };
 
 export class GuessRequestError extends Error {
@@ -28,7 +30,7 @@ function isObject(value: unknown): value is Record<string, unknown> {
 }
 
 function isGuessErrorBody(value: unknown): value is GuessErrorBody {
-  return isObject(value) && typeof value.day === 'number' && typeof value.error === 'string';
+  return isObject(value) && typeof value.error === 'string';
 }
 
 function isGuessResult(value: unknown): value is GuessResult {
@@ -49,20 +51,26 @@ function isHintsResult(value: unknown): value is HintsResult {
   return typeof day === 'number' && hasValidHints;
 }
 
-function isAnswerResult(value: unknown): value is AnswerResult {
-  return isObject(value) && typeof value.day === 'number' && typeof value.word === 'string';
+function isYesterdayResult(value: unknown): value is YesterdayResult {
+  if (!isObject(value)) return false;
+  const hasValidWord = value.word === null || typeof value.word === 'string';
+  return typeof value.day === 'number' && hasValidWord;
 }
 
-async function readJson(url: string): Promise<{ isOk: boolean; body: unknown }> {
-  const response = await fetch(url, { cache: 'no-store' }).catch(() => {
+async function readJson(url: string, init?: RequestInit): Promise<{ isOk: boolean; body: unknown }> {
+  const response = await fetch(url, { cache: 'no-store', ...init }).catch(() => {
     throw new GuessRequestError(NOTICE_KIND.NETWORK);
   });
   const body: unknown = await response.json().catch(() => null);
   return { isOk: response.ok, body };
 }
 
-async function requestValidated<T>(url: string, isValid: (value: unknown) => value is T): Promise<T> {
-  const { isOk, body } = await readJson(url);
+async function requestValidated<T>(
+  url: string,
+  isValid: (value: unknown) => value is T,
+  init?: RequestInit,
+): Promise<T> {
+  const { isOk, body } = await readJson(url, init);
   if (isGuessErrorBody(body)) throw new GuessRequestError(ERROR_NOTICE[body.error] ?? NOTICE_KIND.NETWORK);
   const isExpectedBody = isOk && isValid(body);
   if (!isExpectedBody) throw new GuessRequestError(NOTICE_KIND.NETWORK);
@@ -70,16 +78,20 @@ async function requestValidated<T>(url: string, isValid: (value: unknown) => val
 }
 
 export function requestGuess(word: string): Promise<GuessResult> {
-  const query = new URLSearchParams({ [GUESS_WORD_API.wordParam]: word });
-  return requestValidated(`${GUESS_WORD_API.guess}?${query}`, isGuessResult);
+  const body: GuessRequestBody = { word };
+  return requestValidated(GUESS_WORD_API.guess, isGuessResult, {
+    method: GUESS_WORD_API.guessMethod,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
 }
 
 export function requestHints(): Promise<HintsResult> {
   return requestValidated(GUESS_WORD_API.hints, isHintsResult);
 }
 
-export function requestAnswer(): Promise<AnswerResult> {
-  return requestValidated(GUESS_WORD_API.answer, isAnswerResult);
+export function requestYesterday(): Promise<YesterdayResult> {
+  return requestValidated(GUESS_WORD_API.yesterday, isYesterdayResult);
 }
 
 export function noticeKindOf(error: unknown): NoticeKind {

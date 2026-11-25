@@ -60,6 +60,9 @@ catalogs:
     '@vitejs/plugin-react':
       specifier: ^6.3.0
       version: 6.3.0
+    botid:
+      specifier: ^1.5.13
+      version: 1.5.13
     class-variance-authority:
       specifier: ^0.7.1
       version: 0.7.1
@@ -223,6 +226,9 @@ importers:
       '@tanstack/react-query':
         specifier: 'catalog:'
         version: 5.108.0(@types/react@19.2.15)(react@19.3.1)
+      botid:
+        specifier: 'catalog:'
+        version: 1.5.13(next@16.4.6(@playwright/test@1.65.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1)
       clsx:
         specifier: 'catalog:'
         version: 2.1.1
@@ -2930,6 +2936,17 @@ packages:
 
   bidi-js@1.0.3:
     resolution: {integrity: sha512-RKshQI1R3YQ+n9YJz2QQ147P66ELpa1FQEg20Dk8oW9t2KgLbpDLLp9aGZ7y8WHSshDknG0bknqGw5/tyCs5tw==}
+
+  botid@1.5.13:
+    resolution: {integrity: sha512-bd1oGgunQXOXQOctgLm/XuJKji5E8EUJdHYQAHJhJPgFeBo/mLQMeEsokO9nbrjjOZsSoKZfGHRfM/VAux44GA==}
+    peerDependencies:
+      next: 16.4.6
+      react: ^18.0.0 || ^19.0.0
+    peerDependenciesMeta:
+      next:
+        optional: true
+      react:
+        optional: true
 
   brace-expansion@1.1.22:
     resolution: {integrity: sha512-CKLDTuSsN0+r1ThM0WkzzBI7dnPI6xEGfa/JnVYIK9JNBA1N1NyPwXVHor//NKD/y3sDxp764sZdLhFK7pH8XQ==}
@@ -7351,6 +7368,11 @@ snapshots:
   bidi-js@1.0.3:
     dependencies:
       require-from-string: 2.0.2
+
+  botid@1.5.13(next@16.4.6(@playwright/test@1.65.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1):
+    optionalDependencies:
+      next: 16.4.6(@playwright/test@1.65.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      react: 19.3.1
 
   brace-expansion@1.1.22:
     dependencies:

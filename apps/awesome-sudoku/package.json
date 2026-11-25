@@ -17,6 +17,7 @@
   "dependencies": {
     "@repo/fonts": "workspace:*",
     "@tanstack/react-query": "catalog:",
+    "botid": "catalog:",
     "clsx": "catalog:",
     "jotai": "catalog:",
     "next": "catalog:",

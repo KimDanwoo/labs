@@ -1,4 +1,4 @@
-import { isValidGuess, normalizeGuess } from '@entities/guess-word/lib/guessInput';
+import { isValidGuess, normalizeGuess, readGuessWord } from '@entities/guess-word/lib/guessInput';
 import { describe, expect, it } from 'vitest';
 
 describe('normalizeGuess', () => {
@@ -15,5 +15,13 @@ describe('isValidGuess', () => {
 
   it.each(['', 'love', 'ㅋㅋ', '사랑1', '가나다라마바사아자'])('%s는 거른다', (word) => {
     expect(isValidGuess(word)).toBe(false);
+  });
+});
+
+describe('readGuessWord', () => {
+  it('요청 본문에서 word 문자열만 꺼내고, 형식이 다르면 빈 문자열을 준다', () => {
+    expect(readGuessWord({ word: '바다' })).toBe('바다');
+    expect(readGuessWord({ word: 1 })).toBe('');
+    expect(readGuessWord(null)).toBe('');
   });
 });

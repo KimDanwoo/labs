@@ -1,12 +1,15 @@
 import { GUESS_WORD_ERROR, GUESS_WORD_RANK } from '@entities/guess-word/config/guessWord';
-import { guessWord, todayAnswer, todayHints } from '@entities/guess-word/model/server/guessService';
+import { answerIndex } from '@entities/guess-word/lib/puzzleDay';
+import { guessWord, todayHints, yesterdayAnswer } from '@entities/guess-word/model/server/guessService';
+import { loadWordData } from '@entities/guess-word/model/server/loadWordData';
 import { describe, expect, it } from 'vitest';
 
 const NOW = new Date('2026-11-25T03:00:00Z');
 
 describe('guessService (실제 데이터)', () => {
   it('정답을 맞히면 유사도 100과 정답 표시를 준다', async () => {
-    const { word } = await todayAnswer(NOW);
+    const { answers } = await loadWordData();
+    const word = answers[answerIndex(1, answers.length)] ?? '';
     const result = await guessWord(word, NOW);
     expect(result).toMatchObject({ day: 1, word, similarity: 100, rank: null, isAnswer: true });
   });
@@ -36,5 +39,14 @@ describe('guessService (실제 데이터)', () => {
       const isRanked = result.rank !== null;
       expect(isRanked ? result.rank : GUESS_WORD_RANK.top).toBeLessThanOrEqual(GUESS_WORD_RANK.top);
     }
+  });
+
+  it('어제의 정답은 시작일에는 없고, 다음 날부터 전날 정답을 준다', async () => {
+    const { answers } = await loadWordData();
+    expect(await yesterdayAnswer(NOW)).toEqual({ day: 0, word: null });
+    expect(await yesterdayAnswer(new Date('2026-11-26T03:00:00Z'))).toEqual({
+      day: 1,
+      word: answers[answerIndex(1, answers.length)],
+    });
   });
 });

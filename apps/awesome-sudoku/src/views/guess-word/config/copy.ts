@@ -17,8 +17,7 @@ export const GUESS_WORD_COPY = {
   columnSimilarity: '유사도',
   columnRank: '순위',
   empty: '아직 추측한 단어가 없어요.',
-  giveUp: '포기하고 정답 보기',
-  giveUpConfirm: '정말 포기할까요? 누르면 정답이 공개돼요.',
+  yesterdayLabel: '어제의 정답:',
   close: '닫기',
   tomorrow: '내일 자정(한국 시간)에 새 문제가 열려요.',
   triesText: (count: number) => `${count}번 만에 맞혔어요`,
@@ -30,6 +29,7 @@ export const NOTICE_TEXT: Record<NoticeKind, (word: string) => string> = {
   [NOTICE_KIND.UNKNOWN]: (word) => `'${word}'은(는) 사전에 없거나 명사가 아니에요.`,
   [NOTICE_KIND.DUPLICATE]: (word) => `'${word}'은(는) 이미 입력했어요.`,
   [NOTICE_KIND.NETWORK]: () => '서버와 연결하지 못했어요. 잠시 후 다시 시도해 주세요.',
+  [NOTICE_KIND.BOT]: () => '자동 입력으로 보여서 막았어요. 새로고침한 뒤 직접 입력해 주세요.',
 };
 
 export const RANK_TEXT: Record<RankTone, (rank: number | null) => string> = {
@@ -41,14 +41,13 @@ export const RANK_TEXT: Record<RankTone, (rank: number | null) => string> = {
 export const RESULT_TITLE: Record<GuessStatus, string> = {
   [GUESS_STATUS.PLAYING]: '',
   [GUESS_STATUS.SOLVED]: '정답이에요!',
-  [GUESS_STATUS.GAVE_UP]: '오늘의 정답',
 };
 
 export const GUESS_WORD_RULES = [
   '명사만 입력할 수 있어요. 동사·형용사·부사와 대부분의 고유명사는 받지 않아요.',
   '유사도는 단어의 뜻이 얼마나 가까운지를 -100~100으로 나타내요. 정답은 100이에요.',
   '정답과 가장 가까운 1000개 단어 안에 들면 순위가 보여요. 1위가 정답 다음으로 가까운 단어예요.',
-  '문제는 하루에 하나, 한국 시간 자정에 바뀌어요.',
+  '문제는 하루에 하나, 한국 시간 자정에 바뀌어요. 포기는 없고, 정답은 다음 날 「어제의 정답」으로 공개돼요.',
 ] as const;
 
 export const GUESS_WORD_CREDITS = [

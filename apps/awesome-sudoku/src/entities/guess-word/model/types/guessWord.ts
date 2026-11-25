@@ -11,7 +11,7 @@ export interface GuessResult {
 }
 
 export interface GuessErrorBody {
-  day: number;
+  day?: number;
   error: GuessWordError;
 }
 
@@ -25,7 +25,11 @@ export interface HintsResult {
   hints: RankHint[];
 }
 
-export interface AnswerResult {
-  day: number;
+export interface GuessRequestBody {
   word: string;
+}
+
+export interface YesterdayResult {
+  day: number;
+  word: string | null;
 }

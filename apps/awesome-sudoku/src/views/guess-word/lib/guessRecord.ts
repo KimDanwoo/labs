@@ -1,4 +1,4 @@
-import { isValidGuess, type AnswerResult, type GuessResult } from '@entities/guess-word';
+import { isValidGuess, type GuessResult } from '@entities/guess-word';
 import { GUESS_STATUS, NOTICE_KIND } from '@views/guess-word/config/game';
 import type { GuessEntry, GuessRecord, GuessStatus, Notice } from '@views/guess-word/model/types/guessWord';
 
@@ -32,7 +32,8 @@ export function parseRecord(value: unknown, day: number): GuessRecord {
   if (!isSameDay) return emptyRecord(day);
   const guesses = Array.isArray(value.guesses) ? value.guesses.filter(isGuessEntry) : [];
   const status = isGuessStatus(value.status) ? value.status : GUESS_STATUS.PLAYING;
-  const answer = typeof value.answer === 'string' ? value.answer : null;
+  const hasSolvedAnswer = status === GUESS_STATUS.SOLVED && typeof value.answer === 'string';
+  const answer = hasSolvedAnswer ? String(value.answer) : null;
   return { day, guesses, status, answer };
 }
 
@@ -57,11 +58,6 @@ export function addGuess(record: GuessRecord, result: GuessResult): GuessRecord 
   const isFirstSolve = result.isAnswer && record.status === GUESS_STATUS.PLAYING;
   const solved = isFirstSolve ? { status: GUESS_STATUS.SOLVED, answer: result.word } : {};
   return { ...record, guesses: [...record.guesses, entry], ...solved };
-}
-
-export function revealAnswer(record: GuessRecord, result: AnswerResult): GuessRecord {
-  if (record.status !== GUESS_STATUS.PLAYING) return record;
-  return { ...record, status: GUESS_STATUS.GAVE_UP, answer: result.word };
 }
 
 export function sortBySimilarity(guesses: GuessEntry[]): GuessEntry[] {

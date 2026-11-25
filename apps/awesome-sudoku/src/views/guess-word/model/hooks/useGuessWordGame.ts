@@ -3,14 +3,13 @@
 import { normalizeGuess, type RankHint } from '@entities/guess-word';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { GUESS_QUERY_KEY, GUESS_STATUS } from '@views/guess-word/config/game';
-import { noticeKindOf, requestAnswer, requestGuess, requestHints } from '@views/guess-word/lib/guessApi';
+import { noticeKindOf, requestGuess, requestHints } from '@views/guess-word/lib/guessApi';
 import {
   addGuess,
   blockedGuessNotice,
   latestDay,
   latestGuess,
   parseRecord,
-  revealAnswer,
   sortBySimilarity,
   storedDay,
 } from '@views/guess-word/lib/guessRecord';
@@ -28,11 +27,9 @@ export interface GuessWordGame {
   input: string;
   notice: Notice | null;
   isGuessing: boolean;
-  isGivingUp: boolean;
   isPlaying: boolean;
   handleInputChange: (event: ChangeEvent<HTMLInputElement>) => void;
   handleSubmit: (event: SubmitEvent<HTMLFormElement>) => void;
-  handleGiveUp: () => void;
 }
 
 export function useGuessWordGame(): GuessWordGame {
@@ -64,15 +61,6 @@ export function useGuessWordGame(): GuessWordGame {
     onError: (error, word) => setNotice({ kind: noticeKindOf(error), word }),
   });
 
-  const giveUpMutation = useMutation({
-    mutationFn: requestAnswer,
-    onSuccess: (result) => {
-      reportDay(result.day);
-      setStored((previous: unknown) => revealAnswer(parseRecord(previous, result.day), result));
-    },
-    onError: (error) => setNotice({ kind: noticeKindOf(error), word: '' }),
-  });
-
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => setInput(event.target.value);
 
   const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
@@ -83,8 +71,6 @@ export function useGuessWordGame(): GuessWordGame {
     if (!blockedNotice) guessMutation.mutate(word);
   };
 
-  const handleGiveUp = () => giveUpMutation.mutate();
-
   return {
     day,
     record,
@@ -94,10 +80,8 @@ export function useGuessWordGame(): GuessWordGame {
     input,
     notice,
     isGuessing: guessMutation.isPending,
-    isGivingUp: giveUpMutation.isPending,
     isPlaying: record.status === GUESS_STATUS.PLAYING,
     handleInputChange,
     handleSubmit,
-    handleGiveUp,
   };
 }
