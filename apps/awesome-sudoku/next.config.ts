@@ -3,9 +3,14 @@ import { createSecurityHeaders } from '@repo/security-headers';
 import type { NextConfig } from 'next';
 
 const SECURITY_HEADERS = createSecurityHeaders();
+const GUESS_WORD_DATA_FILES = ['./data/guess-word/**/*'];
 
 const nextConfig: NextConfig = {
   agentRules: false,
+  outputFileTracingIncludes: {
+    '/api/guess-word': GUESS_WORD_DATA_FILES,
+    '/api/guess-word/*': GUESS_WORD_DATA_FILES,
+  },
   async headers() {
     return [{ source: '/(.*)', headers: SECURITY_HEADERS }];
   },
