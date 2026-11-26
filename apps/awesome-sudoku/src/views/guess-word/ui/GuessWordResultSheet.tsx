@@ -5,6 +5,7 @@ import { GUESS_STATUS } from '@views/guess-word/config/game';
 import { solvedTries } from '@views/guess-word/lib/guessRecord';
 import { useGuessWordContext } from '@views/guess-word/model/hooks/useGuessWordContext';
 import { GuessButton } from '@views/guess-word/ui/GuessButton';
+import { GuessResultShare } from '@views/guess-word/ui/GuessResultShare';
 
 export function GuessWordResultSheet() {
   const { record, isResultOpen, handleResultClose } = useGuessWordContext();
@@ -20,6 +21,7 @@ export function GuessWordResultSheet() {
         </p>
       )}
       <p className="mt-1 text-center text-sm text-text-tertiary break-keep">{GUESS_WORD_COPY.tomorrow}</p>
+      {isSolved && <GuessResultShare tries={tries ?? record.guesses.length} />}
       <GuessButton onClick={handleResultClose} className="mt-6 w-full">
         {GUESS_WORD_COPY.close}
       </GuessButton>

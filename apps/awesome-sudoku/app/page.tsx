@@ -1,5 +1,6 @@
-import { SudokuPage } from '@views/sudoku';
+import { GameLibraryPage } from '@views/game-library';
+import { WallsGuide } from '@views/walls';
 
-export default function Home() {
-  return <SudokuPage />;
+export default function HomePage() {
+  return <GameLibraryPage wallsGuide={<WallsGuide />} />;
 }

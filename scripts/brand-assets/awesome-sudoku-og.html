@@ -4,26 +4,73 @@
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../packages/fonts/fonts/maruburi.css" />
     <style>
-      body {
-        margin: 0; width: 1200px; height: 630px; overflow: hidden; font-family: var(--font-maruburi); color: #1c1c1e;
-        background: radial-gradient(ellipse 55% 70% at 72% 45%, rgb(0 122 255 / 14%), transparent 70%), #f2f4f7;
+      * {
+        box-sizing: border-box;
       }
-      .title { position: absolute; left: 80px; top: 50%; transform: translateY(-50%); }
-      .eyebrow { font-size: 20px; font-weight: 600; letter-spacing: 0.3em; color: #007aff; }
-      h1 { margin: 20px 0 0; font-size: 80px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.05; }
-      p { margin: 24px 0 0; font-size: 32px; font-weight: 600; color: #6e6e73; }
-      .board {
-        position: absolute; right: 80px; top: 65px; width: 500px; height: 500px; border-radius: 14px;
-        box-shadow: 0 28px 70px rgb(28 28 30 / 16%);
+      body {
+        margin: 0;
+        width: 1200px;
+        height: 630px;
+        padding: 56px 76px;
+        background: #f8f5ed;
+        color: #282336;
+        font-family: var(--font-maruburi), serif;
+      }
+      main {
+        display: grid;
+        grid-template-columns: 1fr;
+        height: 100%;
+        align-items: center;
+      }
+      main:has(img:not([hidden])) {
+        grid-template-columns: minmax(0, 1fr) 460px;
+        gap: 42px;
+      }
+      .brand {
+        display: block;
+        padding-bottom: 18px;
+        border-bottom: 1px solid #827405;
+        font-size: 28px;
+        font-weight: 700;
+      }
+      h1 {
+        margin: 46px 0 22px;
+        font-size: 98px;
+        font-weight: 700;
+        letter-spacing: -0.07em;
+        line-height: 1.16;
+        white-space: pre-line;
+        word-break: keep-all;
+      }
+      main:has(img:not([hidden])) h1 {
+        font-size: 73px;
+      }
+      .subtitle {
+        margin: 0;
+        color: #5e526a;
+        font-size: 30px;
+        word-break: keep-all;
+      }
+      img {
+        display: block;
+        width: 100%;
+        max-height: 485px;
+        object-fit: contain;
+        border-radius: 18px;
+      }
+      img[hidden] {
+        display: none;
       }
     </style>
   </head>
   <body>
-    <div class="title">
-      <div class="eyebrow">SUDOKU</div>
-      <h1>어썸 스도쿠</h1>
-      <p>클래식 · 킬러</p>
-    </div>
-    <img class="board" data-slot="board" alt="" />
+    <main>
+      <div>
+        <span class="brand" data-brand></span>
+        <h1 data-title></h1>
+        <p class="subtitle" data-subtitle></p>
+      </div>
+      <img data-artwork alt="" hidden />
+    </main>
   </body>
 </html>

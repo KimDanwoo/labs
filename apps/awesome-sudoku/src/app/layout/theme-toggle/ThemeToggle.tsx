@@ -1,12 +1,12 @@
 'use client';
 
-import { useThemeToggle } from '@app/model/hooks/useThemeToggle';
-import { cn } from '@shared/lib/cn';
-import { memo } from 'react';
 import { LuMoon, LuSun } from 'react-icons/lu';
 
-export const ThemeToggle = memo(() => {
+import { useThemeToggle } from '@app/model/hooks/useThemeToggle';
+
+export function ThemeToggle() {
   const { isDark, handleToggle } = useThemeToggle();
+  const ThemeIcon = isDark ? LuMoon : LuSun;
 
   return (
     <button
@@ -16,66 +16,9 @@ export const ThemeToggle = memo(() => {
       aria-label="다크 모드 토글"
       data-theme-toggle
       onClick={handleToggle}
-      className="group relative flex items-center shrink-0 w-[52px] h-7 rounded-full p-[3px] hover:shadow-md active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+      className="grid size-11 shrink-0 cursor-pointer place-items-center rounded-md text-text-secondary hover:bg-bg-tertiary hover:text-text-primary focus-visible:outline-2 focus-visible:outline-accent"
     >
-      <div
-        className={cn(
-          'absolute inset-0 rounded-full',
-          'bg-linear-to-r from-sky-200 to-amber-200',
-          'transition-opacity duration-500',
-          isDark ? 'opacity-0' : 'opacity-100',
-        )}
-      />
-
-      <div
-        className={cn(
-          'absolute inset-0 rounded-full',
-          'bg-indigo-950',
-          'transition-opacity duration-500',
-          isDark ? 'opacity-100 shadow-inner shadow-indigo-900/50' : 'opacity-0',
-        )}
-      />
-
-      <div
-        className={cn(
-          'absolute inset-0 rounded-full overflow-hidden',
-          'transition-opacity duration-700',
-          isDark ? 'opacity-100' : 'opacity-0',
-        )}
-      >
-        <span className="absolute rounded-full bg-white/70" style={{ width: 3, height: 3, top: 5, left: 10 }} />
-        <span className="absolute rounded-full bg-white/40" style={{ width: 2, height: 2, top: 17, left: 17 }} />
-        <span className="absolute rounded-full bg-white/50" style={{ width: 2, height: 2, top: 7, left: 24 }} />
-      </div>
-
-      <div
-        className={cn(
-          'relative z-10 flex items-center justify-center',
-          'w-[22px] h-[22px] rounded-full shadow-md',
-          'transition-all duration-500',
-          'ease-[cubic-bezier(0.68,-0.15,0.27,1.15)]',
-          isDark ? 'translate-x-[24px] bg-indigo-100' : 'translate-x-0 bg-white',
-        )}
-      >
-        <LuSun
-          size={13}
-          className={cn(
-            'absolute text-amber-500',
-            'transition-all duration-500',
-            isDark ? 'opacity-0 -rotate-90 scale-0' : 'opacity-100 rotate-0 scale-100',
-          )}
-        />
-        <LuMoon
-          size={13}
-          className={cn(
-            'absolute text-indigo-600',
-            'transition-all duration-500',
-            isDark ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 rotate-90 scale-0',
-          )}
-        />
-      </div>
+      <ThemeIcon className="size-5" aria-hidden="true" />
     </button>
   );
-});
-
-ThemeToggle.displayName = 'ThemeToggle';
+}
