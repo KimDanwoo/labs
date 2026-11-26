@@ -1,14 +1,16 @@
 import type { MetadataRoute } from 'next';
 
+import { SITE_DESCRIPTION, SITE_NAME } from '@entities/game-catalog';
+
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: '어썸 스도쿠',
-    short_name: '스도쿠',
-    description: '클래식 및 킬러 모드를 지원하는 온라인 스도쿠 퍼즐 게임',
+    name: SITE_NAME,
+    short_name: SITE_NAME,
+    description: SITE_DESCRIPTION,
     start_url: '/',
     display: 'standalone',
     background_color: '#ffffff',
-    theme_color: '#007aff',
+    theme_color: '#ffffff',
     icons: [
       { src: '/icon.svg', sizes: 'any', type: 'image/svg+xml' },
       { src: '/apple-icon.png', sizes: '180x180', type: 'image/png' },

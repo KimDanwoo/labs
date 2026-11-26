@@ -19,9 +19,9 @@
 
 ## 그 밖의 앱
 
-| [![프딥](apps/hub/public/projects/fe-deep.webp)](https://fe-deep.danwoo.dev)                                             | [![스도쿠](apps/hub/public/projects/sudoku.webp)](https://sudoku.danwoo.dev) |
+| [![프딥](apps/hub/public/projects/fe-deep.webp)](https://fe-deep.danwoo.dev)                                             | [![미니게임](apps/hub/public/projects/game-library.webp)](https://game.danwoo.dev) |
 | :----------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------- |
-| **[프딥](https://fe-deep.danwoo.dev)**                                                                                   | **[스도쿠](https://sudoku.danwoo.dev)**                                      |
+| **[프딥](https://fe-deep.danwoo.dev)**                                                                                   | **[미니게임](https://game.danwoo.dev)**                                      |
 | 프론트엔드 개념을 깊게 파고든 기록을 모아 둬요.<br><sub>React Query · Framer Motion · 마크다운 콘텐츠 · Playwright</sub> | 난이도를 골라 가볍게 한 판 즐겨요.<br><sub>Web Worker · Jotai · Vitest</sub> |
 
 ## 모노레포 구성

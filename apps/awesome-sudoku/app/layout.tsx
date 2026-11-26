@@ -1,6 +1,7 @@
 import '@app/globals.css';
 import { AppHeader } from '@app/layout/AppHeader';
 import { AppProviders } from '@app/providers/AppProviders';
+import { SITE_DESCRIPTION, SITE_HEADLINE, SITE_NAME, SITE_TITLE, SITE_URL } from '@entities/game-catalog';
 import '@repo/fonts/fonts.css';
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
@@ -16,29 +17,23 @@ export const viewport: Viewport = {
   ],
 };
 
-const BASE_URL = 'https://sudoku.danwoo.dev';
+const HOME_IMAGE = { url: '/opengraph-image.png', width: 1200, height: 630, alt: SITE_HEADLINE };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(BASE_URL),
+  metadataBase: new URL(SITE_URL),
   alternates: { canonical: '/' },
-  title: {
-    default: '어썸 스도쿠 — 온라인 퍼즐 게임',
-    template: '%s | 어썸 스도쿠',
-  },
-  description:
-    '클래식 및 킬러 모드를 지원하는 온라인 스도쿠 퍼즐 게임. ' + '4단계 난이도와 메모 기능으로 두뇌를 깨우세요.',
+  title: { default: SITE_TITLE, template: `%s | ${SITE_NAME}` },
+  description: SITE_DESCRIPTION,
   openGraph: {
-    title: '어썸 스도쿠 — 온라인 퍼즐 게임',
-    description: '클래식 및 킬러 모드를 지원하는 온라인 스도쿠 퍼즐 게임.',
+    title: SITE_HEADLINE,
+    description: SITE_DESCRIPTION,
+    url: '/',
     type: 'website',
     locale: 'ko_KR',
-    siteName: '어썸 스도쿠',
+    siteName: SITE_NAME,
+    images: [HOME_IMAGE],
   },
-  twitter: {
-    card: 'summary_large_image',
-    title: '어썸 스도쿠 — 온라인 퍼즐 게임',
-    description: '클래식 및 킬러 모드를 지원하는 온라인 스도쿠 퍼즐 게임.',
-  },
+  twitter: { card: 'summary_large_image', title: SITE_HEADLINE, description: SITE_DESCRIPTION, images: [HOME_IMAGE] },
 };
 
 export default function RootLayout({

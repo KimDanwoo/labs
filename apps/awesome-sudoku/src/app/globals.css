@@ -42,16 +42,6 @@ html {
   animation: subtle-pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-@utility glass-header {
-  position: sticky;
-  top: 0;
-  z-index: 30;
-  background: rgba(var(--rgb-glass), var(--glass-opacity));
-  backdrop-filter: blur(24px);
-  border-bottom-width: 1px;
-  border-bottom-color: rgba(var(--rgb-border-light), 0.5);
-}
-
 .press-effect:active {
   transform: scale(0.97);
 }

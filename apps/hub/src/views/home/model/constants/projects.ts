@@ -32,11 +32,11 @@ export const PROJECTS: Project[] = [
     image: '/projects/fe-deep.webp',
   },
   {
-    title: '스도쿠',
-    description: '난이도를 골라 가볍게 한 판 즐겨요',
-    href: 'https://sudoku.danwoo.dev/',
+    title: '미니게임',
+    description: '스도쿠부터 오늘의 단어까지, 설치 없이 한 판 즐겨요',
+    href: 'https://game.danwoo.dev/',
     scope: ['퍼즐 생성 알고리즘', 'Web Worker'],
-    image: '/projects/sudoku.webp',
+    image: '/projects/game-library.webp',
     imagePosition: 'center',
   },
   {
