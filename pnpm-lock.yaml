@@ -25,8 +25,8 @@ catalogs:
       specifier: ^4
       version: 4.3.0
     '@tanstack/react-query':
-      specifier: ^5.107.1
-      version: 5.108.0
+      specifier: ^5.108.2
+      version: 5.108.4
     '@testing-library/jest-dom':
       specifier: ^8.0.0
       version: 8.0.0
@@ -97,8 +97,8 @@ catalogs:
       specifier: ^31.0.1
       version: 31.0.1
     lucide-react:
-      specifier: ^1.73.0
-      version: 1.76.0
+      specifier: ^1.77.0
+      version: 1.79.0
     my-fe-harness:
       specifier: github:KimDanwoo/my-fe-harness#v0.6.0
       version: 0.6.0
@@ -139,8 +139,8 @@ catalogs:
       specifier: 3.0.5
       version: 3.0.5
     tailwind-merge:
-      specifier: ^3.7.0
-      version: 3.7.0
+      specifier: ^3.7.1
+      version: 3.7.1
     tailwindcss:
       specifier: ^4
       version: 4.3.0
@@ -225,7 +225,7 @@ importers:
         version: link:../../packages/fonts
       '@tanstack/react-query':
         specifier: 'catalog:'
-        version: 5.108.0(@types/react@19.2.15)(react@19.3.1)
+        version: 5.108.4(@types/react@19.2.15)(react@19.3.1)
       botid:
         specifier: 'catalog:'
         version: 1.5.13(next@16.4.6(@playwright/test@1.65.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1)
@@ -252,7 +252,7 @@ importers:
         version: 5.7.0(react@19.3.1)
       tailwind-merge:
         specifier: 'catalog:'
-        version: 3.7.0
+        version: 3.7.1
     devDependencies:
       '@config/tsconfig':
         specifier: workspace:*
@@ -395,7 +395,7 @@ importers:
         version: link:../../packages/fonts
       '@tanstack/react-query':
         specifier: 'catalog:'
-        version: 5.108.0(@types/react@19.2.15)(react@19.3.1)
+        version: 5.108.4(@types/react@19.2.15)(react@19.3.1)
       class-variance-authority:
         specifier: 'catalog:'
         version: 0.7.1
@@ -407,7 +407,7 @@ importers:
         version: 14.14.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       lucide-react:
         specifier: 'catalog:'
-        version: 1.76.0(@types/react@19.2.15)(react@19.3.1)
+        version: 1.79.0(@types/react@19.2.15)(react@19.3.1)
       next:
         specifier: 16.4.6
         version: 16.4.6(@playwright/test@1.65.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -434,7 +434,7 @@ importers:
         version: 4.0.1
       tailwind-merge:
         specifier: 'catalog:'
-        version: 3.7.0
+        version: 3.7.1
       yaml:
         specifier: 'catalog:'
         version: 2.9.1
@@ -492,7 +492,7 @@ importers:
         version: 2.1.1
       lucide-react:
         specifier: 'catalog:'
-        version: 1.76.0(@types/react@19.2.15)(react@19.3.1)
+        version: 1.79.0(@types/react@19.2.15)(react@19.3.1)
       next:
         specifier: 16.4.6
         version: 16.4.6(@playwright/test@1.65.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -504,7 +504,7 @@ importers:
         version: 19.3.1(react@19.3.1)
       tailwind-merge:
         specifier: 'catalog:'
-        version: 3.7.0
+        version: 3.7.1
     devDependencies:
       '@config/tsconfig':
         specifier: workspace:*
@@ -681,7 +681,7 @@ importers:
         version: 3.0.2(@types/react@19.2.15)(react@19.3.1)
       lucide-react:
         specifier: 'catalog:'
-        version: 1.76.0(@types/react@19.2.15)(react@19.3.1)
+        version: 1.79.0(@types/react@19.2.15)(react@19.3.1)
       next:
         specifier: 16.4.6
         version: 16.4.6(@playwright/test@1.65.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -696,7 +696,7 @@ importers:
         version: 19.3.1(react@19.3.1)
       tailwind-merge:
         specifier: 'catalog:'
-        version: 3.7.0
+        version: 3.7.1
     devDependencies:
       '@config/tsconfig':
         specifier: workspace:*
@@ -2396,11 +2396,11 @@ packages:
   '@tailwindcss/postcss@4.3.0':
     resolution: {integrity: sha512-Jm05Tjx+9yCLGv5qw1c+84Psds8MnyrEQYCB+FFk2lgGiUjlRqdxke4mVTuYrj2xnVZqKim2Apr5ySuQRYAw/w==}
 
-  '@tanstack/query-core@5.108.0':
-    resolution: {integrity: sha512-X9zJUtEV/0D2q9pmGS/Bza8S4bNovSBhZOtdhtu0fzsHwizC6C+Eh/q5CX3MQBchsRMrirWVQmv7Fp4OStzV9g==}
+  '@tanstack/query-core@5.108.4':
+    resolution: {integrity: sha512-2Ks5dlLWz4eXJrthOyG0qW3SLt3xx0RrQmAmN0rnmogiaaOYuWiAe6HAm9KE2b2v8nig+vraNz8fsfZ6fF6zFg==}
 
-  '@tanstack/react-query@5.108.0':
-    resolution: {integrity: sha512-DpMbB8pVorEZcsHRa0Z13KQGfmndqvJbuLy9h+xfP8XpuEZBOxzq+QfXGonQ0fAgRSWhc+QsfoRETSTWxAEAVw==}
+  '@tanstack/react-query@5.108.4':
+    resolution: {integrity: sha512-GlTa94kfEKTVsbzXe58rFA3GZ0ZE7N1aFtbZAfOS3XxMv8YNn4C+8rsz40LorHLazdm5PsqCroWaYAR+ZkMXMQ==}
     peerDependencies:
       '@types/react': ^18 || ^19
       react: ^18 || ^19
@@ -4060,8 +4060,8 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
-  lucide-react@1.76.0:
-    resolution: {integrity: sha512-wRVHt2Xf64GXndB4rQOY9+3Wy9oJ59HDMYv6vwhT0hpSwUxQhG/RM9YijnOmvmIQ+VI/n+1V/FKd6gP4XL2aBQ==}
+  lucide-react@1.79.0:
+    resolution: {integrity: sha512-MDHKxzUobPRyQgt4hHO1z+pUQJKYMvenh8qw+ndWQE0Wg+Hbjli/ZrkZXBGmRBrMvvqDRjkmQj0Z5RbeL/ogNw==}
     peerDependencies:
       '@types/react': '*'
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
@@ -4847,8 +4847,8 @@ packages:
     resolution: {integrity: sha512-yEFYrVhod+hdNyx7g5Bnkkb0G6si8HJurOoOEgC8B/O0uXLHlaey/65KRv6cuWBNhBgHKAROVpc7QyYqE5gFng==}
     engines: {node: '>=20'}
 
-  tailwind-merge@3.7.0:
-    resolution: {integrity: sha512-XPPUyAc+cvspz3lHTcR/QgPfW2A0lv/xQNIjX3HGhLR+Nq2lHaLq5MtTesHn8GUr3W3DguT2KT5x3NVgRtYwmA==}
+  tailwind-merge@3.7.1:
+    resolution: {integrity: sha512-v7y4BV4FUlO8exj/4M5UXKeoowDiuugVUg3tkMNIyOUCOHy5xp8+5aWQeXCtZ2491sUV1YPsVeM9EveZ6/xuZQ==}
 
   tailwindcss@4.3.0:
     resolution: {integrity: sha512-y6nxMGB1nMW9R6k96e5gdIFzcfL/gTJRNaqGes1YvkLnPVXzWgbqFF2yLC0T8G774n24cx3Pe8XrKoniCOAH+Q==}
@@ -6832,11 +6832,11 @@ snapshots:
       postcss: 8.5.26
       tailwindcss: 4.3.0
 
-  '@tanstack/query-core@5.108.0': {}
+  '@tanstack/query-core@5.108.4': {}
 
-  '@tanstack/react-query@5.108.0(@types/react@19.2.15)(react@19.3.1)':
+  '@tanstack/react-query@5.108.4(@types/react@19.2.15)(react@19.3.1)':
     dependencies:
-      '@tanstack/query-core': 5.108.0
+      '@tanstack/query-core': 5.108.4
       react: 19.3.1
     optionalDependencies:
       '@types/react': 19.2.15
@@ -8625,7 +8625,7 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
-  lucide-react@1.76.0(@types/react@19.2.15)(react@19.3.1):
+  lucide-react@1.79.0(@types/react@19.2.15)(react@19.3.1):
     dependencies:
       react: 19.3.1
     optionalDependencies:
@@ -9791,7 +9791,7 @@ snapshots:
   tagged-tag@1.0.0:
     optional: true
 
-  tailwind-merge@3.7.0: {}
+  tailwind-merge@3.7.1: {}
 
   tailwindcss@4.3.0: {}
 
