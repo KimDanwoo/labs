@@ -504,7 +504,8 @@ export const RESPAWN_POINTS = {
   projects: { area: 'projects', offset: [1, 7.7], rotation: 1.16 },
   social: { area: 'social', offset: [0, -11.5], rotation: -1.57 },
   timeMachine: { area: 'timeMachine', offset: [-3.4, -2.3], rotation: 0 },
-  toilet: { area: 'toilet', offset: [5.2, 2.3], rotation: -2.89 },
+  lighthouse: { area: 'toilet', offset: [44, 7.5], rotation: 0 },
+  toilet: { area: 'toilet', offset: [3.4, 2.7], rotation: -1.91 },
 } as const satisfies Record<string, RespawnPoint>;
 
 export const AREA_ANCHORS: Readonly<Record<AreaKey, AreaAnchor>> = {

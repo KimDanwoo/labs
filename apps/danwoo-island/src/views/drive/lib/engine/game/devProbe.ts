@@ -7,6 +7,7 @@ const IMMEDIATE = 0;
 type Triple = [number, number, number];
 
 interface ProbeSnapshot {
+  tide: number;
   elapsed: number;
   elapsedScaled: number;
   vehicle: { position: Triple; quaternion: [number, number, number, number]; velocity: Triple; speed: number };
@@ -40,6 +41,7 @@ function createProbe(game: Game): IslandProbe {
       const vehicle = game.physicalVehicle;
       const { x, y, z, w } = vehicle.quaternion;
       return {
+        tide: round(game.water.tide.value),
         elapsed: round(game.ticker.elapsed),
         elapsedScaled: round(game.ticker.elapsedScaled),
         vehicle: {

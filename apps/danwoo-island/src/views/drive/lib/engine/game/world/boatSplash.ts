@@ -42,18 +42,18 @@ export class BoatSplash {
     getGame().scene.add(this.#mesh);
   }
 
-  #spawn(): Drop {
+  #spawn(position: THREE.Vector3): Drop {
     const drop = this.#drops[this.#next] ?? this.#drops[0];
     if (!drop) throw new Error('물방울 풀이 비어 있어요.');
     this.#next = (this.#next + 1) % DROPS;
     drop.age = 0;
-    drop.origin.y = getGame().water.surfaceElevation;
+    drop.origin.y = getGame().water.surfaceAt(position.x, position.z);
     return drop;
   }
 
   burst(center: THREE.Vector3): void {
     for (let index = 0; index < BURST.count; index += 1) {
-      const { origin, velocity } = this.#spawn();
+      const { origin, velocity } = this.#spawn(center);
       const angle = (index / BURST.count) * FULL_TURN + Math.random();
       const reach = between(BURST.ring);
       const outward = between(BURST.outward);
@@ -67,7 +67,7 @@ export class BoatSplash {
     const speed = travelled / getGame().ticker.deltaScaled;
     while (this.#owed >= 1) {
       this.#owed -= 1;
-      const { origin, velocity } = this.#spawn();
+      const { origin, velocity } = this.#spawn(stern);
       const sideways = (Math.random() - 0.5) * 2 * WAKE.sideways;
       origin.setX(stern.x).setZ(stern.z);
       velocity.set(

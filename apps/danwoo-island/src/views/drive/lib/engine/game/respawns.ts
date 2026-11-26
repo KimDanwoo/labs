@@ -38,15 +38,14 @@ export class Respawns {
     return this.getByName(this.#defaultName);
   }
 
-  getClosest(position: THREE.Vector3): Respawn {
+  getClosest(position: THREE.Vector3, options: { isLighthouseAccessible: boolean }): Respawn {
     const distanceTo = (respawn: Respawn): number =>
       Math.hypot(respawn.position.x - position.x, respawn.position.z - position.z);
     const isCloserThan = (respawn: Respawn, best: Respawn | null): boolean =>
       best === null || distanceTo(respawn) < distanceTo(best);
-    const closest = [...this.#items.values()].reduce<Respawn | null>(
-      (best, respawn) => (isCloserThan(respawn, best) ? respawn : best),
-      null,
-    );
+    const closest = [...this.#items.values()]
+      .filter((item) => item.name !== 'lighthouse' || options.isLighthouseAccessible)
+      .reduce<Respawn | null>((best, respawn) => (isCloserThan(respawn, best) ? respawn : best), null);
     if (!closest) throw new Error('No respawns loaded');
     return closest;
   }

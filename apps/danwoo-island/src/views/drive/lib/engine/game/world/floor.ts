@@ -1,10 +1,25 @@
-import { color, Fn, min, mix, positionLocal, positionWorld, smoothstep, texture, uniform, uv, vec3 } from 'three/tsl';
+import {
+  color,
+  Fn,
+  min,
+  mix,
+  positionLocal,
+  positionWorld,
+  smoothstep,
+  texture,
+  uniform,
+  uv,
+  vec2,
+  vec3,
+} from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import { getGame } from '@views/drive/lib/engine/game/gameContext';
 import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/meshDefaultMaterial';
 import type { Physical } from '@views/drive/lib/engine/game/physics/physicsTypes';
 import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
+
+import { COVE, hiddenCoveDepth } from '@views/drive/lib/engine/game/world/layout/tideCove';
 
 const CELL_SIZE = 1.5;
 const EDGE_FADE = 20;
@@ -59,6 +74,7 @@ export class Floor {
   readonly physical: Physical;
   readonly #mesh: THREE.Mesh;
   readonly #bedRock: Physical;
+  #updateCoveBed!: (progress: number) => void;
   #isBedRockEnabled = false;
 
   constructor() {
@@ -95,13 +111,44 @@ export class Floor {
       const seam = smoothstep(DECK.seam, edge.fwidth().add(DECK.seam), edge);
       const shade = seam.mul(plankTone.mul(DECK.toneRange).add(1 - DECK.toneRange));
       const deckColor = mix(deckLowColor, deckHighColor, shade);
-      return mix(baseColor, deckColor, terrainData.r.mul(deckNoise)).rgb;
+      const surface = mix(baseColor, deckColor, terrainData.r.mul(deckNoise));
+      const x = positionWorld.x;
+      const alongRoad = x
+        .sub(COVE.startX)
+        .div(COVE.islandX - COVE.startX)
+        .clamp();
+      const centerZ = alongRoad.mul(Math.PI).sin().mul(-2).add(COVE.islandZ);
+      const edgeDistance = positionWorld.z.sub(centerZ).abs();
+      const width = edgeDistance.smoothstep(COVE.roadHalfWidth - 0.25, COVE.roadHalfWidth).oneMinus();
+      const length = x
+        .smoothstep(COVE.startX, COVE.startX + 1)
+        .mul(x.smoothstep(COVE.islandX - 2, COVE.islandX).oneMinus());
+      const stone = mix(color('#928679'), color('#beaf97'), deckNoise);
+      const waterDepth = terrainData.b.mul(COVE.floorScale).add(game.water.surfaceElevationUniform);
+      const exposed = game.water.dropNode(positionWorld.xz).sub(waterDepth).smoothstep(-0.12, 0.08);
+      const road = mix(surface, stone, width.mul(length).mul(exposed).mul(game.water.tide));
+      const shore = positionWorld.xz
+        .sub(vec2(COVE.islandX, COVE.islandZ))
+        .div(vec2(COVE.islandRadiusX, COVE.islandRadiusZ))
+        .length();
+      const grain = texture(game.noises.perlin, positionWorld.xz.mul(0.16)).r;
+      const windBands = positionWorld.z
+        .mul(1.7)
+        .add(positionWorld.x.mul(0.39))
+        .add(grain.mul(8))
+        .sin()
+        .smoothstep(0.38, 1);
+      const powder = mix(color('#d8e5f1'), color('#f5f8fa'), grain.mul(0.6).add(windBands.mul(0.4)));
+      const wheelTracks = texture(game.tracks.renderTarget.texture, game.terrain.trackUvNode(positionWorld.xz)).r;
+      const snow = mix(powder, color('#c2d6e4'), wheelTracks.mul(0.65));
+      const snowCover = shore.add(grain.sub(0.5).mul(0.16)).smoothstep(0.93, 1.12).oneMinus();
+      return mix(road, snow, snowCover.mul(game.water.tide)).rgb;
     })();
 
     const material = new MeshDefaultMaterial({
       colorNode,
       normalNode: vec3(0, 1, 0),
-      shadowNode: terrainData.g,
+      shadowNode: terrainData.g.mul(0.36),
       hasWater: false,
       hasLightBounce: false,
       wireframe: false,
@@ -134,6 +181,16 @@ export class Floor {
     if (!(terrainMesh instanceof THREE.Mesh)) throw new Error('Terrain mesh is missing');
     const { rows, heights } = terrainHeights(terrainMesh.geometry);
     const { size } = game.terrain;
+    const submerged = heights.slice();
+    const changed: number[] = [];
+    for (const [index, height] of heights.entries()) {
+      const x = (Math.floor(index / rows) / (rows - 1) - 0.5) * size;
+      const z = ((index % rows) / (rows - 1) - 0.5) * size;
+      const depth = hiddenCoveDepth(x, z) * DEPTH_SCALE;
+      if (depth >= height) continue;
+      submerged[index] = depth;
+      changed.push(index);
+    }
     const { physical } = game.objects.add(null, {
       type: 'fixed',
       friction: 0.2,
@@ -141,17 +198,32 @@ export class Floor {
       colliders: [
         {
           shape: 'heightfield',
-          parameters: [rows - 1, rows - 1, heights, { x: size, y: 1, z: size }],
+          parameters: [rows - 1, rows - 1, submerged, { x: size, y: 1, z: size }],
           category: 'floor',
         },
       ],
     });
     if (!physical) throw new Error('Floor heightfield was not created');
+    const collider = physical.colliders[0];
+    if (!collider) throw new Error('Floor collider was not created');
+    let stage = 0;
+    const working = submerged.slice();
+    this.#updateCoveBed = (progress) => {
+      const next = Math.floor(progress * 24);
+      if (next === stage) return;
+      stage = next;
+      for (const i of changed) {
+        const bed = submerged[i] ?? 0;
+        working[i] = bed + ((heights[i] ?? 0) - bed) * (next / 24);
+      }
+      collider.setShape(new game.RAPIER.Heightfield(rows - 1, rows - 1, working, { x: size, y: 1, z: size }));
+    };
     return physical;
   }
 
   update(): void {
     const { view, player, terrain, water } = getGame();
+    this.#updateCoveBed(water.tide.value);
     this.#mesh.position.x = Math.round(view.optimalArea.position.x / CELL_SIZE) * CELL_SIZE;
     this.#mesh.position.z = Math.round(view.optimalArea.position.z / CELL_SIZE) * CELL_SIZE;
 

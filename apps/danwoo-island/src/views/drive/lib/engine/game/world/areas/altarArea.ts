@@ -3,7 +3,7 @@ import { uniform } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 import type { AudioItem } from '@views/drive/lib/engine/game/audioItem';
-import { ISLAND_PLACES } from '@views/drive/lib/engine/game/islandPlaces';
+import { availablePlaces } from '@views/drive/lib/engine/game/islandPlaces';
 import { Player } from '@views/drive/lib/engine/game/player';
 import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
 import {
@@ -83,12 +83,14 @@ export class AltarArea extends Area {
     const { player, view, notifications } = this.game;
     this.#liftCall = null;
     const destination = pickTornadoDestination({
-      places: ISLAND_PLACES.map(({ respawnName }) => respawnName),
+      places: availablePlaces(this.game.water.isLighthouseAccessible).map(({ respawnName }) => respawnName),
       visited: this.#visited,
       origin: ORIGIN,
       random: Math.random,
     });
-    const place = ISLAND_PLACES.find(({ respawnName }) => respawnName === destination);
+    const place = availablePlaces(this.game.water.isLighthouseAccessible).find(
+      ({ respawnName }) => respawnName === destination,
+    );
     const isInterrupted = player.respawnSequence !== this.#travelSequence;
     const shouldCancelTravel = isInterrupted || !place;
     if (shouldCancelTravel) {
@@ -131,7 +133,7 @@ export class AltarArea extends Area {
     this.#visitTimer -= ticker.delta;
     if (this.#visitTimer > 0) return;
     this.#visitTimer = VISIT.interval;
-    for (const { respawnName } of ISLAND_PLACES) {
+    for (const { respawnName } of availablePlaces(this.game.water.isLighthouseAccessible)) {
       const { position } = respawns.getByName(respawnName);
       if (Math.hypot(position.x - player.position.x, position.z - player.position.z) < VISIT.radius) {
         this.#visited.add(respawnName);
