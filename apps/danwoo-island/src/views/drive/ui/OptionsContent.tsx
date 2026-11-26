@@ -1,6 +1,7 @@
 import { AudioToggleIcons } from '@views/drive/ui/AudioToggleIcons';
 import { OptionRow } from '@views/drive/ui/OptionRow';
 import { OptionsTable } from '@views/drive/ui/OptionsTable';
+import { OriginalCredits } from '@views/drive/ui/OriginalCredits';
 import { PaintSelect } from '@views/drive/ui/PaintSelect';
 import { TooltipButton } from '@views/drive/ui/TooltipButton';
 
@@ -48,6 +49,7 @@ export function OptionsContent() {
           <PaintSelect />
         </OptionRow>
       </OptionsTable>
+      <OriginalCredits />
     </div>
   );
 }

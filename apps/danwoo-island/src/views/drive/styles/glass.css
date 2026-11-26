@@ -44,6 +44,11 @@
   color: var(--glass-muted);
 }
 
+.menu .contents .original-credits {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
 .menu .navigation .item.is-active .button-inner,
 html:not(.is-mode-touch) .menu .navigation .item.is-active:hover .button-inner {
   background: var(--accent);
