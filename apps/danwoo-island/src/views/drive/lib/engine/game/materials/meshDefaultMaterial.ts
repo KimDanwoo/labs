@@ -194,6 +194,10 @@ export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial {
 
   #isAwayFromWaterline(): THREE.Node<'bool'> {
     const { water } = getGame();
-    return positionWorld.y.sub(water.surfaceElevationUniform).abs().greaterThan(water.surfaceThicknessUniform);
+    return positionWorld.y
+      .add(water.dropNode(positionWorld.xz))
+      .sub(water.surfaceElevationUniform)
+      .abs()
+      .greaterThan(water.surfaceThicknessUniform);
   }
 }

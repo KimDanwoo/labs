@@ -3,7 +3,7 @@ import * as THREE from 'three/webgpu';
 
 import { worldAsset } from '@views/drive/config/worldAsset';
 import { getGame } from '@views/drive/lib/engine/game/gameContext';
-import { ISLAND_PLACES, type IslandPlace } from '@views/drive/lib/engine/game/islandPlaces';
+import { availablePlaces, type IslandPlace } from '@views/drive/lib/engine/game/islandPlaces';
 import {
   FLIGHT,
   HIDDEN_CLASS,
@@ -69,16 +69,29 @@ export class WorldMap {
   }
 
   #ensurePins(): void {
-    if (this.#pins.length > 0) return;
-    const { respawns } = getGame();
-    this.#pins = ISLAND_PLACES.map((place) => {
+    const { respawns, water } = getGame();
+    const places = availablePlaces(water.isLighthouseAccessible);
+    if (this.#pins.length === places.length) return;
+    for (const pin of this.#pins) {
+      if (places.includes(pin.place)) continue;
+      pin.element.remove();
+      this.#chips.get(pin.place)?.closest('li')?.remove();
+      this.#chips.delete(pin.place);
+      if (this.#selected === pin.place) {
+        this.#selected = null;
+        this.#card.root.classList.add(HIDDEN_CLASS);
+      }
+    }
+    this.#pins = this.#pins.filter((pin) => places.includes(pin.place));
+    for (const place of places) {
+      if (this.#chips.has(place)) continue;
       const element = createPinElement(place, () => this.#select(place));
       element.addEventListener('dblclick', () => this.#travelTo(place));
       this.#pinsElement.append(element);
       const anchor = respawns.getByName(place.respawnName).position.clone().setY(PIN_LIFT);
-      return { place, element, anchor };
-    });
-    this.#placesElement.replaceChildren(...ISLAND_PLACES.map((place) => this.#placeItem(place)));
+      this.#pins.push({ place, element, anchor });
+      this.#placesElement.append(this.#placeItem(place));
+    }
   }
 
   #placeItem(place: IslandPlace): HTMLElement {
@@ -203,6 +216,7 @@ export class WorldMap {
 
   update(): void {
     if (!this.#modal.isOpen) return;
+    this.#ensurePins();
     for (const pin of this.#pins) this.#placeAt(pin.element, pin.anchor);
     this.#placeAt(this.#carElement, getGame().player.position);
   }

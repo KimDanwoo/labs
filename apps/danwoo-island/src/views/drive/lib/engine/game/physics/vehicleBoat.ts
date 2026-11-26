@@ -41,7 +41,17 @@ export class VehicleBoat {
     if (!this.#body.isEnabled()) return;
     const { x, y, z } = this.#body.translation();
     const isFlying = getGame().physicalVehicle.flight.isActive;
-    this.isActive = shouldBoat({ isBoating: this.isActive, isFlying, x, z, elevation: y, seabed: this.#seabed(x, z) });
+    const water = getGame().water;
+    const drop = water.surfaceElevation - water.surfaceAt(x, z);
+    const bed = this.#seabed(x, z);
+    this.isActive = shouldBoat({
+      isBoating: this.isActive,
+      isFlying,
+      x,
+      z,
+      elevation: y + drop,
+      seabed: bed === null ? null : bed + drop,
+    });
     if (!this.isActive) return;
 
     this.#quaternion.copy(this.#body.rotation());
@@ -64,7 +74,15 @@ export class VehicleBoat {
     const { player } = getGame();
     const forwardSpeed = this.#heading.x * velocity.x + this.#heading.z * velocity.z;
     const sideSpeed = this.#side.x * velocity.x + this.#side.z * velocity.z;
-    const lift = Math.max(0, -GRAVITY.y + FLOAT.stiffness * (FLOAT.elevation - position.y));
+    const lift = Math.max(
+      0,
+      -GRAVITY.y +
+        FLOAT.stiffness *
+          (FLOAT.elevation +
+            getGame().water.surfaceAt(position.x, position.z) -
+            getGame().water.surfaceElevation -
+            position.y),
+    );
     const isWet = lift > 0;
     const sink = isWet ? FLOAT.damping * velocity.y : 0;
     const forwardDrag = WATER_DRAG.forward + player.braking * WATER_DRAG.brake;

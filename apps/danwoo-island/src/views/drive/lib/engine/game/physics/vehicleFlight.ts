@@ -103,7 +103,7 @@ export class VehicleFlight {
 
   #probeGround(position: Vector, velocity: Vector): number {
     const below = this.#castDown(position.x, position.y, position.z);
-    return Math.max(below, this.#obstacleAhead(position, velocity), getGame().water.surfaceElevation);
+    return Math.max(below, this.#obstacleAhead(position, velocity), getGame().water.surfaceAt(position.x, position.z));
   }
 
   #obstacleAhead(position: Vector, velocity: Vector): number {

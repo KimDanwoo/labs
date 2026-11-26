@@ -5,6 +5,12 @@ import { type IslandModelKey, islandModelMesh } from '@views/drive/lib/engine/ga
 import { IslandTrees, JUNGLE_SPECIES, mixGroves, PALM } from '@views/drive/lib/engine/game/world/islandTrees';
 import { ISLAND_SCATTER, type ScatterPlacement } from '@views/drive/lib/engine/game/world/layout/islandScatter';
 
+import { COVE } from '@views/drive/lib/engine/game/world/layout/tideCove';
+
+function outsideHarbor([x, z]: ScatterPlacement): boolean {
+  return Math.hypot((x - COVE.x) / (COVE.rx + 2), (z - COVE.z) / (COVE.rz + 1)) > 1;
+}
+
 const SHORE_ROCKS: readonly IslandModelKey[] = ['tropicalRockSmall', 'tropicalRockCluster', 'tropicalRockFlat'];
 const ROCK_SINK = 0.2;
 
@@ -33,7 +39,7 @@ function placedObject(
 }
 
 function references(placements: readonly ScatterPlacement[]): THREE.Object3D[] {
-  return placements.map((placement) => placedObject(new THREE.Object3D(), placement));
+  return placements.filter(outsideHarbor).map((placement) => placedObject(new THREE.Object3D(), placement));
 }
 
 export function replantScatteredModels(): void {
@@ -43,7 +49,9 @@ export function replantScatteredModels(): void {
     const template = scene.children[0];
     if (!template) throw new Error(`${name}에 복제할 원본이 없어요.`);
     for (const child of [...scene.children]) child.removeFromParent();
-    scene.add(...placements.map((placement) => placedObject(template, placement, REST_HEIGHTS[name])));
+    scene.add(
+      ...placements.filter(outsideHarbor).map((placement) => placedObject(template, placement, REST_HEIGHTS[name])),
+    );
   }
 }
 
@@ -56,7 +64,7 @@ export function plantScatteredTrees(): IslandTrees {
 
 export function placeShoreRocks(): void {
   const { objects } = getGame();
-  ISLAND_SCATTER.rocks.forEach(([x, z, rotation, scale], index) => {
+  ISLAND_SCATTER.rocks.filter(outsideHarbor).forEach(([x, z, rotation, scale], index) => {
     const model = SHORE_ROCKS[index % SHORE_ROCKS.length] ?? 'tropicalRockSmall';
     const matrix = new THREE.Matrix4()
       .makeTranslation(x, -ROCK_SINK, z)

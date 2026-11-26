@@ -1,7 +1,12 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import { coveBed, islandRadius } from '../../src/views/drive/lib/engine/game/world/layout/tideCove';
 
-import { type Point, WORLD_SIZE } from '../../src/views/drive/lib/engine/game/world/layout/islandLayout';
+import {
+  WORLD_SIZE,
+  introRingCenter,
+  type Point,
+} from '../../src/views/drive/lib/engine/game/world/layout/islandLayout';
 import { landDistance, objectDistance, smoothstep, trackClearance, trailDistance } from './fields';
 import { GLADE_RADIUS, GROVE_RADIUS, gladeDistance, groveDistance } from './groves';
 import { ragged, valueNoise } from './noise';
@@ -56,6 +61,22 @@ function grassCover(point: Point, land: number): number {
   return Math.max(sampleMask(GRASS_MASK, point), grove, glade, tufts) * coast;
 }
 
+const BEACH_CENTER = introRingCenter();
+
+function landingGrass([x, z]: Point, surrounding: number): number {
+  const u = x - BEACH_CENTER[0];
+  const v = z - BEACH_CENTER[1];
+  const influence = 1 - smoothstep(6, 10, Math.hypot(u, v));
+  if (influence === 0) return surrounding;
+  const drift = ragged([x, z], { cell: 1.1, reach: 0.26 });
+  const canopy = Math.hypot((u + 3.7) / 3.4, (v + 0.4) / 5.1);
+  const hollow = Math.hypot((u - 0.1) / 2.2, (v + 0.1) / 3.3);
+  const crescent = smoothstep(1.08, 0.84, canopy + drift * 0.25) * smoothstep(0.95, 1.14, hollow);
+  const lee = Math.hypot((u - 4.5) / 1.2, (v - 1.1) / 0.68);
+  const fringe = smoothstep(1.12, 0.72, lee + drift) * 0.72;
+  return surrounding + (Math.max(crescent, fringe) - surrounding) * influence;
+}
+
 export interface TerrainSample {
   readonly paved: number;
   readonly grass: number;
@@ -67,14 +88,19 @@ export function sampleTerrain(point: Point): TerrainSample {
   const track = trackClearance(point);
   const depth = smoothstep(BEACH.inland, BEACH.offshore, land);
   const paved = land > 0 ? smoothstep(PAVED.shoulder + PAVED.edge, PAVED.shoulder, track) : 0;
-  const grass =
+  const surrounding =
     grassCover(point, land) *
-    smoothstep(GRASS.trackClearance, GRASS.trackClearance + GRASS.edge, track) *
     smoothstep(TRAIL.clearance, TRAIL.clearance + TRAIL.edge, trailDistance(point) + ragged(point, TRAIL_EDGE)) *
     smoothstep(
       GRASS.padClearance,
       GRASS.padClearance + GRASS.edge,
       objectDistance(point) + ragged(point, CLEARING_EDGE),
     );
-  return { paved, grass, depth };
+  const grass =
+    landingGrass(point, surrounding) *
+    smoothstep(0.5, 1.8, land) *
+    smoothstep(GRASS.trackClearance, GRASS.trackClearance + GRASS.edge, track);
+  const bed = coveBed(point[0], point[1], depth);
+  const shoreGrass = bed > depth ? grass * (1 - smoothstep(0, 0.12, bed)) : grass;
+  return { paved, grass: shoreGrass * smoothstep(1, 1.25, islandRadius(...point)), depth: bed };
 }

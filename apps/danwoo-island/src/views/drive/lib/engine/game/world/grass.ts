@@ -1,20 +1,16 @@
 import {
-  atan,
   attribute,
-  cameraPosition,
   Fn,
   mix,
   mod,
   modelWorldMatrix,
   rotateUV,
-  step,
+  smoothstep,
   texture,
   uniform,
-  uniformArray,
   varying,
   vec2,
   vec3,
-  vertexIndex,
 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
@@ -23,17 +19,14 @@ import { MeshDefaultMaterial } from '@views/drive/lib/engine/game/materials/mesh
 import { QUALITY } from '@views/drive/lib/engine/game/quality';
 import { TICK_ORDER } from '@views/drive/lib/engine/game/tickOrder';
 
-const SUBDIVISIONS_BY_QUALITY = { [QUALITY.high]: 200, [QUALITY.low]: 140 } as const;
+import bladeProfile from '@views/drive/lib/engine/game/world/grassBladeShape.json';
+
+const SUBDIVISIONS_BY_QUALITY = { [QUALITY.high]: 196, [QUALITY.low]: 140 } as const;
 const SURFACE_IDEAL = 2000;
-const BLADE = { width: 0.22, height: 0.48, heightRandomness: 0.55, lean: 0.9 } as const;
-const SHADE = { base: [0.56, 0.72, 0.7], tip: [1.32, 1.26, 0.9] } as const;
+const BLADE = { width: 0.35, height: 0.29, heightRandomness: 0.55 } as const;
+const SUNLIT_TIP = [1.12, 1.09, 0.93] as const;
 const PATCH = { scale: 0.045, lush: [0.84, 0.98, 0.95], sunlit: [1.16, 1.1, 0.8] } as const;
-const SPRIG = { root: 0.35, overlap: 0.05, shortTip: 0.7 } as const;
-const LEAF_SHAPE = [-SPRIG.root, 0, -1, 1, SPRIG.overlap, 0, -SPRIG.overlap, 0, 1, SPRIG.shortTip, SPRIG.root, 0];
-const LEAF_VERTICES = LEAF_SHAPE.length / 2;
 const OVERFLOW_GROWTH = { initial: 0.5, resized: 0.4 } as const;
-const HIDDEN_THRESHOLD = 0.1;
-const HIDDEN_LIFT = 100;
 const HEIGHT_NOISE_SCALE = 0.0321;
 const THROTTLE_ORDER = 2;
 
@@ -43,8 +36,9 @@ function surfaceOverflow(size: number): number {
 
 function bladeGeometry(size: number, fragmentSize: number, subdivisions: number): THREE.BufferGeometry {
   const count = subdivisions * subdivisions;
-  const position = new Float32Array(count * LEAF_VERTICES * 2);
-  const heightRandomness = new Float32Array(count * LEAF_VERTICES);
+  const position = new Float32Array(count * 2);
+  const heightRandomness = new Float32Array(count);
+  const heading = new Float32Array(count);
   for (let x = 0; x < subdivisions; x += 1) {
     const fragmentX = (x / subdivisions - 0.5) * size + fragmentSize * 0.5;
     for (let z = 0; z < subdivisions; z += 1) {
@@ -52,17 +46,19 @@ function bladeGeometry(size: number, fragmentSize: number, subdivisions: number)
       const blade = x * subdivisions + z;
       const positionX = fragmentX + (Math.random() - 0.5) * fragmentSize;
       const positionZ = fragmentZ + (Math.random() - 0.5) * fragmentSize;
-      const randomness = Math.random();
-      for (let vertex = 0; vertex < LEAF_VERTICES; vertex += 1) {
-        position.set([positionX, positionZ], (blade * LEAF_VERTICES + vertex) * 2);
-        heightRandomness[blade * LEAF_VERTICES + vertex] = randomness;
-      }
+      position.set([positionX, positionZ], blade * 2);
+      heightRandomness[blade] = Math.random();
+      heading[blade] = Math.random() * 2 * Math.PI;
     }
   }
-  const geometry = new THREE.BufferGeometry();
+  const geometry = new THREE.InstancedBufferGeometry();
+  geometry.instanceCount = count;
   geometry.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 1);
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(position, 2));
-  geometry.setAttribute('heightRandomness', new THREE.Float32BufferAttribute(heightRandomness, 1));
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(bladeProfile.interior, 3));
+  geometry.setAttribute('fringe', new THREE.Float32BufferAttribute(bladeProfile.fringe, 3));
+  geometry.setAttribute('heading', new THREE.InstancedBufferAttribute(heading, 1));
+  geometry.setAttribute('bladeRoot', new THREE.InstancedBufferAttribute(position, 2));
+  geometry.setAttribute('heightRandomness', new THREE.InstancedBufferAttribute(heightRandomness, 1));
   return geometry;
 }
 
@@ -115,36 +111,39 @@ export class Grass {
 
   #material(): MeshDefaultMaterial {
     const game = getGame();
-    const leafShape = uniformArray<'float'>(LEAF_SHAPE, 'float');
-    const shapeIndex = vertexIndex.toFloat().mod(LEAF_VERTICES).mul(2);
-    const tipness = varying(leafShape.element(shapeIndex.add(1)));
+    const profile = attribute('position', 'vec3');
+    const tipness = varying(profile.y);
     const wind = varying(vec2());
     const bladePosition = varying(vec2());
     const heightRandomness = uniform(BLADE.heightRandomness);
 
     const terrainData = game.terrain.terrainNode(bladePosition);
     const grassAmount = terrainData.g;
-    const hidden = step(terrainData.g.sub(0.4), HIDDEN_THRESHOLD);
 
     const material = new MeshDefaultMaterial({
-      colorNode: game.terrain
-        .colorNode(terrainData)
-        .mul(mix(vec3(...SHADE.base), vec3(...SHADE.tip), tipness))
-        .mul(
-          mix(
-            vec3(...PATCH.lush),
-            vec3(...PATCH.sunlit),
-            texture(game.noises.perlin, bladePosition.mul(PATCH.scale)).r,
+      side: THREE.DoubleSide,
+      hasCoreShadows: false,
+      colorNode: mix(
+        game.terrain.colorNode(terrainData),
+        game.terrain.grassColorUniform.rgb
+          .mul(vec3(...SUNLIT_TIP))
+          .mul(
+            mix(
+              vec3(...PATCH.lush),
+              vec3(...PATCH.sunlit),
+              texture(game.noises.perlin, bladePosition.mul(PATCH.scale)).r,
+            ),
           ),
-        ),
+        tipness,
+      ),
       normalNode: vec3(0, 1, 0),
       hasWater: false,
       hasLightBounce: false,
-      shadowNode: tipness.oneMinus().mul(grassAmount),
+      shadowNode: tipness.oneMinus().mul(grassAmount).mul(0.36),
     });
 
     material.positionNode = Fn(() => {
-      const loopPosition = attribute('position', 'vec2').sub(this.#center);
+      const loopPosition = attribute('bladeRoot', 'vec2').sub(this.#center);
       const halfSize = this.#size.mul(0.5);
       loopPosition.x.assign(mod(loopPosition.x.add(halfSize), this.#size).sub(halfSize));
       loopPosition.y.assign(mod(loopPosition.y.add(halfSize), this.#size).sub(halfSize));
@@ -158,21 +157,15 @@ export class Grass {
         .mul(heightRandomness.mul(attribute('heightRandomness', 'float')).add(heightRandomness.oneMinus()))
         .mul(heightVariation)
         .mul(grassAmount);
-      const lean = attribute('heightRandomness', 'float').sub(0.5).mul(BLADE.lean).mul(tipness);
-      const shape = vec3(
-        leafShape.element(shapeIndex).add(lean).mul(this.#bladeWidth).mul(grassAmount),
-        tipness.mul(height),
-        0,
-      );
-      const vertexPosition = position3.add(shape);
-
-      const angleToCamera = atan(worldPosition.z.sub(cameraPosition.z), worldPosition.x.sub(cameraPosition.x)).add(
-        -Math.PI * 0.5,
-      );
-      vertexPosition.xz.assign(rotateUV(vertexPosition.xz, angleToCamera, worldPosition.xz));
+      const interior = smoothstep(0.34, 0.78, grassAmount);
+      const sprig = mix(attribute('fringe', 'vec3'), profile, interior);
+      const heading = attribute('heading', 'float');
+      const angle = mix(heading.sin().mul(0.48), heading, interior);
+      const spread = rotateUV(sprig.xz, angle, vec2(0)).mul(this.#bladeWidth).mul(grassAmount);
+      const vertexPosition = position3.add(vec3(spread.x, sprig.y.mul(height), spread.y));
       wind.assign(game.wind.offsetNode(worldPosition.xz).mul(tipness).mul(height).mul(2));
       vertexPosition.addAssign(vec3(wind.x, 0, wind.y));
-      vertexPosition.y.addAssign(hidden.mul(HIDDEN_LIFT));
+      vertexPosition.y.addAssign(terrainData.b.mul(-1.5));
       return vertexPosition;
     })();
     return material;

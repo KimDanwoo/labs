@@ -148,7 +148,9 @@ export class Physics {
     if (!body.isDynamic()) return;
     if (!body.isEnabled()) return;
     if (body.isSleeping()) return;
-    const isSubmerged = Math.max(-body.translation().y, surfaceElevation) > 0;
+    const point = body.translation();
+    const localDrop = surfaceElevation - getGame().water.surfaceAt(point.x, point.z);
+    const isSubmerged = point.y < -localDrop;
     if (this.#submerged.get(physical) === isSubmerged) return;
     this.#submerged.set(physical, isSubmerged);
     body.setLinearDamping(isSubmerged ? SUBMERGED_DAMPING : linearDamping);

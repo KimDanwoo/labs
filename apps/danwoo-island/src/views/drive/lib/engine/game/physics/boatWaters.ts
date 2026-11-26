@@ -1,5 +1,7 @@
 import { PONDS } from '@views/drive/lib/engine/game/world/layout/islandLayout';
 
+import { tideWeight } from '@views/drive/lib/engine/game/world/layout/tideCove';
+
 export const BOAT_SEABED = { enter: -1.3, leave: -1 } as const;
 export const BOAT_DECK = { enter: 0.7, leave: 0.9 } as const;
 const POND_REACH = { shoreRatio: 1.15, padding: 2 } as const;
@@ -25,5 +27,6 @@ export function shouldBoat({ isBoating, isFlying, x, z, elevation, seabed }: Boa
   if (isInPond(x, z)) return false;
   if (elevation > (isBoating ? BOAT_DECK.leave : BOAT_DECK.enter)) return false;
   if (seabed === null) return true;
+  if (tideWeight(x, z) === 1) return seabed < (isBoating ? -0.52 : -0.68);
   return seabed < (isBoating ? BOAT_SEABED.leave : BOAT_SEABED.enter);
 }

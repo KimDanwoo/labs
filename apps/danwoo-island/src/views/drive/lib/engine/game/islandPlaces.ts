@@ -8,6 +8,7 @@ export type PlaceIcon =
   | 'jukebox'
   | 'waterfall'
   | 'shower'
+  | 'lighthouse'
   | 'bonfire'
   | 'controls'
   | 'cookie'
@@ -43,8 +44,20 @@ export const ISLAND_PLACES: readonly IslandPlace[] = [
   { name: '최신 글 게시판', respawnName: 'behindTheScene', icon: 'blog', description: 'danwoo.dev 최신 글' },
   { name: 'Lab 포털', respawnName: 'timeMachine', icon: 'portal', description: 'lab.danwoo.dev로 가는 포털' },
   { name: '폭포', respawnName: 'achievements', icon: 'waterfall', description: '폭포 아래 쉼터' },
-  { name: '샤워장', respawnName: 'toilet', icon: 'shower', description: '차를 씻어 내요' },
+  {
+    name: '샤워장',
+    respawnName: 'toilet',
+    icon: 'shower',
+    description: '해변 샤워장 옆에 빨간 밸브가 있어요',
+  },
+  { name: '눈등대', respawnName: 'lighthouse', icon: 'lighthouse', description: '눈 내리는 곶의 작은 등대' },
   { name: '모닥불', respawnName: 'bonfire', icon: 'bonfire', description: '해변 모닥불' },
   { name: '조작법', respawnName: 'controls', icon: 'controls', description: '조작법 안내판' },
   { name: '출발점', respawnName: 'beachStart', icon: 'start', description: '처음 출발한 해변' },
 ];
+
+const PLACES_AT_HIGH_TIDE = ISLAND_PLACES.filter((place) => place.respawnName !== 'lighthouse');
+
+export function availablePlaces(isLighthouseAccessible: boolean): readonly IslandPlace[] {
+  return isLighthouseAccessible ? ISLAND_PLACES : PLACES_AT_HIGH_TIDE;
+}

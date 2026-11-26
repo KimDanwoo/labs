@@ -148,4 +148,4 @@ mkdirSync(OUTPUT, { recursive: true });
 writeFileSync(path.join(OUTPUT, 'terrain.png'), encodePng(terrainPixels(), TEXTURE_SIZE));
 writeFileSync(path.join(OUTPUT, 'terrain.glb'), encodeGlb(heightGrid()));
 process.stdout.write(`지형을 구웠어요: ${OUTPUT}\n`);
-writeScatter();
+if (!process.argv.includes('--terrain-only')) writeScatter();

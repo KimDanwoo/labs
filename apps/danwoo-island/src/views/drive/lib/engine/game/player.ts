@@ -161,7 +161,9 @@ export class Player {
     this.#respawnSequence += 1;
     game.overlay.show(() => {
       callback?.();
-      const respawn = respawnName ? game.respawns.getByName(respawnName) : game.respawns.getClosest(this.position);
+      const respawn = respawnName
+        ? game.respawns.getByName(respawnName)
+        : game.respawns.getClosest(this.position, { isLighthouseAccessible: game.water.isLighthouseAccessible });
       game.physicalVehicle.moveTo(respawn.position, respawn.rotation);
       this.state = Player.STATE_DEFAULT;
       game.overlay.hide();
