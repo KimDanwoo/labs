@@ -11,7 +11,7 @@ export const GUESS_WORD_COPY = {
   hintsTitle: '오늘의 힌트',
   hintLabel: (rank: number) => `${rank}위 유사도`,
   listTitle: '추측한 단어',
-  latestTitle: '방금 입력한 단어',
+  latestTitle: '방금 확인한 단어',
   columnOrder: '#',
   columnWord: '단어',
   columnSimilarity: '유사도',
@@ -27,7 +27,6 @@ export const GUESS_WORD_COPY = {
 export const NOTICE_TEXT: Record<NoticeKind, (word: string) => string> = {
   [NOTICE_KIND.INVALID]: () => '한글 단어 하나만 입력할 수 있어요 (8자 이하).',
   [NOTICE_KIND.UNKNOWN]: (word) => `'${word}'은(는) 사전에 없거나, 명사가 아니거나, 외래어예요.`,
-  [NOTICE_KIND.DUPLICATE]: (word) => `'${word}'은(는) 이미 입력했어요.`,
   [NOTICE_KIND.NETWORK]: () => '서버와 연결하지 못했어요. 잠시 후 다시 시도해 주세요.',
   [NOTICE_KIND.BOT]: () => '자동 입력으로 보여서 막았어요. 새로고침한 뒤 직접 입력해 주세요.',
 };

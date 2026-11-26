@@ -1,12 +1,13 @@
 import { GUESS_STATUS, NOTICE_KIND } from '@views/guess-word/config/game';
 import {
   addGuess,
-  blockedGuessNotice,
   emptyRecord,
+  invalidGuessNotice,
   latestDay,
   parseRecord,
   solvedTries,
   sortBySimilarity,
+  spotlightGuess,
   storedDay,
 } from '@views/guess-word/lib/guessRecord';
 import { describe, expect, it } from 'vitest';
@@ -60,12 +61,24 @@ describe('sortBySimilarity', () => {
   });
 });
 
-describe('blockedGuessNotice', () => {
-  it('한글 단어가 아니거나 이미 입력한 단어면 막는다', () => {
-    const record = addGuess(emptyRecord(3), result('바다', 20));
-    expect(blockedGuessNotice(record, 'sea')).toEqual({ kind: NOTICE_KIND.INVALID, word: 'sea' });
-    expect(blockedGuessNotice(record, '바다')).toEqual({ kind: NOTICE_KIND.DUPLICATE, word: '바다' });
-    expect(blockedGuessNotice(record, '하늘')).toBeNull();
+describe('invalidGuessNotice', () => {
+  it('한글 단어가 아니면 막고, 이미 입력한 단어는 막지 않는다', () => {
+    expect(invalidGuessNotice('sea')).toEqual({ kind: NOTICE_KIND.INVALID, word: 'sea' });
+    expect(invalidGuessNotice('바다')).toBeNull();
+  });
+});
+
+describe('spotlightGuess', () => {
+  const record = [result('바다', 20), result('하늘', 30)].reduce(addGuess, emptyRecord(3));
+
+  it('다시 입력한 단어가 있으면 그 단어를 횟수 그대로 위에 띄운다', () => {
+    expect(spotlightGuess(record.guesses, '바다')).toEqual({ word: '바다', similarity: 20, rank: 5, order: 1 });
+  });
+
+  it('지정한 단어가 없으면 가장 최근 추측을 띄운다', () => {
+    expect(spotlightGuess(record.guesses, null)?.word).toBe('하늘');
+    expect(spotlightGuess(record.guesses, '구름')?.word).toBe('하늘');
+    expect(spotlightGuess([], null)).toBeNull();
   });
 });
 
