@@ -41,10 +41,8 @@ export function hasGuessed(record: GuessRecord, word: string): boolean {
   return record.guesses.some((entry) => entry.word === word);
 }
 
-export function blockedGuessNotice(record: GuessRecord, word: string): Notice | null {
-  if (!isValidGuess(word)) return { kind: NOTICE_KIND.INVALID, word };
-  if (hasGuessed(record, word)) return { kind: NOTICE_KIND.DUPLICATE, word };
-  return null;
+export function invalidGuessNotice(word: string): Notice | null {
+  return isValidGuess(word) ? null : { kind: NOTICE_KIND.INVALID, word };
 }
 
 export function addGuess(record: GuessRecord, result: GuessResult): GuessRecord {
@@ -64,8 +62,8 @@ export function sortBySimilarity(guesses: GuessEntry[]): GuessEntry[] {
   return [...guesses].sort((a, b) => b.similarity - a.similarity || a.order - b.order);
 }
 
-export function latestGuess(guesses: GuessEntry[]): GuessEntry | null {
-  return guesses.at(-1) ?? null;
+export function spotlightGuess(guesses: GuessEntry[], word: string | null): GuessEntry | null {
+  return guesses.find((entry) => entry.word === word) ?? guesses.at(-1) ?? null;
 }
 
 export function solvedTries(record: GuessRecord): number | null {

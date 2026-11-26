@@ -6,7 +6,6 @@ export const GUESS_STATUS = {
 export const NOTICE_KIND = {
   INVALID: 'invalid',
   UNKNOWN: 'unknown',
-  DUPLICATE: 'duplicate',
   NETWORK: 'network',
   BOT: 'bot',
 } as const;

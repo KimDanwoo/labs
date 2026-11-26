@@ -6,11 +6,12 @@ import { GUESS_QUERY_KEY } from '@views/guess-word/config/game';
 import { noticeKindOf, requestGuess, requestHints } from '@views/guess-word/lib/guessApi';
 import {
   addGuess,
-  blockedGuessNotice,
+  hasGuessed,
+  invalidGuessNotice,
   latestDay,
-  latestGuess,
   parseRecord,
   sortBySimilarity,
+  spotlightGuess,
   storedDay,
 } from '@views/guess-word/lib/guessRecord';
 import { guessRecordAtom } from '@views/guess-word/model/store/guessRecordAtom';
@@ -37,6 +38,7 @@ export function useGuessWordGame(): GuessWordGame {
   const [stored, setStored] = useAtom(guessRecordAtom);
   const [reportedDay, setReportedDay] = useState<number | null>(null);
   const [input, setInput] = useState('');
+  const [spotlightWord, setSpotlightWord] = useState<string | null>(null);
   const [notice, setNotice] = useState<Notice | null>(null);
   const [isResultOpen, setIsResultOpen] = useState(false);
   const hintsQuery = useQuery({
@@ -52,13 +54,18 @@ export function useGuessWordGame(): GuessWordGame {
     if (responseDay !== day) setReportedDay(responseDay);
   };
 
+  const showGuess = (word: string) => {
+    setSpotlightWord(word);
+    setInput('');
+    setNotice(null);
+  };
+
   const guessMutation = useMutation({
     mutationFn: requestGuess,
     onSuccess: (result) => {
       reportDay(result.day);
       setStored((previous: unknown) => addGuess(parseRecord(previous, result.day), result));
-      setInput('');
-      setNotice(null);
+      showGuess(result.word);
       if (result.isAnswer) setIsResultOpen(true);
     },
     onError: (error, word) => setNotice({ kind: noticeKindOf(error), word }),
@@ -71,16 +78,21 @@ export function useGuessWordGame(): GuessWordGame {
   const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
     const word = normalizeGuess(input);
-    const blockedNotice = blockedGuessNotice(record, word);
-    setNotice(blockedNotice);
-    if (!blockedNotice) guessMutation.mutate(word);
+    const invalidNotice = invalidGuessNotice(word);
+    setNotice(invalidNotice);
+    if (invalidNotice) return;
+    if (hasGuessed(record, word)) {
+      showGuess(word);
+      return;
+    }
+    guessMutation.mutate(word);
   };
 
   return {
     day,
     record,
     sortedGuesses,
-    latest: latestGuess(record.guesses),
+    latest: spotlightGuess(record.guesses, spotlightWord),
     hints: hintsQuery.data?.hints,
     input,
     notice,
