@@ -3,9 +3,7 @@ import { createElement } from '@views/drive/lib/engine/game/utilities/createElem
 import * as THREE from 'three/webgpu';
 
 export type BoardState =
-  | { status: 'loading' }
-  | { status: 'ready'; posts: readonly LatestPost[] }
-  | { status: 'failed' };
+  { status: 'loading' } | { status: 'ready'; posts: readonly LatestPost[] } | { status: 'failed' };
 export const CANVAS = { width: 1200, height: 800, padding: 70 } as const;
 export const BOARD_SIZE = new THREE.Vector3(3.4, 3.4, 0.5);
 export const PAPER_SEGMENTS = 24;

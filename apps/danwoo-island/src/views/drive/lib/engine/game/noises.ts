@@ -77,8 +77,8 @@ const voronoi = Fn(([position, repeat]: [Vec2Node, FloatNode]): THREE.Node<'vec3
   ],
 });
 
-const positiveModulo = Fn(
-  ([dividend, divisor]: [Vec2Node, Vec2Node]): Vec2Node => mod(mod(dividend, divisor).add(divisor), divisor),
+const positiveModulo = Fn(([dividend, divisor]: [Vec2Node, Vec2Node]): Vec2Node =>
+  mod(mod(dividend, divisor).add(divisor), divisor),
 ).setLayout({
   name: 'modulo',
   type: 'vec2',

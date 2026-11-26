@@ -1,16 +1,5 @@
 export type IconName =
-  | 'sun'
-  | 'sunset'
-  | 'rain'
-  | 'moon'
-  | 'sound'
-  | 'mute'
-  | 'camera'
-  | 'map'
-  | 'close'
-  | 'arrow'
-  | 'home'
-  | 'shirt';
+  'sun' | 'sunset' | 'rain' | 'moon' | 'sound' | 'mute' | 'camera' | 'map' | 'close' | 'arrow' | 'home' | 'shirt';
 
 export type IconShape = { kind: 'path'; d: string } | { kind: 'circle'; cx: number; cy: number; r: number };
 

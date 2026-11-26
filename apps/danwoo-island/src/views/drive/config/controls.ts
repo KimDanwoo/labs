@@ -5,8 +5,7 @@ export interface KeyControl {
 }
 
 export type PlaystationButton =
-  | { kind: 'icon'; icon: 'circle' | 'triangle' | 'square' | 'cross' }
-  | { kind: 'label'; label: string };
+  { kind: 'icon'; icon: 'circle' | 'triangle' | 'square' | 'cross' } | { kind: 'label'; label: string };
 
 export type GamepadControl =
   | { kind: 'paired'; xbox: string; playstation: PlaystationButton; action: string }

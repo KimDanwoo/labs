@@ -1,7 +1,5 @@
 export type SetChange<T> =
-  | { type: 'add'; value: T }
-  | { type: 'delete'; value: T }
-  | { type: 'clear'; previousValues: T[] };
+  { type: 'add'; value: T } | { type: 'delete'; value: T } | { type: 'clear'; previousValues: T[] };
 
 export class ObservableSet<T> extends Set<T> {
   readonly #onChange: (change: SetChange<T>) => void;
