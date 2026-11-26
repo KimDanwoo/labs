@@ -57,7 +57,7 @@ export const PROJECTS: Project[] = [
   },
   {
     title: 'Danwoo Island',
-    description: '차를 몰고 열대 섬을 돌아다니는 3D 포트폴리오',
+    description: 'Bruno Simon의 folio-2025(MIT)를 포크해 만든 3D 섬 포트폴리오',
     href: 'https://world.danwoo.dev/',
     scope: ['3D 엔진 이식', '에셋 파이프라인', '월드 제작'],
     image: '/projects/danwoo-island-card.webp',
