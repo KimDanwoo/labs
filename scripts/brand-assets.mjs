@@ -43,6 +43,11 @@ async function captureGame(page, id, href) {
   if (!response?.ok()) throw new Error(`플레이 화면에 접속할 수 없습니다: ${href} (${response?.status()})`);
 
   const board = page.locator(GAME_BOARD[id]);
+  if (id === 'sudoku')
+    await board
+      .getByText(/^[1-9]$/u)
+      .first()
+      .waitFor({ state: 'visible' });
   if (id === 'slitherlink') await board.locator('text').first().waitFor({ state: 'visible' });
   if (id === 'gomoku') {
     const center = await board.evaluate((element) => Math.floor(element.children.length / 2));
