@@ -32,14 +32,7 @@ export interface SearchLimits {
 }
 
 type Exit =
-  | 'opening'
-  | 'immediate-win'
-  | 'only-move'
-  | 'no-candidate'
-  | 'forcing-win'
-  | 'mate-score'
-  | 'timeout'
-  | 'target';
+  'opening' | 'immediate-win' | 'only-move' | 'no-candidate' | 'forcing-win' | 'mate-score' | 'timeout' | 'target';
 
 export interface SearchResult {
   cell: number;

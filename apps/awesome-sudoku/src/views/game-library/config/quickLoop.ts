@@ -2,9 +2,7 @@ const SIZE = 7;
 const CLUES_PER_ROW = 3;
 
 type LoopSlot = { id: number; label: string } & (
-  | { kind: 'dot' }
-  | { kind: 'clue'; clue: number }
-  | { kind: 'edge'; isHorizontal: boolean }
+  { kind: 'dot' } | { kind: 'clue'; clue: number } | { kind: 'edge'; isHorizontal: boolean }
 );
 
 export const LOOP_SLOTS: LoopSlot[] = Array.from({ length: SIZE ** 2 }, (_, index) => {

@@ -62,13 +62,11 @@ export function placeIslandBridges(): void {
             parameters: [span.width / 2, DECK.thickness / 2, length / 2],
             position: { x: 0, y: DECK.top - DECK.thickness / 2, z: 0 },
           },
-          ...RAIL_SIDES.map(
-            (side): ColliderDescription => ({
-              shape: 'cuboid',
-              parameters: [RAIL.halfThickness, RAIL.halfHeight, length / 2],
-              position: { x: side * (span.width / 2 - RAIL.halfThickness), y: DECK.top + RAIL.halfHeight, z: 0 },
-            }),
-          ),
+          ...RAIL_SIDES.map((side): ColliderDescription => ({
+            shape: 'cuboid',
+            parameters: [RAIL.halfThickness, RAIL.halfHeight, length / 2],
+            position: { x: side * (span.width / 2 - RAIL.halfThickness), y: DECK.top + RAIL.halfHeight, z: 0 },
+          })),
         ],
       },
     );

@@ -88,12 +88,10 @@ export function bridgeLanternSpots({ from, to, width }: BridgeSpan): Point[] {
     [to, LANTERN.beyond],
   ];
   return ends.flatMap(([end, beyond]) =>
-    [-aside, aside].map(
-      (side): Point => [
-        end[0] + forward[0] * beyond - forward[1] * side,
-        end[1] + forward[1] * beyond + forward[0] * side,
-      ],
-    ),
+    [-aside, aside].map((side): Point => [
+      end[0] + forward[0] * beyond - forward[1] * side,
+      end[1] + forward[1] * beyond + forward[0] * side,
+    ]),
   );
 }
 export function ringAround(center: Point, radius: number, count: number): Point[] {
