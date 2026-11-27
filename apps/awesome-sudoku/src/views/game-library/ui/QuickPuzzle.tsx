@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import { Button } from '@shared/ui/button';
 import { PuzzleVictory } from '@shared/ui/puzzle-victory';
 
 import {
@@ -56,12 +57,12 @@ export function QuickPuzzle({ mode = 'classic' }: QuickPuzzleProps) {
       <QuickSudokuKeys canEnter={canEnter} onNumber={handleNumber} />
       <div className={styles.feedback}>
         <p role="status">{isSolved ? <PuzzleVictory /> : CHECK_MESSAGES[progress.result]}</p>
-        <button type="button" onClick={handleCheck} disabled={isSolved}>
+        <Button variant="surface" size="s" onClick={handleCheck} disabled={isSolved}>
           정답 확인
-        </button>
-        <button type="button" onClick={handleReset}>
+        </Button>
+        <Button variant="surface" size="s" onClick={handleReset}>
           다른 판
-        </button>
+        </Button>
       </div>
     </div>
   );

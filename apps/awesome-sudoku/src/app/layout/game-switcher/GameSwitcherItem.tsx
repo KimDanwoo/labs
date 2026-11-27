@@ -19,9 +19,9 @@ export function GameSwitcherItem({ game }: GameSwitcherItemProps) {
         href={game.href}
         aria-current={isCurrent ? 'page' : undefined}
         onClick={handleClose}
-        className="flex min-h-11 items-center justify-between gap-3 rounded-lg px-3 py-2 text-text-primary hover:bg-bg-tertiary focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent aria-[current=page]:bg-accent-light aria-[current=page]:text-accent-text"
+        className="flex min-h-11 items-center justify-between gap-3 rounded-[10px] px-3 py-2 text-text-primary hover:bg-weak focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent aria-[current=page]:bg-lemon-soft aria-[current=page]:text-on-lemon-soft"
       >
-        <span className="truncate font-medium">{game.name}</span>
+        <span className="truncate font-semibold">{game.name}</span>
         <span className="shrink-0 text-xs text-text-tertiary">{game.category}</span>
       </Link>
     </li>

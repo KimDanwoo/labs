@@ -4,7 +4,7 @@
 
 @theme {
   --breakpoint-xs: 395px;
-  --font-sans: var(--font-maruburi);
+  --font-sans: var(--font-pretendard);
 }
 
 html,
@@ -12,9 +12,14 @@ body {
   overscroll-behavior: none;
   -webkit-overflow-scrolling: auto;
   height: 100dvh;
-  background: linear-gradient(180deg, rgb(var(--rgb-bg-primary)) 0%, rgb(var(--rgb-bg-secondary)) 100%) no-repeat
-    rgb(var(--rgb-bg-secondary));
+  background: rgb(var(--rgb-bg-primary));
   color: rgb(var(--rgb-text-primary));
+}
+
+body {
+  letter-spacing: -0.01em;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 html {

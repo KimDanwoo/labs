@@ -2,11 +2,10 @@
 
 import { useContext } from 'react';
 
-import type { ShelfGame } from '@entities/game-catalog';
-import { FeaturedGameContext } from '@views/game-library/model/store/featuredGameContext';
+import { FeaturedGameContext, type FeaturedGame } from '@views/game-library/model/store/featuredGameContext';
 
-export function useFeaturedGameContext(): ShelfGame {
-  const game = useContext(FeaturedGameContext);
-  if (!game) throw new Error('FeaturedSlide.Root 안에서만 사용할 수 있어요');
-  return game;
+export function useFeaturedGameContext(): FeaturedGame {
+  const featured = useContext(FeaturedGameContext);
+  if (!featured) throw new Error('FeaturedSlide.Root 안에서만 사용할 수 있어요');
+  return featured;
 }

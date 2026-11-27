@@ -24,9 +24,7 @@ export const ListSelector = () => {
                 'text-sm font-normal',
                 'transition-all duration-200 ease-out',
                 'active:scale-95',
-                isActive
-                  ? 'bg-linear-to-b from-gradient-from to-gradient-to text-white shadow-[0_4px_12px_rgba(var(--rgb-gradient-from),0.3)]'
-                  : 'bg-surface-primary/80 text-text-secondary shadow-sm',
+                isActive ? 'bg-primary text-on-primary' : 'bg-surface-primary/80 text-text-secondary shadow-sm',
                 !isActive && ['hover:bg-surface-primary', 'hover:text-text-primary', 'hover:shadow-md'],
               )}
             >

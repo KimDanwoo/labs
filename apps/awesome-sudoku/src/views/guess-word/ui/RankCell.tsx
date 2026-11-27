@@ -15,7 +15,7 @@ export function RankCell({ view }: RankCellProps) {
       {hasBar && (
         <span aria-hidden className="h-1.5 w-10 overflow-hidden rounded-full bg-surface-tertiary sm:w-20">
           <span
-            className="block h-full rounded-full bg-linear-to-r from-gradient-from to-gradient-to"
+            className="block h-full rounded-full bg-primary"
             style={{ width: `${view.progress * RANK_BAR_PERCENT}%` }}
           />
         </span>

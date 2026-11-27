@@ -44,3 +44,13 @@ export const SLIDES = [
 
 export const SWIPE_DISTANCE = 48;
 export const FULL_GAME_LINK_TEXT = '본게임 하기';
+
+export type TrialSlide = (typeof SLIDES)[number];
+
+export const TRIAL_TEXT = {
+  title: '한 수 맛보기',
+  description: `체험판 ${SLIDES.length}개, 옆으로 넘겨 보세요`,
+  tabsLabel: '체험판 고르기',
+  previous: '이전 체험판',
+  next: '다음 체험판',
+} as const;

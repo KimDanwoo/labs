@@ -15,7 +15,7 @@ export function ResultSheet() {
       <button
         type="button"
         onClick={reset}
-        className="mt-6 h-12 w-full rounded-xl bg-linear-to-b from-gradient-from to-gradient-to text-base font-semibold text-white shadow-lg shadow-gradient-from/30 transition-all duration-200 ease-out hover:brightness-110 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+        className="mt-6 h-12 w-full rounded-xl bg-primary text-base font-semibold text-on-primary transition-all duration-200 ease-out hover:brightness-110 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
       >
         {GOMOKU_COPY.playAgain}
       </button>

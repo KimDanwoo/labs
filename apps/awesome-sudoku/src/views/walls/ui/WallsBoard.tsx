@@ -10,7 +10,7 @@ export function WallsBoard() {
   const { owners } = useWallsContext();
 
   return (
-    <div className="relative aspect-square w-full max-w-[480px] rounded-2xl bg-goban shadow-xl shadow-gradient-from/5 ring-4 ring-goban-line max-lg:landscape:max-w-[calc(100svh-6rem)]">
+    <div className="relative aspect-square w-full max-w-[480px] rounded-2xl bg-goban ring-4 ring-goban-line max-lg:landscape:max-w-[calc(100svh-6rem)]">
       <div
         role="group"
         aria-label={WALLS_COPY.boardLabel}

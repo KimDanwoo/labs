@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import { Button } from '@shared/ui/button';
 import { PuzzleVictory } from '@shared/ui/puzzle-victory';
 
 import { LOOP_BOARDS, LOOP_SLOTS } from '@views/game-library/config/quickLoop';
@@ -45,9 +46,9 @@ export function QuickLoop() {
       </div>
       <div className={styles.feedback}>
         <p role="status">{isSolved ? <PuzzleVictory /> : '선을 누르면 켜거나 지울 수 있어요.'}</p>
-        <button type="button" onClick={handleReset}>
+        <Button variant="surface" size="s" onClick={handleReset}>
           다른 판
-        </button>
+        </Button>
       </div>
     </div>
   );

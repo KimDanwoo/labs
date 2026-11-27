@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@shared/ui/button';
 import { PuzzleVictory } from '@shared/ui/puzzle-victory';
 import { SIDE } from '@views/walls/config/board';
 import { STEP_TEXT } from '@views/walls/config/copy';
@@ -29,9 +30,9 @@ export function WallsGuide() {
             내 땅 {score[SIDE.ME]}칸 · 상대 {score[SIDE.COMPUTER]}칸
           </p>
         ) : null}
-        <button type="button" onClick={guide.reset}>
+        <Button variant="surface" size="s" onClick={guide.reset}>
           다른 판
-        </button>
+        </Button>
       </div>
     </div>
   );

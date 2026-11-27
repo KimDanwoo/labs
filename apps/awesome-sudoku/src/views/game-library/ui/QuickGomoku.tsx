@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import { Button } from '@shared/ui/button';
 import { PuzzleVictory } from '@shared/ui/puzzle-victory';
 
 import {
@@ -61,9 +62,9 @@ export function QuickGomoku() {
       </div>
       <div className={styles.feedback}>
         <p role="status">{isSolved ? <PuzzleVictory /> : status}</p>
-        <button type="button" onClick={handleReset}>
+        <Button variant="surface" size="s" onClick={handleReset}>
           다른 판
-        </button>
+        </Button>
       </div>
     </div>
   );

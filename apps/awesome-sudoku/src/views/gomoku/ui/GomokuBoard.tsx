@@ -8,7 +8,7 @@ export function GomokuBoard() {
   const { cells } = useGomokuContext();
 
   return (
-    <div className="relative aspect-square w-full max-w-[560px] overflow-hidden rounded-2xl bg-goban shadow-xl shadow-gradient-from/5 ring-1 ring-border-light max-lg:landscape:max-w-[calc(100svh-6rem)]">
+    <div className="relative aspect-square w-full max-w-[560px] overflow-hidden rounded-2xl bg-goban ring-1 ring-border-light max-lg:landscape:max-w-[calc(100svh-6rem)]">
       <BoardGrid />
       <div
         role="group"

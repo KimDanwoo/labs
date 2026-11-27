@@ -18,11 +18,7 @@ export function SlitherlinkBoard() {
 
   return (
     <div className="relative w-full max-w-[400px] max-lg:landscape:max-w-[calc(100svh-6rem)] lg:w-[432px] lg:max-w-none xl:w-[504px]">
-      <div
-        aria-hidden="true"
-        className="absolute -inset-3 rounded-3xl bg-linear-to-br from-gradient-from/15 to-gradient-to/10 opacity-70 blur-2xl"
-      />
-      <div className="relative aspect-square overflow-hidden rounded-2xl bg-surface-primary shadow-xl shadow-gradient-from/5 ring-1 ring-border-light">
+      <div className="relative aspect-square overflow-hidden rounded-2xl bg-surface-primary ring-1 ring-border-light">
         <svg
           ref={svgRef}
           viewBox={layout.viewBox}

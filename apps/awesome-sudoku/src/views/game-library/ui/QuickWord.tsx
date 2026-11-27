@@ -2,6 +2,7 @@
 
 import { useState, type SubmitEvent } from 'react';
 
+import { Button } from '@shared/ui/button';
 import { PuzzleVictory } from '@shared/ui/puzzle-victory';
 import { INITIAL_WORD_ROUND, WORD_PATTERN, WORD_PUZZLES } from '@views/game-library/config/quickWords';
 import { quickWordFeedback } from '@views/game-library/lib/quickWordFeedback';
@@ -63,18 +64,18 @@ export function QuickWord() {
       </p>
       <div className={styles.feedback}>
         {hasHintButton ? (
-          <button type="button" onClick={handleReveal}>
+          <Button variant="surface" size="s" onClick={handleReveal}>
             {round.hintCount === puzzle.hints.length - 1 ? '초성 보기' : '힌트 더 보기'}
-          </button>
+          </Button>
         ) : null}
         {hasAnswerButton ? (
-          <button type="button" onClick={handleShowAnswer}>
+          <Button variant="surface" size="s" onClick={handleShowAnswer}>
             정답 보기
-          </button>
+          </Button>
         ) : null}
-        <button type="button" onClick={handleReset}>
+        <Button variant="surface" size="s" onClick={handleReset}>
           다른 문제
-        </button>
+        </Button>
       </div>
     </div>
   );

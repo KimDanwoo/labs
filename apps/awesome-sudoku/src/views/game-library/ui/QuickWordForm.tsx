@@ -1,5 +1,7 @@
 import type { SubmitEvent } from 'react';
 
+import { Button } from '@shared/ui/button';
+
 import { WORD_MAX_LENGTH } from '@views/game-library/config/quickWords';
 import styles from '@views/game-library/ui/GameLibrary.module.css';
 
@@ -24,9 +26,9 @@ export function QuickWordForm({ value, isFinished, onChange, onSubmit }: QuickWo
         onChange={(event) => onChange(event.target.value)}
         disabled={isFinished}
       />
-      <button type="submit" disabled={isFinished}>
+      <Button type="submit" size="l" disabled={isFinished}>
         확인
-      </button>
+      </Button>
     </form>
   );
 }
