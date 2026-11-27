@@ -1,3 +1,4 @@
+import { PAUSE_OVERLAY } from '@entities/sudoku/config/board';
 import { GAME_PHASE } from '@entities/sudoku/config/game';
 import { initializeGameAtom } from '@entities/sudoku/model/store/gameLifecycleAtoms';
 import { difficultyAtom } from '@entities/sudoku/model/store/primitives';
@@ -17,12 +18,8 @@ export const PauseGameOverlay: FC = () => {
   if (gamePhase !== GAME_PHASE.PAUSED) return null;
 
   return (
-    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-6 bg-surface-primary">
-      <button
-        aria-label="게임 계속하기"
-        onClick={() => toggleTimer()}
-        className="flex flex-col items-center gap-4 p-8 rounded-3xl transition-all duration-300 hover:scale-105 active:scale-95"
-      >
+    <div className={PAUSE_OVERLAY.root}>
+      <button aria-label="게임 계속하기" onClick={() => toggleTimer()} className={PAUSE_OVERLAY.resume}>
         <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center">
           <VscPlay className="text-on-primary text-3xl ml-1" />
         </div>

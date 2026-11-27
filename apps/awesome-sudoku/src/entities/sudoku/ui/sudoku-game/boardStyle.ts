@@ -1,4 +1,4 @@
-import { CELL_FOCUS_RING } from '@entities/sudoku/config/board';
+import { BLOCK_LINE, CELL_FOCUS_RING, CELL_SIZE } from '@entities/sudoku/config/board';
 import type { CellHighlight } from '@entities/sudoku/model/types/board';
 import { cn } from '@shared/lib/cn';
 
@@ -32,25 +32,21 @@ export function buildCellClassName(
   isInitial: boolean,
 ) {
   return cn(
-    'relative',
-    'w-[min(36px,calc((100vw-55px)/9))] h-[min(36px,calc((100vw-55px)/9))]',
-    'xs:w-10 xs:h-10',
-    'lg:w-12 lg:h-12',
-    'xl:w-14 xl:h-14',
-    'short-landscape:w-[30px] short-landscape:h-[30px]',
+    'relative p-0',
+    CELL_SIZE,
     'border',
     borderColor,
     'text-center align-middle',
     'cursor-pointer',
-    'transition-all duration-150 ease-out',
+    'transition-[background-color,color] duration-150 ease-out motion-reduce:transition-none',
     CELL_FOCUS_RING,
     'select-none',
     'touch-manipulation',
     bgColor,
     textColor,
     isInitial ? 'font-semibold' : 'font-normal',
-    isRightBlockBorder && 'border-r-[1.5px] border-r-text-tertiary',
-    isBottomBlockBorder && 'border-b-[1.5px] border-b-text-tertiary',
+    isRightBlockBorder && BLOCK_LINE.right,
+    isBottomBlockBorder && BLOCK_LINE.bottom,
     'hover:bg-cell-related',
   );
 }

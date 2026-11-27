@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 
+import { BOARD_COLUMN } from '@entities/sudoku/config/board';
 import { SudokuBoard } from '@entities/sudoku/ui/game-board/SudokuBoard';
 import { GAME_BOARD_SIZE } from '@shared/config/gameLayout';
 import { cn } from '@shared/lib/cn';
@@ -11,7 +12,7 @@ const GeneratingOverlay = dynamic(() => import('@entities/sudoku/ui/game-overlay
 
 export function GameColumn() {
   return (
-    <div className={cn('relative overflow-hidden rounded-[20px]', GAME_BOARD_SIZE)}>
+    <div className={cn(BOARD_COLUMN, GAME_BOARD_SIZE)}>
       <PauseGameOverlay />
       <GeneratingOverlay />
       <SudokuBoard />

@@ -1,4 +1,5 @@
 'use client';
+import { PANEL_GRID } from '@entities/sudoku/config/board';
 import { GetHint } from '@entities/sudoku/ui/sudoku-game/GetHint';
 import { RedoMove } from '@entities/sudoku/ui/sudoku-game/RedoMove';
 import { RemoveNumber } from '@entities/sudoku/ui/sudoku-game/RemoveNumber';
@@ -8,7 +9,7 @@ import { UndoMove } from '@entities/sudoku/ui/sudoku-game/UndoMove';
 
 export function Controls() {
   return (
-    <div className="grid grid-cols-6 gap-2">
+    <div className={PANEL_GRID.tools}>
       <RestartGame />
       <UndoMove />
       <RedoMove />
