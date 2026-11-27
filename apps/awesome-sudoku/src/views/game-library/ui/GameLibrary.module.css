@@ -427,6 +427,66 @@
   text-underline-offset: 0.25em;
 }
 
+.gameLink {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+  color: var(--play-accent);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.3em;
+  word-break: keep-all;
+}
+
+.gameLink svg {
+  flex-shrink: 0;
+  transition: transform 160ms ease-out;
+}
+
+.gameLink:hover svg {
+  transform: translateX(3px);
+}
+
+.gameLink[data-variant='victory'] {
+  margin: 0.25rem 0.3rem;
+  padding-inline: 0.9rem;
+  border-radius: 0.375rem;
+  background: var(--play-accent);
+  color: var(--play-surface);
+  font-size: 0.875rem;
+  text-decoration: none;
+  vertical-align: middle;
+  animation: game-link-rise 320ms 240ms ease-out both;
+}
+
+.gameLink[data-variant='victory']:hover {
+  background: var(--play-text);
+}
+
+@keyframes game-link-rise {
+  from {
+    transform: translateY(0.35rem);
+    opacity: 0;
+  }
+
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gameLink svg,
+  .gameLink[data-variant='victory'] {
+    transition: none;
+    animation: none;
+  }
+}
+
 .hero :is(a, button):focus-visible {
   outline: 2px solid var(--play-accent);
   outline-offset: 3px;

@@ -5,6 +5,7 @@ import { LuArrowLeft, LuArrowRight } from 'react-icons/lu';
 
 import { SITE_HEADLINE } from '@entities/game-catalog';
 import { SLIDES, SWIPE_DISTANCE } from '@views/game-library/config/featuredSlides';
+import { FeaturedSlide } from '@views/game-library/ui/featured-slide/featuredSlide';
 import { FeaturedSlideContent } from '@views/game-library/ui/FeaturedSlideContent';
 import styles from '@views/game-library/ui/GameLibrary.module.css';
 
@@ -61,13 +62,14 @@ export function FeaturedPuzzle({ wallsGuide }: FeaturedPuzzleProps) {
         </div>
       </div>
       {SLIDES.map((slide, index) => (
-        <article key={slide.id} className={styles.slide} hidden={position !== index}>
+        <FeaturedSlide.Root key={slide.id} gameId={slide.id} isHidden={position !== index}>
           <div className={styles.heroCopy}>
             <h2>{slide.title}</h2>
             <p>{slide.hint}</p>
+            <FeaturedSlide.GameLink />
           </div>
           <FeaturedSlideContent slide={slide} wallsGuide={wallsGuide} />
-        </article>
+        </FeaturedSlide.Root>
       ))}
     </section>
   );

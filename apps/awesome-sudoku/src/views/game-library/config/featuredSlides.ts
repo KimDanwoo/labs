@@ -43,3 +43,4 @@ export const SLIDES = [
 ] as const;
 
 export const SWIPE_DISTANCE = 48;
+export const FULL_GAME_LINK_TEXT = '본게임 하기';
