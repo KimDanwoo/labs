@@ -11,6 +11,8 @@ export const FORBIDDEN_LABEL = '흑의 금수(삼삼·사사·장목)로 둘 수
 
 export const EMPTY_STONE_CLASS = 'opacity-0 group-hover:opacity-25 group-aria-disabled:group-hover:opacity-0';
 
+export const PLACED_STONE_CLASS = 'animate-pop-in motion-reduce:animate-none';
+
 export const STONE_CLASS: Record<Stone, string> = {
   [STONE.BLACK]: 'bg-stone-black',
   [STONE.WHITE]: 'bg-stone-white ring-1 ring-inset ring-stone-white-edge',

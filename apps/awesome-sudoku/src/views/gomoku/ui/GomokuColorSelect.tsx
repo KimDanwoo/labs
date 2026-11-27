@@ -22,7 +22,9 @@ export function GomokuColorSelect() {
           </button>
         ))}
       </div>
-      <p className="mt-2 text-center text-[13px] text-text-tertiary lg:text-left">{GOMOKU_COPY.colorHint}</p>
+      <p className="mt-2 text-center text-[13px] text-text-tertiary lg:text-left short-landscape:hidden">
+        {GOMOKU_COPY.colorHint}
+      </p>
     </div>
   );
 }

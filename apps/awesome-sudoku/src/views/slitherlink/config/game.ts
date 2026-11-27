@@ -46,3 +46,6 @@ export const LEVEL_LABEL: Record<SlitherlinkLevel, string> = {
 };
 
 export const LEVEL_OPTIONS: readonly SlitherlinkLevel[] = Object.values(SLITHERLINK_LEVEL);
+
+export const LEVEL_TAB_CLASS =
+  'h-[42px] justify-center rounded-[11px] bg-transparent text-[15px] aria-selected:bg-surface-primary aria-selected:text-text-primary dark:aria-selected:bg-border-medium';

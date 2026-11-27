@@ -1,6 +1,8 @@
+import { cn } from '@shared/lib/cn';
 import { BOARD_VIEW } from '@views/walls/config/boardView';
 import { edgeLine } from '@views/walls/lib/edgeGeometry';
 import { useWallsContext } from '@views/walls/model/hooks/useWallsContext';
+import styles from '@views/walls/ui/BoardWalls.module.css';
 
 export function BoardWalls() {
   const { walls } = useWallsContext();
@@ -16,7 +18,8 @@ export function BoardWalls() {
           <line
             key={edge}
             {...edgeLine(edge)}
-            className={index === walls.length - 1 ? 'stroke-primary' : 'stroke-text-tertiary'}
+            pathLength={1}
+            className={cn(styles.wall, index === walls.length - 1 ? 'stroke-primary' : 'stroke-text-tertiary')}
           />
         ))}
       </g>

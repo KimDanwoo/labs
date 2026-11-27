@@ -11,7 +11,7 @@ export function GeneratingOverlay() {
     <div
       role="status"
       aria-live="polite"
-      className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-face/95"
+      className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 rounded-[20px] bg-face/95"
     >
       <LoopLoader />
       <span className="text-sm font-normal text-text-secondary">{SLITHERLINK_COPY.generating}</span>

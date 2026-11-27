@@ -3,6 +3,7 @@ export const SLITHERLINK_COPY = {
   generating: '새 퍼즐을 만드는 중…',
   wrongLoop: '아직 아니에요. 숫자를 다시 살펴보세요.',
   levelGroup: '난이도',
+  levelHint: '난이도를 바꾸면 새 퍼즐이 시작돼요.',
   timerLabel: '걸린 시간',
   undo: '되돌리기',
   redo: '다시하기',

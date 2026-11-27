@@ -16,6 +16,7 @@ export function WallsPage() {
           <Walls.Board />
         </GameLayout.Board>
         <GameLayout.Panel>
+          <Walls.Score />
           <Walls.Actions />
           <Walls.Rule />
         </GameLayout.Panel>

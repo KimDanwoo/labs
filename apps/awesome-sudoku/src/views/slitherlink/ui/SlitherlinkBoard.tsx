@@ -20,7 +20,7 @@ export function SlitherlinkBoard() {
 
   return (
     <div className={GAME_BOARD_SIZE}>
-      <div className="relative aspect-square overflow-hidden rounded-[20px] bg-face">
+      <div className="relative aspect-square rounded-[20px] bg-face">
         <svg
           ref={svgRef}
           viewBox={layout.viewBox}

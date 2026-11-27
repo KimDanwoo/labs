@@ -16,6 +16,7 @@ export function SlitherlinkPage() {
           <SlitherlinkGame.Board />
         </GameLayout.Board>
         <GameLayout.Panel>
+          <SlitherlinkGame.Level />
           <SlitherlinkGame.Controls />
           <SlitherlinkGame.Rule />
         </GameLayout.Panel>
