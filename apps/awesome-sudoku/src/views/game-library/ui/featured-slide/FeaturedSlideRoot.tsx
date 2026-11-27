@@ -31,7 +31,9 @@ export function FeaturedSlideRoot({ slide, isHidden, children }: FeaturedSlideRo
     >
       <FeaturedGameContext.Provider value={{ game, slide }}>
         <VictoryActionContext.Provider value={<FeaturedSlideVictoryLink />}>
-          <Card className={styles.slide}>{children}</Card>
+          <Card className={styles.slide} data-layout={slide.layout}>
+            {children}
+          </Card>
         </VictoryActionContext.Provider>
       </FeaturedGameContext.Provider>
     </article>
