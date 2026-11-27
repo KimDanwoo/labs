@@ -136,29 +136,53 @@ html.theme-transition [data-theme-toggle] * {
   }
 }
 
-@keyframes lotto-ball-drop {
+@keyframes lotto-roll-in {
   0% {
-    opacity: 0;
-    transform: translateY(-18px) scale(0.55) rotate(-120deg);
+    transform: translateX(-32px) rotate(-220deg) scale(0);
   }
-  65% {
-    opacity: 1;
-    transform: translateY(2px) scale(1.06) rotate(10deg);
+  70% {
+    transform: translateX(2px) rotate(8deg) scale(1.05);
   }
   100% {
-    opacity: 1;
-    transform: translateY(0) scale(1) rotate(0deg);
+    transform: translateX(0) rotate(0deg) scale(1);
   }
 }
 
-@keyframes lotto-fade-up {
+@keyframes lotto-pop {
+  from {
+    transform: scale(0.6);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes lotto-fade-in {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(3px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes lotto-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes lotto-sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
   }
 }
 

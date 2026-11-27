@@ -2,14 +2,13 @@ import { describe, expect, it } from 'vitest';
 
 import {
   ballToneOf,
-  jackpotFactsOf,
+  drawEmphasisOf,
   jackpotOutcomeOf,
   observedOddsTextOf,
   phaseOfMode,
   profitToneOf,
   progressPercentOf,
   progressRatioOf,
-  resultsTitleOf,
   revealStyleOf,
   ticketSlotsOf,
 } from '@views/lotto/lib/simulationView';
@@ -93,20 +92,6 @@ describe('jackpotOutcomeOf', () => {
   });
 });
 
-describe('jackpotFactsOf', () => {
-  it('장수·쓴 돈·기간을 글로 만든다', () => {
-    expect(jackpotFactsOf(tallyOf(8_145_060))).toEqual({
-      ticketsText: '814만 5,060장',
-      spentText: '81억 4,506만 원',
-      durationText: '31,327년',
-    });
-  });
-
-  it('결과가 없으면 0장', () => {
-    expect(jackpotFactsOf(null).ticketsText).toBe('0장');
-  });
-});
-
 describe('profitToneOf', () => {
   it('손해·이득·없음을 구분한다', () => {
     expect(profitToneOf(tallyOf(10))).toBe('loss');
@@ -123,9 +108,9 @@ describe('observedOddsTextOf', () => {
   });
 });
 
-describe('resultsTitleOf', () => {
-  it('모드에 따라 제목이 바뀐다', () => {
-    expect(resultsTitleOf(BULK)).toBe('1만 장 몰아 사기 결과');
-    expect(resultsTitleOf(JACKPOT)).toBe('1등 나올 때까지 결과');
+describe('drawEmphasisOf', () => {
+  it('내 번호에 있으면 맞힘, 없으면 흐리게', () => {
+    expect(drawEmphasisOf(TICKET, 3)).toBe('matched');
+    expect(drawEmphasisOf(TICKET, 30)).toBe('muted');
   });
 });

@@ -13,7 +13,7 @@ export function LottoRankTally({ tally }: LottoRankTallyProps) {
   return (
     <table className="w-full border-collapse">
       <thead>
-        <tr className="border-b border-border-light">
+        <tr className="border-b border-text-primary/10">
           <th scope="col" className={cn(TABLE_HEAD_CELL_CLASS, 'text-left')}>
             {LOTTO_COPY.rankColumn}
           </th>
@@ -21,13 +21,13 @@ export function LottoRankTally({ tally }: LottoRankTallyProps) {
             {LOTTO_COPY.countColumn}
           </th>
           <th scope="col" className={cn(TABLE_HEAD_CELL_CLASS, 'text-right')}>
-            {LOTTO_COPY.prizeTotalColumn}
+            {LOTTO_COPY.oddsColumn}
           </th>
         </tr>
       </thead>
-      <tbody className="divide-y divide-border-light/60">
+      <tbody className="divide-y divide-text-primary/6">
         {LOTTO_RANKS.map((rank) => (
-          <LottoRankTallyRow key={rank} rank={rank} count={tally.counts[rank]} />
+          <LottoRankTallyRow key={rank} rank={rank} tally={tally} />
         ))}
       </tbody>
     </table>

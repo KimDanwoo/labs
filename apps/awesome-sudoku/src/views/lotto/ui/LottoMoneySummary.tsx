@@ -11,7 +11,7 @@ interface LottoMoneySummaryProps {
 
 export function LottoMoneySummary({ tally }: LottoMoneySummaryProps) {
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-2">
       <dl className="grid grid-cols-3 gap-2">
         <LottoStatTile label={LOTTO_COPY.spent} value={formatWon(spentOf(tally))} />
         <LottoStatTile label={LOTTO_COPY.won} value={formatWon(wonOf(tally))} />

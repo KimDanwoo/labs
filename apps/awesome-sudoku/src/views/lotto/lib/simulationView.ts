@@ -1,26 +1,31 @@
 import type { CSSProperties } from 'react';
 
-import { LOTTO_COPY, type JackpotFacts, type JackpotOutcome } from '@views/lotto/config/copy';
-import { BALL_REVEAL_STEP_MS, PERCENT } from '@views/lotto/config/display';
-import { LOTTO_DRAWN_COUNT, LOTTO_PICK_COUNT, TICKET_PRICE, type LottoRank } from '@views/lotto/config/lotto';
-import { BALL_TONE_CEILINGS, type BallTone, type StatTone } from '@views/lotto/config/style';
-import { formatBuyingDuration, formatOdds, formatTickets, formatWon } from '@views/lotto/lib/format';
+import type { JackpotOutcome } from '@views/lotto/config/copy';
+import { BALL_REVEAL_STEP_MS, BALL_ROLL_MS, PERCENT } from '@views/lotto/config/display';
+import { LOTTO_PICK_COUNT, TICKET_PRICE, type LottoRank } from '@views/lotto/config/lotto';
+import { BALL_TONE_CEILINGS, type BallEmphasis, type BallTone, type StatTone } from '@views/lotto/config/style';
+import { formatOdds } from '@views/lotto/lib/format';
 import { targetTicketsOf } from '@views/lotto/lib/simulate';
 import { observedOddsOf, returnRateOf, spentOf } from '@views/lotto/lib/tally';
 import type { SimulationRun } from '@views/lotto/model/hooks/useSimulation';
-import type { SimulationMode, SimulationRequest, SimulationStatus, Tally } from '@views/lotto/model/types/lotto';
+import type { SimulationMode, SimulationStatus, Tally } from '@views/lotto/model/types/lotto';
 
 const FALLBACK_TONE: BallTone = 'green';
 
 export const ballToneOf = (number: number): BallTone =>
   BALL_TONE_CEILINGS.find(({ ceiling }) => number <= ceiling)?.tone ?? FALLBACK_TONE;
 
+export const drawEmphasisOf = (ticket: readonly number[], number: number): BallEmphasis =>
+  ticket.includes(number) ? 'matched' : 'muted';
+
 export const ticketSlotsOf = (ticket: readonly number[]): readonly (number | null)[] =>
   Array.from({ length: LOTTO_PICK_COUNT }, (_, index) => ticket[index] ?? null);
 
 export const revealStyleOf = (index: number): CSSProperties => ({ animationDelay: `${index * BALL_REVEAL_STEP_MS}ms` });
 
-export const verdictRevealStyle: CSSProperties = revealStyleOf(LOTTO_DRAWN_COUNT);
+export const verdictRevealStyle: CSSProperties = {
+  animationDelay: `${LOTTO_PICK_COUNT * BALL_REVEAL_STEP_MS + BALL_ROLL_MS}ms`,
+};
 
 export const phaseOfMode = (run: SimulationRun, mode: SimulationMode): SimulationStatus =>
   run.request?.mode === mode ? run.status : 'idle';
@@ -45,15 +50,6 @@ export function jackpotOutcomeOf(run: SimulationRun): JackpotOutcome {
   return run.result?.hasJackpot ? 'won' : 'missed';
 }
 
-export function jackpotFactsOf(tally: Tally | null): JackpotFacts {
-  const tickets = tally?.tickets ?? 0;
-  return {
-    ticketsText: formatTickets(tickets),
-    spentText: formatWon(tickets * TICKET_PRICE),
-    durationText: formatBuyingDuration(tickets),
-  };
-}
-
 export function profitToneOf(tally: Tally): StatTone {
   const profit = returnRateOf(tally) - 1;
   if (spentOf(tally) === 0) return 'plain';
@@ -68,9 +64,4 @@ export function observedOddsTextOf(tally: Tally | null, rank: LottoRank, neverHi
   if (hasNoRun) return formatOdds(0);
   if (tally.counts[rank] === 0) return neverHitText;
   return formatOdds(observedOddsOf(tally, rank));
-}
-
-export function resultsTitleOf(request: SimulationRequest | null): string {
-  if (request?.mode !== 'bulk') return LOTTO_COPY.resultsTitleJackpot;
-  return LOTTO_COPY.resultsTitleBulk(formatTickets(request.count));
 }

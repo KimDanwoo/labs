@@ -14,12 +14,13 @@ import { ballToneOf } from '@views/lotto/lib/simulationView';
 
 interface LottoBallProps extends ComponentProps<'span'> {
   number: number;
-  size?: BallSize;
+  size: BallSize;
   emphasis?: BallEmphasis;
 }
 
-export function LottoBall({ number, size = 'md', emphasis = 'plain', className, ...props }: LottoBallProps) {
+export function LottoBall({ number, size, emphasis = 'plain', className, ...props }: LottoBallProps) {
   const isMatched = emphasis === 'matched';
+
   return (
     <span
       {...props}
