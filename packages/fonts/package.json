@@ -3,7 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
-    "./fonts.css": "./fonts/maruburi.css"
+    "./fonts.css": "./fonts/maruburi.css",
+    "./pretendard.css": "./fonts/pretendard.css"
+  },
+  "dependencies": {
+    "pretendard": "catalog:"
   },
   "scripts": {
     "fonts": "python3 scripts/subsetFonts.py"
