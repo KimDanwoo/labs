@@ -1,15 +1,16 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import type { ReactNode } from 'react';
 
-import { GAME_MODE_TITLES } from '@entities/sudoku/config/gameMode';
 import { useInitializeGame } from '@entities/sudoku/model/sudoku-game/hooks/useInitializeGame';
 import type { GameMode } from '@entities/sudoku/model/types/game';
-
-import { BackgroundGlow } from '@entities/sudoku/ui/BackgroundGlow';
 import { GameColumn } from '@entities/sudoku/ui/game-board/GameColumn';
-import { DesktopControlPanel } from '@entities/sudoku/ui/game-controls/DesktopControlPanel';
-import { MobileControlPanel } from '@entities/sudoku/ui/game-controls/MobileControlPanel';
+import { Controls } from '@entities/sudoku/ui/game-controls/Controls';
+import { GameStatus } from '@entities/sudoku/ui/game-header/GameStatus';
+import { SudokuRule } from '@entities/sudoku/ui/game-rule/SudokuRule';
+import { SelectNumber } from '@entities/sudoku/ui/sudoku-game/SelectNumber';
+import { GameLayout } from '@shared/ui/game-layout';
 
 const GameConfirmSheet = dynamic(
   () => import('@entities/sudoku/ui/game-confirm/GameConfirmSheet').then((m) => m.GameConfirmSheet),
@@ -27,24 +28,30 @@ const GameResultSheet = dynamic(
 
 interface SudokuScreenProps {
   mode: GameMode;
+  children: ReactNode;
 }
 
-export function SudokuScreen({ mode }: SudokuScreenProps) {
+export function SudokuScreen({ mode, children }: SudokuScreenProps) {
   useInitializeGame(mode);
 
   return (
-    <main className="min-w-[360px] relative overflow-x-hidden">
-      <h1 className="sr-only">{GAME_MODE_TITLES[mode]}</h1>
-      <BackgroundGlow />
-      <div className="relative mx-auto px-4 sm:px-6 py-6 md:py-10">
-        <div className="flex flex-col items-center lg:grid lg:grid-cols-[auto_auto] lg:justify-center lg:items-start lg:gap-12">
+    <>
+      <GameLayout.Root>
+        {children}
+        <GameLayout.Status>
+          <GameStatus />
+        </GameLayout.Status>
+        <GameLayout.Board>
           <GameColumn />
-          <DesktopControlPanel />
-          <MobileControlPanel />
-        </div>
-      </div>
+        </GameLayout.Board>
+        <GameLayout.Panel>
+          <Controls />
+          <SelectNumber />
+          <SudokuRule />
+        </GameLayout.Panel>
+      </GameLayout.Root>
       <GameResultSheet />
       <GameConfirmSheet />
-    </main>
+    </>
   );
 }

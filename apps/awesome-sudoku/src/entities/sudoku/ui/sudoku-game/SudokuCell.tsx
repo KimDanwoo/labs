@@ -40,7 +40,11 @@ export const SudokuCell: FC<CellProps> = memo((props) => {
         boxShadow: 'none',
       }}
     >
-      {cell.value ? <CellValue value={cell.value} /> : <CellNotes notes={cell.notes} hasCageLabel={hasCageLabel} />}
+      {cell.value ? (
+        <CellValue value={cell.value} hasCageLabel={hasCageLabel} />
+      ) : (
+        <CellNotes notes={cell.notes} hasCageLabel={hasCageLabel} />
+      )}
     </td>
   );
 });

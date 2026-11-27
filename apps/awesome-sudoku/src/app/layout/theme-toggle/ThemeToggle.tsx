@@ -3,22 +3,21 @@
 import { LuMoon, LuSun } from 'react-icons/lu';
 
 import { useThemeToggle } from '@app/model/hooks/useThemeToggle';
+import { CircleButton } from '@shared/ui/circle-button';
 
 export function ThemeToggle() {
   const { isDark, handleToggle } = useThemeToggle();
-  const ThemeIcon = isDark ? LuMoon : LuSun;
+  const ThemeIcon = isDark ? LuSun : LuMoon;
 
   return (
-    <button
-      type="button"
+    <CircleButton
       role="switch"
       aria-checked={isDark}
       aria-label="다크 모드 토글"
       data-theme-toggle
       onClick={handleToggle}
-      className="grid size-11 shrink-0 cursor-pointer place-items-center rounded-md text-text-secondary hover:bg-bg-tertiary hover:text-text-primary focus-visible:outline-2 focus-visible:outline-accent"
     >
-      <ThemeIcon className="size-5" aria-hidden="true" />
-    </button>
+      <ThemeIcon aria-hidden="true" className="animate-spin-in" />
+    </CircleButton>
   );
 }

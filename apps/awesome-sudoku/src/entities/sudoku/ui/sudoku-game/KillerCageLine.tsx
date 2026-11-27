@@ -2,19 +2,17 @@ import { memo } from 'react';
 
 interface KillerCageLineProps {
   path: string;
-  color?: string;
 }
 
-export const KillerCageLine = memo<KillerCageLineProps>(({ path, color = '#436def' }) => (
+export const KillerCageLine = memo<KillerCageLineProps>(({ path }) => (
   <path
     d={path}
     fill="none"
-    stroke={color}
     strokeWidth={1}
     strokeDasharray="4,4"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="opacity-90"
+    className="stroke-text-tertiary opacity-90"
   />
 ));
 

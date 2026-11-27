@@ -2,23 +2,20 @@
 
 import dynamic from 'next/dynamic';
 
+import { BOARD_COLUMN } from '@entities/sudoku/config/board';
 import { SudokuBoard } from '@entities/sudoku/ui/game-board/SudokuBoard';
-import { GameStatus } from '@entities/sudoku/ui/game-header/GameStatus';
+import { GAME_BOARD_SIZE } from '@shared/config/gameLayout';
+import { cn } from '@shared/lib/cn';
 
 const PauseGameOverlay = dynamic(() => import('@entities/sudoku/ui/game-overlays/PauseGameOverlay'), { ssr: false });
 const GeneratingOverlay = dynamic(() => import('@entities/sudoku/ui/game-overlays/GeneratingOverlay'), { ssr: false });
 
 export function GameColumn() {
   return (
-    <div className="flex flex-col items-center">
-      <div className="w-full mb-4">
-        <GameStatus />
-      </div>
-      <div className="relative">
-        <PauseGameOverlay />
-        <GeneratingOverlay />
-        <SudokuBoard />
-      </div>
+    <div className={cn(BOARD_COLUMN, GAME_BOARD_SIZE)}>
+      <PauseGameOverlay />
+      <GeneratingOverlay />
+      <SudokuBoard />
     </div>
   );
 }

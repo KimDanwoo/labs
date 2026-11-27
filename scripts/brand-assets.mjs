@@ -1,6 +1,6 @@
 import { chromium } from '@playwright/test';
 
-import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { readFile, stat, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
@@ -27,7 +27,6 @@ const APPS = {
 
 const appDir = (app) => join(ROOT, 'apps', app, 'app');
 
-const PREVIEW_FOLDER = 'game-previews';
 const GAME_PREVIEW_URL = process.env.GAME_PREVIEW_URL ?? SITE_URL;
 const GAME_BOARD = {
   sudoku: 'table[role="grid"]',
@@ -83,17 +82,10 @@ async function shootGameCards(browser, app) {
     file: join(id, 'opengraph-image.png'),
   }));
   const outputs = [];
-  const previewFolder = join(appDir(app), '..', 'public', PREVIEW_FOLDER);
-  await mkdir(previewFolder, { recursive: true });
 
   try {
     for (const { id, href, title, subtitle, file } of [home, ...cards]) {
       const png = id ? await captureGame(preview, id, href) : null;
-      if (png) {
-        const previewPath = join(previewFolder, `${id}.png`);
-        await writeFile(previewPath, png);
-        outputs.push(previewPath);
-      }
       const src = png ? `data:image/png;base64,${png.toString('base64')}` : '';
       await page.evaluate(
         async ({ brand, title, subtitle, src }) => {

@@ -1,0 +1,19 @@
+.wall {
+  stroke-dasharray: 1;
+  animation: wall-draw-in 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes wall-draw-in {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wall {
+    animation: none;
+  }
+}

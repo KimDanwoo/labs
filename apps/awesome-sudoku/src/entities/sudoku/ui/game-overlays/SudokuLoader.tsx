@@ -25,7 +25,7 @@ export const SudokuLoader = memo<SudokuLoaderProps>(({ size = 'md', className })
   return (
     <div className={cn('flex flex-col items-center gap-3', className)}>
       <div
-        className={cn(styles.grid, 'relative grid grid-cols-3 rounded-lg overflow-hidden shadow-lg')}
+        className={cn(styles.grid, 'relative grid grid-cols-3 rounded-lg overflow-hidden')}
         style={{ width: config.grid, height: config.grid, gap: config.gap, padding: config.gap }}
       >
         {SUDOKU_NUMBERS.map((num, index) => (

@@ -1,13 +1,15 @@
 .victory {
   display: inline-flex;
-  min-height: 2rem;
+  height: 2rem;
   align-items: center;
-  gap: 0.45rem;
-  border: 1px solid var(--play-accent, #c9f7a5);
-  border-radius: 0.375rem;
-  padding-inline: 0.65rem;
-  color: var(--play-accent, #c9f7a5);
+  gap: 0.375rem;
+  border-radius: 999px;
+  padding-inline: 0.75rem;
+  background: rgb(var(--rgb-lemon));
+  color: rgb(var(--rgb-ink));
+  font-size: 0.875rem;
   font-weight: 700;
+  vertical-align: middle;
 }
 
 .victoryEffect {
@@ -24,8 +26,8 @@
 .victoryEffect::before {
   position: absolute;
   inset: 0.8rem;
-  border: 2px solid var(--play-accent, #c9f7a5);
-  border-radius: 0.6rem;
+  border: 2px solid rgb(var(--rgb-lemon));
+  border-radius: 1.5rem;
   content: '';
 }
 
@@ -33,13 +35,13 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle, #f5cf77 0 3px, transparent 4px) 3% 24% / 12px 12px no-repeat,
-    radial-gradient(circle, var(--play-accent, #c9f7a5) 0 3px, transparent 4px) 40% 0% / 12px 12px no-repeat,
-    radial-gradient(circle, #f5cf77 0 2px, transparent 3px) 87% 7% / 10px 10px no-repeat,
-    radial-gradient(circle, var(--play-accent, #c9f7a5) 0 4px, transparent 5px) 98% 48% / 14px 14px no-repeat,
-    radial-gradient(circle, #f5cf77 0 3px, transparent 4px) 82% 96% / 12px 12px no-repeat,
-    radial-gradient(circle, var(--play-accent, #c9f7a5) 0 3px, transparent 4px) 29% 100% / 12px 12px no-repeat,
-    radial-gradient(circle, #f5cf77 0 2px, transparent 3px) 2% 76% / 10px 10px no-repeat;
+    radial-gradient(circle, rgb(var(--rgb-lemon)) 0 3px, transparent 4px) 3% 24% / 12px 12px no-repeat,
+    radial-gradient(circle, rgb(var(--rgb-text-primary)) 0 3px, transparent 4px) 40% 0% / 12px 12px no-repeat,
+    radial-gradient(circle, rgb(var(--rgb-lemon)) 0 2px, transparent 3px) 87% 7% / 10px 10px no-repeat,
+    radial-gradient(circle, rgb(var(--rgb-text-primary)) 0 4px, transparent 5px) 98% 48% / 14px 14px no-repeat,
+    radial-gradient(circle, rgb(var(--rgb-lemon)) 0 3px, transparent 4px) 82% 96% / 12px 12px no-repeat,
+    radial-gradient(circle, rgb(var(--rgb-text-primary)) 0 3px, transparent 4px) 29% 100% / 12px 12px no-repeat,
+    radial-gradient(circle, rgb(var(--rgb-lemon)) 0 2px, transparent 3px) 2% 76% / 10px 10px no-repeat;
   content: '';
 }
 

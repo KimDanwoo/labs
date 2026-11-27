@@ -2,23 +2,28 @@ import { OUTCOME, STEP } from '@views/walls/config/game';
 import type { Outcome, Step } from '@views/walls/model/types/walls';
 
 export const WALLS_COPY = {
-  title: '담쌓기',
   boardLabel: '담쌓기 판',
   undo: '무르기',
   newGame: '새 게임',
   playAgain: '다시 하기',
-  rulesTitle: '규칙',
+  ruleTitle: '담쌓기 규칙',
+  ruleCaption: '말을 옮기고 담을 세워 땅을 나눠요',
   scoreLabel: '예상 땅',
   scoreMe: '나',
   scoreComputer: '컴퓨터',
+  scoreHint: '내 말이 더 가까운 칸을 내 땅으로 세요.',
   wallOption: '여기에 담 세우기',
 } as const;
 
 export const STEP_TEXT: Record<Step, string> = {
   [STEP.THINKING]: '컴퓨터가 생각하는 중…',
   [STEP.PICK_PAWN]: '움직일 내 말을 고르세요',
-  [STEP.PICK_CELL]: '옮길 칸을 고르세요 (말을 다시 누르면 제자리)',
+  [STEP.PICK_CELL]: '옮길 칸을 고르세요',
   [STEP.PICK_WALL]: '담을 세울 변을 고르세요',
+};
+
+export const STEP_NOTE: Partial<Record<Step, string>> = {
+  [STEP.PICK_CELL]: '말을 다시 누르면 제자리',
 };
 
 export const OUTCOME_TITLE: Record<Outcome, string> = {

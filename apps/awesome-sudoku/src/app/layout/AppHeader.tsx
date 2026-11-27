@@ -1,18 +1,11 @@
-import Link from 'next/link';
-
+import { AppHeaderTitle } from '@app/layout/AppHeaderTitle';
 import { ThemeToggle } from '@app/layout/theme-toggle/ThemeToggle';
-import { SITE_NAME } from '@entities/game-catalog';
 
 export function AppHeader() {
   return (
-    <header className="h-16 border-b border-border-light bg-surface-primary">
-      <div className="mx-auto flex h-full w-full max-w-5xl items-center justify-between gap-4 px-5 sm:px-8">
-        <Link
-          href="/"
-          className="inline-flex min-h-11 items-center font-bold text-text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
-        >
-          {SITE_NAME}
-        </Link>
+    <header className="sticky top-0 z-40 h-16 bg-surface-primary after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-border-light after:opacity-0 after:content-[''] after:[animation:header-divider_linear_both] after:[animation-range:0_24px] after:[animation-timeline:scroll(root)]">
+      <div className="relative mx-auto flex h-full w-full max-w-[1120px] items-center justify-between gap-3 px-5 lg:px-8">
+        <AppHeaderTitle />
         <ThemeToggle />
       </div>
     </header>

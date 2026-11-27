@@ -6,10 +6,14 @@ export function WrongLoopNotice() {
   const { isWrongLoop } = useSlitherlinkContext();
 
   return (
-    <div role="status" aria-live="polite" className="my-4 flex min-h-10 w-full max-w-[400px] justify-center">
+    <div
+      role="status"
+      aria-live="polite"
+      className="pointer-events-none absolute inset-x-3 bottom-3 flex justify-center"
+    >
       {isWrongLoop && (
-        <p className="inline-flex animate-snackbar-in items-center gap-2 rounded-full bg-surface-primary/90 px-4 py-2 text-sm text-text-primary shadow-sm ring-1 ring-border-light break-keep">
-          <LuCircleDashed aria-hidden="true" className="shrink-0 text-accent-text" />
+        <p className="inline-flex animate-snackbar-in items-center gap-2 rounded-full bg-lemon px-4 py-2 text-sm font-bold text-ink break-keep">
+          <LuCircleDashed aria-hidden="true" className="shrink-0" />
           {SLITHERLINK_COPY.wrongLoop}
         </p>
       )}

@@ -1,5 +1,5 @@
 'use client';
-import { BOARD_SIZE, KEY_NUMBER } from '@entities/sudoku/config/board';
+import { BOARD_SIZE, KEY_NUMBER, PANEL_GRID } from '@entities/sudoku/config/board';
 import { cellAt } from '@entities/sudoku/lib/gridAccess';
 import { fillCellAtom, toggleNoteAtom } from '@entities/sudoku/model/store/cellValueAtoms';
 import {
@@ -41,7 +41,7 @@ export const SelectNumber: FC = () => {
   );
 
   return (
-    <div className="grid grid-cols-9 md:grid-cols-3 gap-1 xs:gap-1.5 md:gap-2.5 lg:gap-3 h-full place-content-center place-items-center">
+    <div className={PANEL_GRID.keypad}>
       {KEY_NUMBER.map((num) => (
         <NumberButton
           key={num}

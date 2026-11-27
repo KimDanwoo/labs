@@ -1,18 +1,27 @@
 'use client';
 
-import { GOMOKU_COPY } from '@views/gomoku/config/copy';
+import { GameHeading } from '@entities/game-catalog';
+import { GameLayout } from '@shared/ui/game-layout';
 import { Gomoku } from '@views/gomoku/ui/gomoku';
 
 export function GomokuPage() {
   return (
     <Gomoku.Root>
-      <main className="relative mx-auto flex min-w-[360px] flex-col items-center gap-4 px-4 py-6 sm:px-6 md:py-10">
-        <h1 className="sr-only">{GOMOKU_COPY.title}</h1>
-        <Gomoku.Status />
-        <Gomoku.Board />
-        <Gomoku.Controls />
-        <Gomoku.ResultSheet />
-      </main>
+      <GameLayout.Root>
+        <GameHeading game="gomoku" />
+        <GameLayout.Status>
+          <Gomoku.Status />
+        </GameLayout.Status>
+        <GameLayout.Board>
+          <Gomoku.Board />
+        </GameLayout.Board>
+        <GameLayout.Panel>
+          <Gomoku.ColorSelect />
+          <Gomoku.Actions />
+          <Gomoku.Rule />
+        </GameLayout.Panel>
+      </GameLayout.Root>
+      <Gomoku.ResultSheet />
     </Gomoku.Root>
   );
 }

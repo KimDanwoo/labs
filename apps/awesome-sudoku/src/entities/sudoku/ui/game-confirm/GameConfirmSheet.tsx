@@ -6,8 +6,8 @@ import {
   gameConfirmAtom,
   keepCurrentGameAtom,
 } from '@entities/sudoku/model/store/gameConfirmAtoms';
-import { GameConfirmButton } from '@entities/sudoku/ui/game-confirm/GameConfirmButton';
 import { BottomSheet } from '@shared/ui/bottom-sheet';
+import { Button } from '@shared/ui/button';
 import { useAtomValue, useSetAtom } from 'jotai';
 
 export function GameConfirmSheet() {
@@ -25,13 +25,13 @@ export function GameConfirmSheet() {
         {detail && <p className="text-lg font-semibold text-text-primary">{detail}</p>}
         <p className="text-sm text-text-secondary break-keep">{copy.message}</p>
       </div>
-      <div className="mt-6 grid grid-cols-2 gap-3">
-        <GameConfirmButton variant="secondary" onClick={keepCurrentGame}>
+      <div className="mt-6 grid grid-cols-2 gap-2">
+        <Button variant="weak" size="l" onClick={keepCurrentGame}>
           계속하기
-        </GameConfirmButton>
-        <GameConfirmButton variant="primary" onClick={discard}>
+        </Button>
+        <Button size="l" onClick={discard}>
           {copy.confirm}
-        </GameConfirmButton>
+        </Button>
       </div>
     </BottomSheet>
   );

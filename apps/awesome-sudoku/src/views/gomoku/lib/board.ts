@@ -1,10 +1,16 @@
 import { CELL_COUNT, STONE } from '@views/gomoku/config/board';
-import { EMPTY_STONE_CLASS, FORBIDDEN_LABEL, STONE_CLASS, STONE_LABEL } from '@views/gomoku/config/stone';
+import {
+  EMPTY_STONE_CLASS,
+  FORBIDDEN_LABEL,
+  PLACED_STONE_CLASS,
+  STONE_CLASS,
+  STONE_LABEL,
+} from '@views/gomoku/config/stone';
 import { colOf, rowOf, stoneAtPly } from '@views/gomoku/lib/coords';
 import type { Cell, Stone } from '@views/gomoku/model/types/gomoku';
 
 export const stoneClassOf = (stone: Cell, playerStone: Stone): string => {
-  if (stone !== STONE.EMPTY) return STONE_CLASS[stone];
+  if (stone !== STONE.EMPTY) return `${STONE_CLASS[stone]} ${PLACED_STONE_CLASS}`;
   return `${STONE_CLASS[playerStone]} ${EMPTY_STONE_CLASS}`;
 };
 

@@ -1,14 +1,14 @@
 export const SLITHERLINK_COPY = {
-  title: '슬리더링크',
   boardLabel: '슬리더링크 판',
   generating: '새 퍼즐을 만드는 중…',
   wrongLoop: '아직 아니에요. 숫자를 다시 살펴보세요.',
   levelGroup: '난이도',
+  levelHint: '난이도를 바꾸면 새 퍼즐이 시작돼요.',
   timerLabel: '걸린 시간',
-  hintsLabel: '남은 힌트',
   undo: '되돌리기',
   redo: '다시하기',
   hint: '힌트',
+  hintLabel: (remaining: number) => `힌트, ${remaining}번 남음`,
   newGame: '새 게임',
   resultTitle: '고리를 완성했어요!',
   resultTime: '완료 시간',
@@ -16,7 +16,8 @@ export const SLITHERLINK_COPY = {
   confirmTitle: '새 게임을 시작할까요?',
   confirmMessage: '지금 그린 선은 저장되지 않고 사라져요.',
   confirmKeep: '계속하기',
-  rulesTitle: '규칙',
+  ruleTitle: '슬리더링크 규칙',
+  ruleCaption: '숫자만큼 선을 둘러 고리 하나를 이어요',
 } as const;
 
 export const SLITHERLINK_RULES = [

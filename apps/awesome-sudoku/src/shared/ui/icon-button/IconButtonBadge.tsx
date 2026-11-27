@@ -8,7 +8,7 @@ export function IconButtonBadge({ children }: IconButtonBadgeProps) {
   return (
     <span
       aria-hidden="true"
-      className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1.5 bg-linear-to-br from-gradient-from to-gradient-to text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg shadow-gradient-from/30 border-2 border-surface-primary"
+      className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-surface-primary bg-lemon px-1.5 text-xs font-bold text-ink tabular-nums animate-pop-in"
     >
       {children}
     </span>

@@ -2,7 +2,7 @@ import '@app/globals.css';
 import { AppHeader } from '@app/layout/AppHeader';
 import { AppProviders } from '@app/providers/AppProviders';
 import { SITE_DESCRIPTION, SITE_HEADLINE, SITE_NAME, SITE_TITLE, SITE_URL } from '@entities/game-catalog';
-import '@repo/fonts/fonts.css';
+import '@repo/fonts/pretendard.css';
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 
@@ -13,7 +13,7 @@ export const viewport: Viewport = {
   userScalable: true,
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#1c1c1e' },
+    { media: '(prefers-color-scheme: dark)', color: '#101216' },
   ],
 };
 

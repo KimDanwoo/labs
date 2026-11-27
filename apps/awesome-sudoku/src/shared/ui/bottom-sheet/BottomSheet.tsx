@@ -15,10 +15,9 @@ type BottomSheetProps = {
   onClose: () => void;
   children: ReactNode;
   title?: string;
-  className?: string;
 };
 
-export function BottomSheet({ isOpen, onClose, children, title, className }: BottomSheetProps) {
+export function BottomSheet({ isOpen, onClose, children, title }: BottomSheetProps) {
   const titleId = useId();
   const isDesktop = useIsDesktop();
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -41,9 +40,9 @@ export function BottomSheet({ isOpen, onClose, children, title, className }: Bot
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-50">
+    <div data-phase={phase} className="fixed inset-0 z-50 data-[phase=closing]:pointer-events-none">
       <div
-        className="absolute inset-0 bg-black/40"
+        className="absolute inset-0 bg-black/50"
         style={{ opacity: isShown ? 1 : 0, transition: BACKDROP_TRANSITION }}
         onClick={close}
       />
@@ -53,10 +52,8 @@ export function BottomSheet({ isOpen, onClose, children, title, className }: Bot
         aria-modal="true"
         aria-labelledby={title ? titleId : undefined}
         className={cn(
-          'absolute bg-surface-primary',
-          'shadow-xl max-h-[85vh]',
-          isDesktop ? 'left-1/2 top-1/2 rounded-2xl w-full max-w-md' : 'bottom-0 left-0 right-0 rounded-t-2xl',
-          className,
+          'absolute max-h-[85vh] bg-surface-elevated',
+          isDesktop ? 'left-1/2 top-1/2 w-full max-w-md rounded-3xl' : 'bottom-0 left-0 right-0 rounded-t-3xl',
         )}
         style={sheetStyle}
       >
@@ -71,7 +68,11 @@ export function BottomSheet({ isOpen, onClose, children, title, className }: Bot
         {title && (
           <div
             id={titleId}
-            className={cn('px-6 text-lg font-bold', isDesktop ? 'pt-6 pb-3' : 'py-3', 'text-text-primary')}
+            className={cn(
+              'px-6 text-xl font-extrabold tracking-[-0.03em]',
+              isDesktop ? 'pt-6 pb-3' : 'py-3',
+              'text-text-primary',
+            )}
           >
             {title}
           </div>

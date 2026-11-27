@@ -2,133 +2,167 @@
 
 @theme inline {
   --color-accent: rgb(var(--rgb-accent));
-  --color-accent-light: rgb(var(--rgb-accent-light));
   --color-accent-text: rgb(var(--rgb-accent-text));
-  --color-bg-tertiary: rgb(var(--rgb-bg-tertiary));
   --color-border-light: rgb(var(--rgb-border-light));
   --color-border-medium: rgb(var(--rgb-border-medium));
   --color-cell-related: rgb(var(--rgb-cell-related));
   --color-cell-selected: rgb(var(--rgb-cell-selected));
   --color-error-text: rgb(var(--rgb-error-text));
-  --color-glass: rgb(var(--rgb-glass));
+  --color-face: rgb(var(--rgb-face));
   --color-goban: rgb(var(--rgb-goban));
   --color-goban-line: rgb(var(--rgb-goban-line));
-  --color-gradient-from: rgb(var(--rgb-gradient-from));
-  --color-gradient-to: rgb(var(--rgb-gradient-to));
   --color-hint-text: rgb(var(--rgb-hint-text));
+  --color-ink: rgb(var(--rgb-ink));
+  --color-lemon: rgb(var(--rgb-lemon));
+  --color-lemon-soft: rgb(var(--rgb-lemon-soft));
+  --color-on-lemon-muted: rgb(var(--rgb-on-lemon-muted));
+  --color-on-lemon-soft: rgb(var(--rgb-on-lemon-soft));
+  --color-on-primary: rgb(var(--rgb-on-primary));
+  --color-on-weak: rgb(var(--rgb-on-weak));
+  --color-stone-black: rgb(var(--rgb-stone-black));
+  --color-stone-white: rgb(var(--rgb-stone-white));
+  --color-stone-white-edge: rgb(var(--rgb-stone-white-edge));
+  --color-primary: rgb(var(--rgb-primary));
+  --color-surface-elevated: rgb(var(--rgb-surface-elevated));
   --color-surface-primary: rgb(var(--rgb-surface-primary));
   --color-surface-secondary: rgb(var(--rgb-surface-secondary));
-  --color-surface-tertiary: rgb(var(--rgb-surface-tertiary));
   --color-text-primary: rgb(var(--rgb-text-primary));
   --color-text-secondary: rgb(var(--rgb-text-secondary));
   --color-text-tertiary: rgb(var(--rgb-text-tertiary));
+  --color-walls-cell: rgb(var(--rgb-walls-cell));
+  --color-walls-cpu: rgb(var(--rgb-walls-cpu));
+  --color-walls-cpu-pawn: rgb(var(--rgb-walls-cpu-pawn));
+  --color-walls-cpu-soft: rgb(var(--rgb-walls-cpu-soft));
+  --color-walls-me: rgb(var(--rgb-walls-me));
+  --color-walls-me-soft: rgb(var(--rgb-walls-me-soft));
+  --color-weak: rgb(var(--rgb-weak));
 }
 
 :root {
-  --rgb-bg-primary: 250, 250, 252;
+  --rgb-ink: 25, 31, 40;
+  --rgb-lemon: 255, 225, 77;
+  --rgb-on-lemon-muted: 74, 66, 32;
+
+  --rgb-primary: var(--rgb-ink);
+  --rgb-on-primary: 255, 255, 255;
+  --rgb-weak: 242, 244, 246;
+  --rgb-on-weak: 51, 61, 75;
+  --rgb-face: 242, 244, 246;
+  --rgb-lemon-soft: 255, 244, 191;
+  --rgb-on-lemon-soft: var(--rgb-ink);
+
+  --rgb-bg-primary: 255, 255, 255;
   --rgb-bg-secondary: 255, 255, 255;
-  --rgb-bg-tertiary: 245, 245, 247;
 
-  --rgb-text-primary: 28, 28, 30;
-  --rgb-text-secondary: 99, 99, 102;
-  --rgb-text-tertiary: 142, 142, 147;
+  --rgb-text-primary: 25, 31, 40;
+  --rgb-text-secondary: 78, 89, 104;
+  --rgb-text-tertiary: 107, 118, 132;
 
-  --rgb-accent: 0, 122, 255;
-  --rgb-accent-text: 0, 88, 190;
-  --rgb-accent-light: 230, 242, 255;
-  --rgb-accent-soft: 245, 249, 255;
+  --rgb-accent: var(--rgb-ink);
+  --rgb-accent-text: var(--rgb-ink);
+  --rgb-accent-soft: 255, 250, 224;
 
-  --rgb-cell-selected: 220, 235, 255;
-  --rgb-cell-related: 245, 248, 255;
-  --rgb-cell-same-value: 200, 225, 255;
+  --rgb-cell-selected: 255, 236, 140;
+  --rgb-cell-related: 249, 250, 251;
+  --rgb-cell-same-value: 255, 244, 191;
 
-  --rgb-border-light: 229, 229, 234;
-  --rgb-border-medium: 199, 199, 204;
-  --rgb-border-strong: 58, 58, 60;
+  --rgb-border-light: 229, 232, 235;
+  --rgb-border-medium: 209, 214, 219;
+  --rgb-border-strong: 51, 61, 75;
 
-  --rgb-error: 255, 59, 48;
-  --rgb-success: 52, 199, 89;
+  --rgb-error: 240, 68, 82;
+  --rgb-success: 3, 178, 108;
 
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
 
   --rgb-surface-primary: 255, 255, 255;
-  --rgb-surface-secondary: 248, 250, 252;
-  --rgb-surface-tertiary: 241, 245, 249;
+  --rgb-surface-secondary: 255, 255, 255;
   --rgb-surface-elevated: 255, 255, 255;
 
-  --rgb-glass: 255, 255, 255;
-  --glass-opacity: 0.7;
-  --overlay-opacity: 0.9;
+  --rgb-hover: 249, 250, 251;
+  --rgb-active: 242, 244, 246;
 
-  --rgb-hover: 248, 250, 252;
-  --rgb-active: 241, 245, 249;
+  --rgb-error-bg: 255, 238, 238;
+  --rgb-error-text: 228, 41, 57;
+  --rgb-success-bg: 229, 248, 239;
+  --rgb-success-text: 2, 147, 89;
 
-  --rgb-gradient-from: 59, 130, 246;
-  --rgb-gradient-to: 99, 102, 241;
+  --rgb-hint-text: 2, 147, 89;
 
-  --rgb-error-bg: 254, 226, 226;
-  --rgb-error-text: 225, 29, 72;
-  --rgb-success-bg: 209, 250, 229;
-  --rgb-success-text: 5, 150, 105;
+  --rgb-divider: 242, 244, 246;
 
-  --rgb-hint-text: 16, 185, 129;
+  --rgb-goban: 241, 217, 168;
+  --rgb-goban-line: 165, 124, 69;
+  --rgb-stone-black: 30, 34, 41;
+  --rgb-stone-white: 255, 255, 255;
+  --rgb-stone-white-edge: 203, 182, 140;
 
-  --rgb-divider: 241, 245, 249;
-
-  --rgb-goban: 233, 198, 140;
-  --rgb-goban-line: 96, 66, 28;
+  --rgb-walls-cell: 255, 255, 255;
+  --rgb-walls-me: 255, 225, 77;
+  --rgb-walls-me-soft: 255, 244, 191;
+  --rgb-walls-cpu: 176, 184, 193;
+  --rgb-walls-cpu-soft: 229, 232, 235;
+  --rgb-walls-cpu-pawn: var(--rgb-ink);
 }
 
 .dark {
-  --rgb-bg-primary: 22, 22, 24;
-  --rgb-bg-secondary: 28, 28, 30;
-  --rgb-bg-tertiary: 36, 36, 38;
+  --rgb-primary: var(--rgb-lemon);
+  --rgb-on-primary: var(--rgb-ink);
+  --rgb-weak: 38, 42, 49;
+  --rgb-on-weak: 229, 232, 235;
+  --rgb-face: 29, 32, 38;
+  --rgb-lemon-soft: 46, 42, 20;
+  --rgb-on-lemon-soft: var(--rgb-lemon);
 
-  --rgb-text-primary: 242, 242, 247;
-  --rgb-text-secondary: 174, 174, 178;
-  --rgb-text-tertiary: 124, 124, 128;
+  --rgb-bg-primary: 16, 18, 22;
+  --rgb-bg-secondary: 16, 18, 22;
 
-  --rgb-accent: 10, 132, 255;
-  --rgb-accent-text: 120, 180, 255;
-  --rgb-accent-light: 20, 40, 70;
-  --rgb-accent-soft: 15, 25, 50;
+  --rgb-text-primary: 242, 244, 246;
+  --rgb-text-secondary: 195, 202, 211;
+  --rgb-text-tertiary: 168, 176, 187;
 
-  --rgb-cell-selected: 30, 60, 110;
-  --rgb-cell-related: 38, 40, 58;
-  --rgb-cell-same-value: 28, 55, 100;
+  --rgb-accent: var(--rgb-lemon);
+  --rgb-accent-text: var(--rgb-lemon);
+  --rgb-accent-soft: 34, 31, 16;
 
-  --rgb-border-light: 48, 48, 52;
-  --rgb-border-medium: 62, 62, 66;
-  --rgb-border-strong: 174, 174, 178;
+  --rgb-cell-selected: 82, 72, 28;
+  --rgb-cell-related: 35, 38, 45;
+  --rgb-cell-same-value: 62, 55, 24;
 
-  --rgb-error: 255, 69, 58;
-  --rgb-success: 48, 209, 88;
+  --rgb-border-light: 44, 48, 56;
+  --rgb-border-medium: 58, 63, 72;
+  --rgb-border-strong: 168, 176, 187;
 
-  --rgb-surface-primary: 28, 28, 30;
-  --rgb-surface-secondary: 22, 22, 24;
-  --rgb-surface-tertiary: 36, 36, 38;
-  --rgb-surface-elevated: 44, 44, 46;
+  --rgb-error: 255, 92, 104;
+  --rgb-success: 48, 209, 128;
 
-  --rgb-glass: 28, 28, 30;
-  --glass-opacity: 0.8;
-  --overlay-opacity: 0.95;
+  --rgb-surface-primary: 16, 18, 22;
+  --rgb-surface-secondary: 16, 18, 22;
+  --rgb-surface-elevated: 29, 32, 38;
 
-  --rgb-hover: 44, 44, 46;
-  --rgb-active: 54, 54, 58;
+  --rgb-hover: 38, 42, 49;
+  --rgb-active: 44, 48, 56;
 
-  --rgb-gradient-from: 10, 132, 255;
-  --rgb-gradient-to: 94, 92, 230;
+  --rgb-error-bg: 58, 24, 28;
+  --rgb-error-text: 255, 107, 117;
+  --rgb-success-bg: 16, 46, 32;
+  --rgb-success-text: 72, 214, 140;
 
-  --rgb-error-bg: 50, 20, 20;
-  --rgb-error-text: 255, 69, 58;
-  --rgb-success-bg: 15, 45, 25;
-  --rgb-success-text: 48, 209, 88;
+  --rgb-hint-text: 72, 214, 140;
 
-  --rgb-hint-text: 52, 211, 153;
+  --rgb-divider: 38, 42, 49;
 
-  --rgb-divider: 44, 44, 46;
+  --rgb-goban: 210, 178, 122;
+  --rgb-goban-line: 110, 82, 48;
+  --rgb-stone-black: 21, 24, 29;
+  --rgb-stone-white: 247, 244, 236;
+  --rgb-stone-white-edge: 169, 141, 94;
 
-  --rgb-goban: 178, 140, 88;
-  --rgb-goban-line: 62, 42, 16;
+  --rgb-walls-cell: 38, 42, 49;
+  --rgb-walls-me: 112, 96, 28;
+  --rgb-walls-me-soft: 52, 47, 22;
+  --rgb-walls-cpu: 96, 106, 121;
+  --rgb-walls-cpu-soft: 58, 64, 74;
+  --rgb-walls-cpu-pawn: 195, 202, 211;
 }

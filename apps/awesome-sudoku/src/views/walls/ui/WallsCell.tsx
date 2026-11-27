@@ -18,11 +18,11 @@ export function WallsCell({ cell }: WallsCellProps) {
       aria-label={view.label}
       onClick={handleClick}
       className={cn(
-        'relative m-[4%] flex items-center justify-center rounded-md transition-colors duration-300 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white',
+        'relative m-[4%] flex items-center justify-center rounded-md transition-colors duration-300 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
         view.tintClass,
       )}
     >
-      {view.isTarget && <span className="size-[26%] rounded-full bg-white/90 shadow-sm" />}
+      {view.isTarget && <span className="size-[26%] rounded-full bg-text-tertiary/60" />}
     </button>
   );
 }

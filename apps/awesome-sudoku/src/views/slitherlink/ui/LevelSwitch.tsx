@@ -1,6 +1,9 @@
-import { cn } from '@shared/lib/cn';
+import type { KeyboardEvent } from 'react';
+
+import { keyToPosition } from '@shared/lib/rovingIndex';
+import { PillTab } from '@shared/ui/pill-tab';
 import { SLITHERLINK_COPY } from '@views/slitherlink/config/copy';
-import { LEVEL_LABEL, LEVEL_OPTIONS } from '@views/slitherlink/config/game';
+import { LEVEL_LABEL, LEVEL_OPTIONS, LEVEL_TAB_CLASS } from '@views/slitherlink/config/game';
 import { useSlitherlinkContext } from '@views/slitherlink/model/hooks/useSlitherlinkContext';
 import type { SlitherlinkLevel } from '@views/slitherlink/model/types/slitherlink';
 
@@ -11,28 +14,37 @@ export function LevelSwitch() {
     if (target !== level) confirm.request(target);
   };
 
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const tabs = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
+    const current = tabs.findIndex((tab) => tab === event.target);
+    const next = keyToPosition(event.key, current, tabs.length);
+    if (next === null) return;
+    event.preventDefault();
+    tabs[next]?.focus();
+  };
+
   return (
-    <div
-      role="group"
-      aria-label={SLITHERLINK_COPY.levelGroup}
-      className="inline-flex rounded-xl bg-bg-tertiary/80 p-1 backdrop-blur-sm"
-    >
-      {LEVEL_OPTIONS.map((option) => (
-        <button
-          key={option}
-          type="button"
-          aria-pressed={option === level}
-          onClick={() => handleSelect(option)}
-          className={cn(
-            'h-9 min-w-13 rounded-lg px-3 text-sm transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40',
-            option === level
-              ? 'bg-surface-primary font-semibold text-text-primary shadow-sm'
-              : 'font-normal text-text-secondary hover:text-text-primary active:scale-95',
-          )}
-        >
-          {LEVEL_LABEL[option]}
-        </button>
-      ))}
+    <div>
+      <div
+        role="tablist"
+        aria-label={SLITHERLINK_COPY.levelGroup}
+        onKeyDown={handleKeyDown}
+        className="grid grid-cols-3 gap-1 rounded-[14px] bg-face p-1"
+      >
+        {LEVEL_OPTIONS.map((option) => (
+          <PillTab
+            key={option}
+            isSelected={option === level}
+            onClick={() => handleSelect(option)}
+            className={LEVEL_TAB_CLASS}
+          >
+            {LEVEL_LABEL[option]}
+          </PillTab>
+        ))}
+      </div>
+      <p className="mt-2 text-center text-[13px] text-text-tertiary lg:text-left short-landscape:hidden">
+        {SLITHERLINK_COPY.levelHint}
+      </p>
     </div>
   );
 }
