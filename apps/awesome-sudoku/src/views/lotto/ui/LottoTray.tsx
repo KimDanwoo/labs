@@ -8,7 +8,7 @@ export function LottoTray() {
   const draw = freshDrawOf(singleDraw, ticket);
 
   return (
-    <div className="flex justify-center rounded-2xl bg-surface-primary px-2 py-3 sm:py-4">
+    <div className="flex justify-center rounded-2xl bg-surface-primary px-2 py-3 sm:py-4 short-landscape:py-2.5 dark:bg-border-medium">
       {draw ? <LottoTrayDraw key={draw.round} draw={draw} /> : <LottoTrayTicket />}
     </div>
   );

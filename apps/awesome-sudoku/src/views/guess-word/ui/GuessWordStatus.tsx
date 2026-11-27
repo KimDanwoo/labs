@@ -4,11 +4,11 @@ import { useGuessWordContext } from '@views/guess-word/model/hooks/useGuessWordC
 
 export function GuessWordStatus() {
   const { day, record } = useGuessWordContext();
-  if (day === null) return null;
+  const text = day === null ? GUESS_WORD_COPY.statusLoading : GUESS_WORD_COPY.status(day, record.guesses.length);
+
   return (
-    <>
-      <StatusPill.Root>{GUESS_WORD_COPY.puzzleNumber(day)}</StatusPill.Root>
-      <StatusPill.Root tone="weak">{GUESS_WORD_COPY.guessCount(record.guesses.length)}</StatusPill.Root>
-    </>
+    <StatusPill.Root role="status" aria-live="polite">
+      {text}
+    </StatusPill.Root>
   );
 }

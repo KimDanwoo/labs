@@ -16,10 +16,10 @@ export const BALL_BASE_CLASS =
 
 export const BALL_TONE_CLASS: Record<BallTone, string> = {
   yellow: 'bg-lemon text-ink',
-  blue: 'bg-[#1b64da] text-white',
-  red: 'bg-[#d22030] text-white',
-  gray: 'bg-[#6b7684] text-white',
-  green: 'bg-[#18b26b] text-ink',
+  blue: 'bg-[#2b66d9] text-white',
+  red: 'bg-[#d6343a] text-white',
+  gray: 'bg-[#4e5968] text-white dark:bg-[#6b7684]',
+  green: 'bg-[#3ac47d] text-ink',
 };
 
 export const BALL_SIZE_CLASS: Record<BallSize, string> = {
@@ -30,7 +30,7 @@ export const BALL_SIZE_CLASS: Record<BallSize, string> = {
 export const BALL_EMPHASIS_CLASS: Record<BallEmphasis, string> = {
   plain: '',
   matched: '',
-  muted: 'opacity-30 saturate-50',
+  muted: 'bg-weak text-on-weak dark:bg-weak',
 };
 
 export const BALL_ROLL_IN_CLASS = 'motion-safe:animate-[lotto-roll-in_560ms_cubic-bezier(0.34,1.4,0.64,1)_both]';
@@ -41,7 +41,7 @@ export const DRAWING_TEXT_CLASS =
 export const PROGRESS_SWEEP_CLASS = 'motion-safe:animate-[lotto-sweep_1.4s_ease-in-out_infinite]';
 
 export const BULK_PANEL_CLASS =
-  'fixed inset-x-4 top-auto bottom-6 m-0 mx-auto w-auto max-w-sm rounded-3xl border-0 bg-surface-elevated p-5 text-text-primary opacity-0 translate-y-3 transition-[opacity,translate,display,overlay] transition-discrete duration-200 ease-out open:opacity-100 open:translate-y-0 starting:open:opacity-0 starting:open:translate-y-3 backdrop:bg-black/50 sm:top-0 sm:bottom-0 sm:my-auto sm:h-fit';
+  'fixed inset-x-4 top-auto bottom-6 m-0 mx-auto w-auto max-w-md rounded-3xl border-0 bg-surface-elevated p-6 text-text-primary opacity-0 translate-y-3 transition-[opacity,translate,display,overlay] transition-discrete duration-200 ease-out open:opacity-100 open:translate-y-0 starting:open:opacity-0 starting:open:translate-y-3 backdrop:bg-black/50 sm:top-0 sm:bottom-0 sm:my-auto sm:h-fit';
 
 export const EMPTY_SLOT_CLASS =
   'inline-flex size-[34px] shrink-0 items-center justify-center rounded-full bg-weak text-text-tertiary sm:size-12 short-landscape:size-[34px]';
@@ -50,7 +50,7 @@ export const NUMBER_CELL_CLASS =
   'group flex aspect-square w-full items-center justify-center rounded-full transition-transform duration-150 ease-out active:scale-90 focus-visible:outline-none disabled:cursor-not-allowed disabled:active:scale-100';
 
 export const NUMBER_DISC_CLASS =
-  'flex size-[84%] items-center justify-center rounded-full bg-surface-primary text-[15px] font-semibold font-tabular text-text-secondary transition-colors duration-150 group-hover:bg-lemon-soft group-hover:text-text-primary group-disabled:opacity-30 sm:text-[17px]';
+  'flex size-[84%] items-center justify-center rounded-full bg-surface-primary text-[15px] font-semibold dark:bg-border-medium font-tabular text-text-secondary transition-colors duration-150 group-hover:bg-lemon-soft group-hover:text-text-primary group-disabled:opacity-30 sm:text-[17px]';
 
 export const NUMBER_FOCUS_CLASS =
   'group-focus-visible:ring-2 group-focus-visible:ring-accent group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-face';
@@ -65,3 +65,5 @@ export const STAT_TONE_CLASS: Record<StatTone, string> = {
 
 export const TABLE_HEAD_CELL_CLASS = 'pb-2 text-xs font-normal text-text-tertiary';
 export const TABLE_CELL_CLASS = 'py-2.5 text-sm font-tabular text-text-primary';
+
+export const LOTTO_BOARD_SIZE = 'short-landscape:max-w-[calc((100svh-6rem)*1.25)]';

@@ -13,16 +13,16 @@ export function GuessWordPage() {
           <GuessWord.Status />
         </GameLayout.Status>
         <GameLayout.Board>
-          <div className="grid w-full gap-4">
-            <GuessWord.Hints />
+          <GuessWord.Board>
             <GuessWord.Form />
             <GuessWord.Latest />
             <GuessWord.List />
-          </div>
+          </GuessWord.Board>
         </GameLayout.Board>
         <GameLayout.Panel>
-          <GuessWord.Yesterday />
-          <GuessWord.About />
+          <GuessWord.Hints />
+          <GuessWord.Actions />
+          <GuessWord.Rule />
         </GameLayout.Panel>
       </GameLayout.Root>
       <GuessWord.ResultSheet />

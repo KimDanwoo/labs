@@ -26,7 +26,7 @@ export function LottoBulkPanel({ id }: LottoBulkPanelProps) {
       onToggle={handleToggle}
       className={BULK_PANEL_CLASS}
     >
-      <p id={titleId} className="px-1 pb-3 text-lg font-bold text-text-primary">
+      <p id={titleId} className="pb-4 text-xl font-extrabold tracking-[-0.03em] text-text-primary">
         {LOTTO_COPY.bulkPanelTitle}
       </p>
       <div className="grid grid-cols-2 gap-2.5">

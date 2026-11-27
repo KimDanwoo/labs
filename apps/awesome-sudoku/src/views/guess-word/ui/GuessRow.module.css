@@ -1,0 +1,16 @@
+.enter {
+  animation: guess-row-in 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes guess-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter {
+    animation: none;
+  }
+}

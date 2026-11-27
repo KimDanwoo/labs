@@ -4,7 +4,7 @@ import { RuleCard } from '@shared/ui/rule-card';
 import { GUESS_WORD_COPY, GUESS_WORD_RULES } from '@views/guess-word/config/copy';
 import { GuessWordCredits } from '@views/guess-word/ui/GuessWordCredits';
 
-export function GuessWordAbout() {
+export function GuessWordRule() {
   return (
     <RuleCard.Root>
       <RuleCard.Summary>

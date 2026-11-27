@@ -22,3 +22,7 @@ export const GUESS_QUERY_KEY = {
   hints: (day: number | null) => ['guess-word', 'hints', day] as const,
   yesterday: (day: number | null) => ['guess-word', 'yesterday', day] as const,
 };
+
+export const GUESS_FORM_ID = 'guess-word-form';
+
+export const HINT_RANKS = [1, 10, 1000] as const;
