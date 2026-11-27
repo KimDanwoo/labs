@@ -11,13 +11,31 @@
 @theme {
   --breakpoint-xs: 395px;
   --font-sans: var(--font-pretendard);
+  --ease-snappy: cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-pop-in: pop-in 220ms var(--ease-snappy) both;
+  --animate-spin-in: spin-in 260ms var(--ease-snappy) both;
+
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+      scale: 0.6;
+    }
+  }
+
+  @keyframes spin-in {
+    from {
+      opacity: 0;
+      rotate: -90deg;
+      scale: 0.7;
+    }
+  }
 }
 
 html,
 body {
   overscroll-behavior: none;
   -webkit-overflow-scrolling: auto;
-  height: 100dvh;
+  min-height: 100dvh;
   background: rgb(var(--rgb-bg-primary));
   color: rgb(var(--rgb-text-primary));
 }
@@ -202,8 +220,10 @@ html.theme-transition [data-theme-toggle] * {
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
     scroll-behavior: auto !important;
   }
 }

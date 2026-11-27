@@ -17,7 +17,7 @@ export function ThemeToggle() {
       data-theme-toggle
       onClick={handleToggle}
     >
-      <ThemeIcon aria-hidden="true" />
+      <ThemeIcon aria-hidden="true" className="animate-spin-in" />
     </CircleButton>
   );
 }

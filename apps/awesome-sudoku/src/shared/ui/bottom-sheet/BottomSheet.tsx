@@ -40,7 +40,7 @@ export function BottomSheet({ isOpen, onClose, children, title }: BottomSheetPro
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-50">
+    <div data-phase={phase} className="fixed inset-0 z-50 data-[phase=closing]:pointer-events-none">
       <div
         className="absolute inset-0 bg-black/50"
         style={{ opacity: isShown ? 1 : 0, transition: BACKDROP_TRANSITION }}

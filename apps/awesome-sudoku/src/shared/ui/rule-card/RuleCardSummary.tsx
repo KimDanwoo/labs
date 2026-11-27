@@ -11,7 +11,7 @@ export function RuleCardSummary({ children }: RuleCardSummaryProps) {
       {children}
       <LuChevronDown
         aria-hidden="true"
-        className="col-start-3 row-span-2 row-start-1 size-5 text-text-tertiary transition-transform duration-200 group-open:rotate-180"
+        className="col-start-3 row-span-2 row-start-1 size-5 text-text-tertiary transition-transform duration-240 ease-snappy group-open:rotate-180"
       />
     </summary>
   );

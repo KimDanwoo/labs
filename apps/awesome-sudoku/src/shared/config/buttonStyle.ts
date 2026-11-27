@@ -8,7 +8,7 @@ export interface ButtonLook {
 }
 
 export const BUTTON_BASE =
-  'inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 font-semibold whitespace-nowrap transition-[transform,opacity,background-color] duration-150 ease-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100 [&_svg]:size-[18px] [&_svg]:shrink-0';
+  'inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 font-semibold whitespace-nowrap transition-[scale,opacity,background-color] duration-150 ease-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100 [&_svg]:size-[18px] [&_svg]:shrink-0';
 
 export const BUTTON_VARIANT: Record<ButtonVariant, string> = {
   fill: 'bg-primary text-on-primary hover:opacity-90',
