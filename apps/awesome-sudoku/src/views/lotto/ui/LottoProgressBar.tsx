@@ -11,22 +11,22 @@ export function LottoProgressBar() {
   const percent = progressPercentOf(progressRatioOf(simulation));
 
   return (
-    <div
+    <span
       role="progressbar"
       aria-label={isBulk ? LOTTO_COPY.bulkProgress : LOTTO_COPY.jackpotProgress}
       aria-valuemin={0}
       aria-valuemax={PERCENT}
       aria-valuenow={isBulk ? percent : undefined}
-      className="absolute inset-x-0 bottom-0 h-[3px] overflow-hidden bg-black/5 dark:bg-white/8"
+      className="absolute inset-x-0 bottom-0 block h-[3px] overflow-hidden bg-ink/10"
     >
-      <div
+      <span
         className={cn(
-          'h-full rounded-full bg-accent transition-[width] duration-300 ease-out',
+          'block h-full rounded-full bg-ink transition-[width] duration-300 ease-out',
           !isBulk && 'w-2/5',
           !isBulk && PROGRESS_SWEEP_CLASS,
         )}
         style={isBulk ? { width: `${percent}%` } : undefined}
       />
-    </div>
+    </span>
   );
 }

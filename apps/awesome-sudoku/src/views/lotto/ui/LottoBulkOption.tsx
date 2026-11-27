@@ -1,7 +1,7 @@
 import { cn } from '@shared/lib/cn';
 import { BULK_PRESET_LABEL, LOTTO_COPY, type BulkPreset } from '@views/lotto/config/copy';
 import { TICKET_PRICE } from '@views/lotto/config/lotto';
-import { GLASS_BUTTON_CLASS, GLASS_LENS_CLASS } from '@views/lotto/config/style';
+import { TILE_CLASS } from '@views/lotto/config/style';
 import { formatWon } from '@views/lotto/lib/format';
 import { useLottoContext } from '@views/lotto/model/hooks/useLottoContext';
 
@@ -21,9 +21,8 @@ export function LottoBulkOption({ count, panelId }: LottoBulkOptionProps) {
       popoverTargetAction="hide"
       onClick={handleClick}
       className={cn(
-        'flex flex-col items-start gap-1 rounded-2xl px-4 py-3.5 text-left',
-        GLASS_LENS_CLASS,
-        GLASS_BUTTON_CLASS,
+        'flex cursor-pointer flex-col items-start gap-1 px-4 py-3.5 text-left transition-[transform,background-color] duration-150 hover:bg-border-light active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
+        TILE_CLASS,
       )}
     >
       <span className="text-lg font-semibold text-text-primary font-tabular">{BULK_PRESET_LABEL[count]}</span>

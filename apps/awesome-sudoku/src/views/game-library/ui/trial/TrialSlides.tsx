@@ -13,6 +13,7 @@ export function TrialSlides() {
         <FeaturedSlide.Root key={slide.id} slide={slide} isHidden={position !== index}>
           <FeaturedSlide.Head />
           <FeaturedSlide.Play />
+          <FeaturedSlide.Pager />
           <FeaturedSlide.GameLink />
         </FeaturedSlide.Root>
       ))}

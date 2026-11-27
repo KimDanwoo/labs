@@ -2,6 +2,7 @@
 
 import { useState, type SubmitEvent } from 'react';
 
+import { cn } from '@shared/lib/cn';
 import { Button } from '@shared/ui/button';
 import { PuzzleVictory } from '@shared/ui/puzzle-victory';
 import { INITIAL_WORD_ROUND, WORD_PATTERN, WORD_PUZZLES } from '@views/game-library/config/quickWords';
@@ -50,32 +51,34 @@ export function QuickWord() {
 
   return (
     <div className={styles.wordGame}>
-      <p className={styles.wordContext}>
-        {puzzle.category} · {puzzle.answer.length}글자
-      </p>
-      <ol className={styles.wordHints} aria-label="공개된 힌트" aria-live="polite">
-        {puzzle.hints.slice(0, round.hintCount).map((hint) => (
-          <li key={hint}>{hint}</li>
-        ))}
-      </ol>
-      <QuickWordForm value={round.input} isFinished={isFinished} onChange={handleChange} onSubmit={handleSubmit} />
-      <p className={styles.wordStatus} role="status">
-        {isSolved ? <PuzzleVictory /> : message}
-      </p>
+      <div className={cn(styles.stage, styles.wordStage)}>
+        <p className={styles.wordContext}>
+          {puzzle.category} · {puzzle.answer.length}글자
+        </p>
+        <ol className={styles.wordHints} aria-label="공개된 힌트" aria-live="polite">
+          {puzzle.hints.slice(0, round.hintCount).map((hint) => (
+            <li key={hint}>{hint}</li>
+          ))}
+        </ol>
+        <QuickWordForm value={round.input} isFinished={isFinished} onChange={handleChange} onSubmit={handleSubmit} />
+      </div>
       <div className={styles.feedback}>
-        {hasHintButton ? (
-          <Button variant="surface" size="s" onClick={handleReveal}>
-            {round.hintCount === puzzle.hints.length - 1 ? '초성 보기' : '힌트 더 보기'}
+        <p role="status">{isSolved ? <PuzzleVictory /> : message}</p>
+        <div className={styles.actions}>
+          {hasHintButton ? (
+            <Button variant="surface" size="s" onClick={handleReveal}>
+              {round.hintCount === puzzle.hints.length - 1 ? '초성 보기' : '힌트 더 보기'}
+            </Button>
+          ) : null}
+          {hasAnswerButton ? (
+            <Button variant="surface" size="s" onClick={handleShowAnswer}>
+              정답 보기
+            </Button>
+          ) : null}
+          <Button variant="surface" size="s" onClick={handleReset}>
+            다른 문제
           </Button>
-        ) : null}
-        {hasAnswerButton ? (
-          <Button variant="surface" size="s" onClick={handleShowAnswer}>
-            정답 보기
-          </Button>
-        ) : null}
-        <Button variant="surface" size="s" onClick={handleReset}>
-          다른 문제
-        </Button>
+        </div>
       </div>
     </div>
   );

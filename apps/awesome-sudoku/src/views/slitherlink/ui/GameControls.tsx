@@ -9,7 +9,7 @@ export function GameControls() {
   const handleNewGame = () => confirm.request(level);
 
   return (
-    <div className="grid grid-cols-4 justify-items-center gap-2 md:gap-3">
+    <div className="grid grid-cols-4 gap-2">
       <IconButton.Root type="button" onClick={undo} disabled={!canUndo}>
         <IconButton.Icon>
           <LuUndo2 strokeWidth={2} />
@@ -22,7 +22,12 @@ export function GameControls() {
         </IconButton.Icon>
         <IconButton.Label>{SLITHERLINK_COPY.redo}</IconButton.Label>
       </IconButton.Root>
-      <IconButton.Root type="button" onClick={takeHint} disabled={!canHint}>
+      <IconButton.Root
+        type="button"
+        aria-label={SLITHERLINK_COPY.hintLabel(hintsRemaining)}
+        onClick={takeHint}
+        disabled={!canHint}
+      >
         <IconButton.Icon>
           <LuLightbulb strokeWidth={2} />
         </IconButton.Icon>

@@ -1,18 +1,26 @@
 'use client';
 
-import { WALLS_COPY } from '@views/walls/config/copy';
+import { GameHeading } from '@entities/game-catalog';
+import { GameLayout } from '@shared/ui/game-layout';
 import { Walls } from '@views/walls/ui/walls';
 
 export function WallsPage() {
   return (
     <Walls.Root>
-      <main className="relative mx-auto flex min-w-[360px] flex-col items-center gap-4 px-4 py-6 sm:px-6 md:py-10">
-        <h1 className="sr-only">{WALLS_COPY.title}</h1>
-        <Walls.Status />
-        <Walls.Board />
-        <Walls.Controls />
-        <Walls.ResultSheet />
-      </main>
+      <GameLayout.Root>
+        <GameHeading game="walls" />
+        <GameLayout.Status>
+          <Walls.Status />
+        </GameLayout.Status>
+        <GameLayout.Board>
+          <Walls.Board />
+        </GameLayout.Board>
+        <GameLayout.Panel>
+          <Walls.Actions />
+          <Walls.Rule />
+        </GameLayout.Panel>
+      </GameLayout.Root>
+      <Walls.ResultSheet />
     </Walls.Root>
   );
 }

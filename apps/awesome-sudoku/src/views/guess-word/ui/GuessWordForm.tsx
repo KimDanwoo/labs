@@ -1,6 +1,6 @@
+import { Button } from '@shared/ui/button';
 import { GUESS_WORD_COPY, NOTICE_TEXT } from '@views/guess-word/config/copy';
 import { useGuessWordContext } from '@views/guess-word/model/hooks/useGuessWordContext';
-import { GuessButton } from '@views/guess-word/ui/GuessButton';
 
 export function GuessWordForm() {
   const { input, notice, isGuessing, handleInputChange, handleSubmit } = useGuessWordContext();
@@ -17,11 +17,11 @@ export function GuessWordForm() {
           autoCapitalize="off"
           spellCheck={false}
           enterKeyHint="send"
-          className="h-12 min-w-0 flex-1 rounded-xl border border-border-medium bg-surface-primary px-4 text-base text-text-primary placeholder:text-text-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+          className="h-14 min-w-0 flex-1 rounded-2xl bg-weak px-[18px] text-[17px] text-text-primary placeholder:text-text-tertiary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         />
-        <GuessButton type="submit" disabled={isGuessing} className="shrink-0">
+        <Button type="submit" size="xl" disabled={isGuessing}>
           {GUESS_WORD_COPY.submit}
-        </GuessButton>
+        </Button>
       </div>
       <p role="status" aria-live="polite" className="min-h-5 text-sm text-error-text break-keep">
         {notice && NOTICE_TEXT[notice.kind](notice.word)}

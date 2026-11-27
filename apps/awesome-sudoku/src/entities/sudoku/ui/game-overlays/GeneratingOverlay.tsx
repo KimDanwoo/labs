@@ -13,7 +13,7 @@ export const GeneratingOverlay: FC = () => {
       role="status"
       aria-live="polite"
       aria-label="새 퍼즐을 만드는 중"
-      className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-4 bg-glass/(--overlay-opacity) backdrop-blur-md"
+      className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-4 bg-surface-primary/95"
     >
       <SudokuLoader size="lg" />
       <span className="text-sm font-normal text-text-secondary">새 퍼즐을 만드는 중…</span>

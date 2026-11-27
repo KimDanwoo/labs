@@ -2,6 +2,12 @@
 
 @import './styles/colors.css';
 
+@custom-variant short-landscape {
+  @media (orientation: landscape) and (max-width: 1023.98px) and (max-height: 600px) {
+    @slot;
+  }
+}
+
 @theme {
   --breakpoint-xs: 395px;
   --font-sans: var(--font-pretendard);
@@ -199,5 +205,11 @@ html.theme-transition [data-theme-toggle] * {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+@keyframes header-divider {
+  to {
+    opacity: 1;
   }
 }

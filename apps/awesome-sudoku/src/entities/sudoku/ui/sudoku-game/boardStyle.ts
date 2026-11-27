@@ -33,10 +33,11 @@ export function buildCellClassName(
 ) {
   return cn(
     'relative',
-    'w-9 h-9',
+    'w-[min(36px,calc((100vw-55px)/9))] h-[min(36px,calc((100vw-55px)/9))]',
     'xs:w-10 xs:h-10',
     'lg:w-12 lg:h-12',
     'xl:w-14 xl:h-14',
+    'short-landscape:w-[30px] short-landscape:h-[30px]',
     'border',
     borderColor,
     'text-center align-middle',

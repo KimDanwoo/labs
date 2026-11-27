@@ -1,10 +1,5 @@
 import type { DiscardAction } from '@entities/sudoku/model/types/game';
 
-export const GAME_CONFIRM_BUTTON_VARIANT = {
-  primary: 'bg-primary text-on-primary',
-  secondary: 'bg-bg-tertiary text-text-primary border border-border-light hover:bg-surface-tertiary',
-} as const;
-
 export const GAME_CONFIRM_COPY = {
   newGame: {
     title: '새 게임을 시작할까요?',

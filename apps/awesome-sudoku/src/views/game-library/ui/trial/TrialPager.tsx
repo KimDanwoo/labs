@@ -1,20 +1,17 @@
 'use client';
 
-import { LuChevronLeft, LuChevronRight } from 'react-icons/lu';
-
 import { cn } from '@shared/lib/cn';
-import { CircleButton } from '@shared/ui/circle-button';
-import { SLIDES, TRIAL_TEXT } from '@views/game-library/config/featuredSlides';
+import { SLIDES } from '@views/game-library/config/featuredSlides';
 import { useTrialContext } from '@views/game-library/model/hooks/useTrialContext';
+import { TrialCount } from '@views/game-library/ui/trial/TrialCount';
+import { TrialStepButton } from '@views/game-library/ui/trial/TrialStepButton';
 
 export function TrialPager() {
-  const { position, handleStep } = useTrialContext();
+  const { position } = useTrialContext();
 
   return (
-    <div className="mt-3.5 flex items-center justify-center gap-3">
-      <CircleButton size="s" aria-label={TRIAL_TEXT.previous} onClick={() => handleStep(-1)}>
-        <LuChevronLeft aria-hidden="true" />
-      </CircleButton>
+    <div className="mt-3.5 flex items-center justify-center gap-3 lg:hidden">
+      <TrialStepButton step={-1} />
       <span aria-hidden="true" className="flex items-center gap-1.5">
         {SLIDES.map((slide, index) => (
           <span
@@ -26,15 +23,8 @@ export function TrialPager() {
           />
         ))}
       </span>
-      <span
-        aria-live="polite"
-        className="min-w-[34px] text-center text-[13px] font-bold text-text-tertiary tabular-nums"
-      >
-        {position + 1} / {SLIDES.length}
-      </span>
-      <CircleButton size="s" aria-label={TRIAL_TEXT.next} onClick={() => handleStep(1)}>
-        <LuChevronRight aria-hidden="true" />
-      </CircleButton>
+      <TrialCount />
+      <TrialStepButton step={1} />
     </div>
   );
 }

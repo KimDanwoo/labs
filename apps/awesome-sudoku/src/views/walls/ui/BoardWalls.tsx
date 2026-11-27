@@ -16,7 +16,7 @@ export function BoardWalls() {
           <line
             key={edge}
             {...edgeLine(edge)}
-            className={index === walls.length - 1 ? 'stroke-white' : 'stroke-goban-line'}
+            className={index === walls.length - 1 ? 'stroke-primary' : 'stroke-text-tertiary'}
           />
         ))}
       </g>

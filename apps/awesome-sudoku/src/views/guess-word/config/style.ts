@@ -4,11 +4,6 @@ import type { RankTone } from '@views/guess-word/model/types/guessWord';
 export const GUESS_ROW_GRID =
   'grid grid-cols-[1.5rem_minmax(0,1fr)_3.25rem_auto] gap-2 sm:grid-cols-[2.5rem_minmax(0,1fr)_4.5rem_auto]';
 
-export const GUESS_BUTTON_VARIANT = {
-  primary: 'bg-primary font-semibold text-on-primary hover:brightness-110',
-  secondary: 'border border-border-light bg-bg-tertiary font-normal text-text-primary hover:bg-surface-tertiary',
-} as const;
-
 export const RANK_TONE_TEXT_CLASS: Record<RankTone, string> = {
   [RANK_TONE.ANSWER]: 'text-accent-text font-semibold',
   [RANK_TONE.RANKED]: 'text-text-primary',

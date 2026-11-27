@@ -1,19 +1,26 @@
 'use client';
 
-import { LOTTO_COPY } from '@views/lotto/config/copy';
+import { GameHeading } from '@entities/game-catalog';
+import { GameLayout } from '@shared/ui/game-layout';
 import { Lotto } from '@views/lotto/ui/lotto';
 
 export function LottoPage() {
   return (
     <Lotto.Root>
-      <main className="relative mx-auto flex min-w-[360px] flex-col items-center gap-4 px-4 py-6 sm:px-6 md:py-10">
-        <h1 className="sr-only">{LOTTO_COPY.title}</h1>
-        <Lotto.Status />
-        <Lotto.Board />
-        <Lotto.Controls />
-        <Lotto.About />
-        <Lotto.ResultSheet />
-      </main>
+      <GameLayout.Root>
+        <GameHeading game="lotto" />
+        <GameLayout.Status>
+          <Lotto.Status />
+        </GameLayout.Status>
+        <GameLayout.Board>
+          <Lotto.Board />
+        </GameLayout.Board>
+        <GameLayout.Panel>
+          <Lotto.Controls />
+          <Lotto.Rule />
+        </GameLayout.Panel>
+      </GameLayout.Root>
+      <Lotto.ResultSheet />
     </Lotto.Root>
   );
 }

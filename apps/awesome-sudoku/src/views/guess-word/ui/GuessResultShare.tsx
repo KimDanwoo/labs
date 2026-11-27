@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 import { GAMES, SITE_URL } from '@entities/game-catalog';
-import { GuessButton } from '@views/guess-word/ui/GuessButton';
+import { Button } from '@shared/ui/button';
 
 interface GuessResultShareProps {
   tries: number;
@@ -25,9 +25,9 @@ export function GuessResultShare({ tries }: GuessResultShareProps) {
 
   return (
     <div className="mt-5">
-      <GuessButton onClick={handleCopy} className="w-full">
+      <Button size="l" isFull onClick={handleCopy}>
         결과 복사하기
-      </GuessButton>
+      </Button>
       {message && (
         <p role="status" className="mt-2 text-center text-sm text-text-secondary">
           {message}

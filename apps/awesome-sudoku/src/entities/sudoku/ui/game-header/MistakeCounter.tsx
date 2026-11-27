@@ -1,25 +1,18 @@
 'use client';
+import { useAtomValue } from 'jotai';
+
 import { MAX_MISTAKES } from '@entities/sudoku/config/game';
 import { mistakeCountAtom } from '@entities/sudoku/model/store/primitives';
 import { cn } from '@shared/lib/cn';
-import { useAtomValue } from 'jotai';
-import type { FC } from 'react';
+import { StatusPill } from '@shared/ui/status-pill';
 
-export const MistakeCounter: FC = () => {
+export function MistakeCounter() {
   const mistakeCount = useAtomValue(mistakeCountAtom);
+  const isNearLimit = mistakeCount >= MAX_MISTAKES - 1;
 
   return (
-    <div
-      className={cn(
-        'flex items-center gap-1 text-sm',
-        'font-normal font-tabular',
-        mistakeCount >= MAX_MISTAKES - 1 ? 'text-error-text' : 'text-text-secondary',
-      )}
-    >
-      <span>오답</span>
-      <span>
-        {mistakeCount}/{MAX_MISTAKES}
-      </span>
-    </div>
+    <StatusPill.Root tone="weak" className={cn(isNearLimit && 'text-error-text')}>
+      오답 {mistakeCount}/{MAX_MISTAKES}
+    </StatusPill.Root>
   );
-};
+}

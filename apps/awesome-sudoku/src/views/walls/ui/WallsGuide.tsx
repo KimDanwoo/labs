@@ -21,18 +21,24 @@ export function WallsGuide() {
 
   return (
     <div className={styles.guide}>
-      <WallsGuideBoard guide={guide} />
-      {canPickWall ? <WallsGuideEdges target={target} edges={guide.edges} onPick={guide.pickWall} /> : null}
+      <div className={styles.stage}>
+        <WallsGuideBoard guide={guide} />
+        {canPickWall ? <WallsGuideEdges target={target} edges={guide.edges} onPick={guide.pickWall} /> : null}
+      </div>
       <div className={styles.feedback}>
-        <p role="status">{isWon ? <PuzzleVictory /> : guide.notice || STEP_TEXT[step]}</p>
-        {score ? (
-          <p>
-            내 땅 {score[SIDE.ME]}칸 · 상대 {score[SIDE.COMPUTER]}칸
-          </p>
-        ) : null}
-        <Button variant="surface" size="s" onClick={guide.reset}>
-          다른 판
-        </Button>
+        <p role="status">
+          {isWon ? <PuzzleVictory /> : guide.notice || STEP_TEXT[step]}
+          {score ? (
+            <span className={styles.score}>
+              내 땅 {score[SIDE.ME]}칸 · 상대 {score[SIDE.COMPUTER]}칸
+            </span>
+          ) : null}
+        </p>
+        <div className={styles.actions}>
+          <Button variant="surface" size="s" onClick={guide.reset}>
+            다른 판
+          </Button>
+        </div>
       </div>
     </div>
   );

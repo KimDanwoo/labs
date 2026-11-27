@@ -2,12 +2,12 @@ import { OUTCOME, STEP } from '@views/walls/config/game';
 import type { Outcome, Step } from '@views/walls/model/types/walls';
 
 export const WALLS_COPY = {
-  title: '담쌓기',
   boardLabel: '담쌓기 판',
   undo: '무르기',
   newGame: '새 게임',
   playAgain: '다시 하기',
-  rulesTitle: '규칙',
+  ruleTitle: '담쌓기 규칙',
+  ruleCaption: '말을 옮기고 담을 세워 땅을 나눠요',
   scoreLabel: '예상 땅',
   scoreMe: '나',
   scoreComputer: '컴퓨터',

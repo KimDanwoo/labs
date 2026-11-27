@@ -7,8 +7,8 @@ export function GuessWordYesterday() {
   const yesterday = useYesterdayAnswer(day);
   if (!yesterday) return null;
   return (
-    <p className="text-center text-sm text-text-tertiary">
-      {GUESS_WORD_COPY.yesterdayLabel} <span className="font-semibold text-text-secondary">{yesterday}</span>
+    <p className="text-center text-sm text-text-secondary lg:text-left">
+      {GUESS_WORD_COPY.yesterdayLabel} <span className="font-bold text-text-primary">{yesterday}</span>
     </p>
   );
 }

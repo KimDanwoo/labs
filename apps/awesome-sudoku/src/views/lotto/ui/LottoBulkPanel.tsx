@@ -1,9 +1,8 @@
 import type { ToggleEvent } from 'react';
 
-import { cn } from '@shared/lib/cn';
 import { LOTTO_COPY } from '@views/lotto/config/copy';
 import { BULK_TICKET_PRESETS } from '@views/lotto/config/lotto';
-import { BULK_PANEL_CLASS, GLASS_CLASS } from '@views/lotto/config/style';
+import { BULK_PANEL_CLASS } from '@views/lotto/config/style';
 import { LottoBulkOption } from '@views/lotto/ui/LottoBulkOption';
 
 interface LottoBulkPanelProps {
@@ -25,7 +24,7 @@ export function LottoBulkPanel({ id }: LottoBulkPanelProps) {
       role="dialog"
       aria-labelledby={titleId}
       onToggle={handleToggle}
-      className={cn(BULK_PANEL_CLASS, GLASS_CLASS)}
+      className={BULK_PANEL_CLASS}
     >
       <p id={titleId} className="px-1 pb-3 text-lg font-bold text-text-primary">
         {LOTTO_COPY.bulkPanelTitle}

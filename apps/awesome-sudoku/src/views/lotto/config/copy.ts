@@ -27,7 +27,6 @@ export interface StatusFacts {
 type StatusTemplate = (facts: StatusFacts) => string;
 
 export const LOTTO_COPY = {
-  title: '로또 시뮬레이터',
   boardLabel: '번호판',
   ticketLabel: '내 번호',
   winningLabel: '당첨 번호',
@@ -59,6 +58,8 @@ export const LOTTO_COPY = {
   assumedNote: '* 1~3등 상금은 회차마다 달라 20억·5,500만·150만 원으로 가정했어요. 4·5등은 고정 금액이에요.',
   neverHit: '없음',
   close: '닫기',
+  ruleTitle: '로또 규칙',
+  ruleCaption: '6개를 고르고 추첨해요',
   rule: '1부터 45까지 중 6개를 고르면 번호 6개와 보너스 1개를 뽑아요. 6개가 맞으면 1등, 5개와 보너스 2등, 5개 3등, 4개 4등, 3개 5등이고 한 장은 1,000원으로 쳐요.',
   disclaimer: '실제 구매와 관계없는 시뮬레이션이에요.',
 } as const;

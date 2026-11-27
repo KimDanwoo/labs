@@ -53,16 +53,20 @@ export function QuickPuzzle({ mode = 'classic' }: QuickPuzzleProps) {
 
   return (
     <div className={styles.playArea}>
-      <QuickBoard mode={mode} rows={board} selection={progress} onSelect={handleSelect} />
-      <QuickSudokuKeys canEnter={canEnter} onNumber={handleNumber} />
+      <div className={styles.stage}>
+        <QuickBoard mode={mode} rows={board} selection={progress} onSelect={handleSelect} />
+        <QuickSudokuKeys canEnter={canEnter} onNumber={handleNumber} />
+      </div>
       <div className={styles.feedback}>
         <p role="status">{isSolved ? <PuzzleVictory /> : CHECK_MESSAGES[progress.result]}</p>
-        <Button variant="surface" size="s" onClick={handleCheck} disabled={isSolved}>
-          정답 확인
-        </Button>
-        <Button variant="surface" size="s" onClick={handleReset}>
-          다른 판
-        </Button>
+        <div className={styles.actions}>
+          <Button variant="surface" size="s" onClick={handleCheck} disabled={isSolved}>
+            정답 확인
+          </Button>
+          <Button variant="surface" size="s" onClick={handleReset}>
+            다른 판
+          </Button>
+        </div>
       </div>
     </div>
   );

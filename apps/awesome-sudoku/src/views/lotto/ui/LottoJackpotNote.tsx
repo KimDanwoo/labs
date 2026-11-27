@@ -1,6 +1,6 @@
 import { cn } from '@shared/lib/cn';
 import { LOTTO_COPY } from '@views/lotto/config/copy';
-import { GLASS_LENS_CLASS } from '@views/lotto/config/style';
+import { TILE_CLASS } from '@views/lotto/config/style';
 import { formatBuyingDuration, formatTickets } from '@views/lotto/lib/format';
 import { useLottoContext } from '@views/lotto/model/hooks/useLottoContext';
 
@@ -12,7 +12,7 @@ export function LottoJackpotNote() {
   if (!isJackpot) return null;
 
   return (
-    <p className={cn('rounded-2xl px-4 py-3 text-sm leading-relaxed text-text-primary break-keep', GLASS_LENS_CLASS)}>
+    <p className={cn('px-4 py-3 text-sm leading-relaxed text-text-primary break-keep', TILE_CLASS)}>
       {LOTTO_COPY.jackpotDuration(formatTickets(tickets), formatBuyingDuration(tickets))}
     </p>
   );

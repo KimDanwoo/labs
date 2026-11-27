@@ -11,7 +11,7 @@ export function IconButtonRoot({ variant = 'default', className, disabled, child
     <button
       {...props}
       className={cn(
-        'relative flex aspect-square w-full flex-col items-center justify-center gap-1.5 rounded-2xl text-xs font-semibold transition-[transform,opacity,background-color,color] duration-150 ease-out lg:max-w-[72px] xl:max-w-[88px]',
+        'relative flex h-16 w-full min-w-0 flex-col items-center justify-center gap-1 rounded-2xl text-[13px] font-semibold transition-[transform,opacity,background-color,color] duration-150 ease-out',
         'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
         variant === 'default' && 'bg-weak text-on-weak',
         variant === 'primary' && 'bg-primary text-on-primary',

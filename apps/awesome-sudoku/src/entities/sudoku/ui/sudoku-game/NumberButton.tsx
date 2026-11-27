@@ -1,4 +1,3 @@
-import { cn } from '@shared/lib/cn';
 import { memo } from 'react';
 
 interface NumberButtonProps {
@@ -7,21 +6,10 @@ interface NumberButtonProps {
   isDisabled: boolean;
 }
 
-export const NumberButton: React.FC<NumberButtonProps> = memo(({ value, onClick, isDisabled }) => (
+export const NumberButton = memo(({ value, onClick, isDisabled }: NumberButtonProps) => (
   <button
-    className={cn(
-      'w-full h-13 md:h-auto md:aspect-square',
-      'md:max-w-10 lg:max-w-[72px] xl:max-w-[88px]',
-      'rounded-xl md:rounded-2xl',
-      'text-2xl md:text-3xl lg:text-4xl font-semibold',
-      'font-tabular',
-      'flex items-center justify-center',
-      'transition-all duration-200 ease-out',
-      isDisabled
-        ? 'text-text-tertiary cursor-not-allowed bg-bg-tertiary/50 border border-border-light'
-        : 'text-text-primary bg-linear-to-b from-surface-primary to-bg-tertiary shadow-sm border border-border-light/60 hover:from-accent-light hover:to-surface-primary hover:text-accent hover:shadow-md hover:border-accent/30 hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40',
-    )}
+    type="button"
+    className="flex h-14 w-full min-w-0 cursor-pointer items-center justify-center rounded-[14px] bg-weak text-2xl font-semibold text-text-primary tabular-nums transition-[transform,background-color,opacity] duration-150 ease-out hover:bg-border-light active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100 lg:h-[72px] lg:rounded-2xl lg:text-3xl"
     aria-label={`숫자 ${value}`}
     onClick={onClick}
     disabled={isDisabled}

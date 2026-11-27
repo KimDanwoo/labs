@@ -2,9 +2,8 @@ import { GUESS_STATUS, NOTICE_KIND, RANK_TONE } from '@views/guess-word/config/g
 import type { GuessStatus, NoticeKind, RankTone } from '@views/guess-word/model/types/guessWord';
 
 export const GUESS_WORD_COPY = {
-  title: '맞춰봐',
-  description: '오늘의 단어를 맞혀 보세요. 뜻이 가까운 명사일수록 유사도가 높아요.',
   puzzleNumber: (day: number) => `${day}번째 문제`,
+  guessCount: (count: number) => `${count}번 추측`,
   inputLabel: '추측할 단어',
   inputPlaceholder: '명사를 입력하세요',
   submit: '확인',
@@ -21,7 +20,9 @@ export const GUESS_WORD_COPY = {
   close: '닫기',
   tomorrow: '내일 자정(한국 시간)에 새 문제가 열려요.',
   triesText: (count: number) => `${count}번 만에 맞혔어요`,
-  rulesTitle: '규칙',
+  ruleTitle: '맞춰봐 규칙',
+  ruleCaption: '명사만, 뜻이 가까울수록 유사도가 높아요',
+  creditsTitle: '자료 출처',
 } as const;
 
 export const NOTICE_TEXT: Record<NoticeKind, (word: string) => string> = {

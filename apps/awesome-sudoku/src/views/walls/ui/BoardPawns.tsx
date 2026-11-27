@@ -13,7 +13,7 @@ export function BoardPawns() {
       aria-hidden="true"
       style={cellCenter(cell)}
       className={cn(
-        'pointer-events-none absolute z-10 size-[9%] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white/80 shadow-md transition-[left,top,scale] duration-300 ease-out motion-reduce:transition-none',
+        'pointer-events-none absolute z-10 size-[9%] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-ink transition-[left,top,scale] duration-300 ease-out motion-reduce:transition-none',
         PAWN_CLASS[sideOfPawn(pawn)],
         pawn === selectedPawn && PAWN_RING_CLASS,
       )}

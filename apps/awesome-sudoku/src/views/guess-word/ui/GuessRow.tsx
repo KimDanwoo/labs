@@ -12,7 +12,7 @@ interface GuessRowProps {
 
 export function GuessRow({ entry, answer, isHighlighted = false }: GuessRowProps) {
   return (
-    <li className={cn(GUESS_ROW_GRID, 'items-center rounded-lg px-3 py-2', isHighlighted && 'bg-accent-light/60')}>
+    <li className={cn(GUESS_ROW_GRID, 'items-center rounded-xl px-3 py-2.5', isHighlighted && 'bg-lemon-soft')}>
       <span className="text-xs text-text-tertiary font-tabular">{entry.order}</span>
       <span className="truncate text-base font-semibold text-text-primary">{entry.word}</span>
       <span className="text-right text-sm text-text-secondary font-tabular">{entry.similarity.toFixed(2)}</span>

@@ -1,5 +1,6 @@
 import { cn } from '@shared/lib/cn';
 import { STONE } from '@views/gomoku/config/board';
+import { LAST_MOVE_CLASS } from '@views/gomoku/config/stone';
 import { cellLabel, stoneClassOf } from '@views/gomoku/lib/board';
 import { useGomokuContext } from '@views/gomoku/model/hooks/useGomokuContext';
 import { LuX } from 'react-icons/lu';
@@ -13,6 +14,7 @@ export function GomokuCell({ cell }: GomokuCellProps) {
   const stone = cells[cell] ?? STONE.EMPTY;
   const isForbidden = forbidden.has(cell);
   const isBlocked = isLocked || isForbidden || stone !== STONE.EMPTY;
+  const isLastMove = cell === lastMove && stone !== STONE.EMPTY;
 
   const handleClick = () => {
     if (!isBlocked) place(cell);
@@ -35,7 +37,7 @@ export function GomokuCell({ cell }: GomokuCellProps) {
         )}
       />
       {isForbidden && <LuX aria-hidden="true" className="absolute size-3 text-error-text" strokeWidth={3} />}
-      {cell === lastMove && <span className="absolute size-1.5 rounded-full bg-accent" />}
+      {isLastMove && <span className={cn('absolute size-1.5 rounded-full', LAST_MOVE_CLASS[stone])} />}
     </button>
   );
 }

@@ -20,8 +20,8 @@ export const SudokuBoard: React.FC = () => {
   const handleSelectCell = useCallback((row: number, col: number) => selectCell({ row, col }), [selectCell]);
 
   return (
-    <div className="relative group shrink-0">
-      <div className="relative bg-surface-primary overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] ring-1 ring-black/3 dark:ring-white/5">
+    <div className="group flex aspect-square w-full items-center justify-center rounded-[20px] bg-face p-1.5">
+      <div className="relative border-[1.5px] border-text-tertiary bg-surface-primary">
         {gameMode === GAME_MODE.KILLER && <KillerCage tableRef={tableRef} />}
 
         <table ref={tableRef} role="grid" aria-label="스도쿠 보드" className="border-collapse bg-surface-primary">

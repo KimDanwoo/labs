@@ -2,14 +2,9 @@
 
 import { useId, useRef, useState, type KeyboardEvent, type TouchEvent } from 'react';
 
+import { keyToPosition, stepPosition, type RovingStep } from '@shared/lib/rovingIndex';
 import { SLIDES, SWIPE_DISTANCE } from '@views/game-library/config/featuredSlides';
-import {
-  centeredScrollLeft,
-  keyToPosition,
-  stepPosition,
-  swipeStep,
-  type TrialStep,
-} from '@views/game-library/lib/trialNavigation';
+import { centeredScrollLeft, swipeStep } from '@views/game-library/lib/trialNavigation';
 
 interface Point {
   x: number;
@@ -41,7 +36,7 @@ export function useTrialCarousel() {
     revealTab(tablistRef.current, findTab(tablistRef.current, next));
   }
 
-  function handleStep(step: TrialStep): void {
+  function handleStep(step: RovingStep): void {
     handleSelect(stepPosition(position, step, SLIDES.length));
   }
 

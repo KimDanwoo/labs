@@ -14,7 +14,7 @@ export function TrialTabs() {
       role="tablist"
       aria-label={TRIAL_TEXT.tabsLabel}
       onKeyDown={handleTabKeyDown}
-      className="relative -mx-5 mb-3 flex gap-1.5 overflow-x-auto px-5 [scrollbar-width:none] lg:mx-0 lg:flex-wrap lg:px-0 [&::-webkit-scrollbar]:hidden"
+      className="relative -mx-5 mb-3 flex gap-1.5 overflow-x-auto px-5 [scrollbar-width:none] lg:mx-0 lg:px-0 [&::-webkit-scrollbar]:hidden"
     >
       {SLIDES.map((slide, index) => (
         <PillTab

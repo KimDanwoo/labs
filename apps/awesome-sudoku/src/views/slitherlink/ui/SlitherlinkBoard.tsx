@@ -1,3 +1,4 @@
+import { GAME_BOARD_SIZE } from '@shared/config/gameLayout';
 import { SLITHERLINK_COPY } from '@views/slitherlink/config/copy';
 import { getBoardLayout } from '@views/slitherlink/lib/boardGeometry';
 import { useBoardPointer } from '@views/slitherlink/model/hooks/useBoardPointer';
@@ -8,6 +9,7 @@ import { BoardDots } from '@views/slitherlink/ui/BoardDots';
 import { BoardFocus } from '@views/slitherlink/ui/BoardFocus';
 import { BoardLines } from '@views/slitherlink/ui/BoardLines';
 import { GeneratingOverlay } from '@views/slitherlink/ui/GeneratingOverlay';
+import { WrongLoopNotice } from '@views/slitherlink/ui/WrongLoopNotice';
 import { useRef } from 'react';
 
 export function SlitherlinkBoard() {
@@ -17,8 +19,8 @@ export function SlitherlinkBoard() {
   const layout = getBoardLayout(boardSize);
 
   return (
-    <div className="relative w-full max-w-[400px] max-lg:landscape:max-w-[calc(100svh-6rem)] lg:w-[432px] lg:max-w-none xl:w-[504px]">
-      <div className="relative aspect-square overflow-hidden rounded-2xl bg-surface-primary ring-1 ring-border-light">
+    <div className={GAME_BOARD_SIZE}>
+      <div className="relative aspect-square overflow-hidden rounded-[20px] bg-face">
         <svg
           ref={svgRef}
           viewBox={layout.viewBox}
@@ -33,6 +35,7 @@ export function SlitherlinkBoard() {
           <BoardFocus hoverEdge={hoverEdge} />
           <BoardLines />
         </svg>
+        <WrongLoopNotice />
         <GeneratingOverlay />
       </div>
     </div>

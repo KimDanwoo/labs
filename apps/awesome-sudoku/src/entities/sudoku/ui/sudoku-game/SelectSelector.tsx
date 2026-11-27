@@ -21,7 +21,7 @@ export const SelectSelector = () => {
       onChange={(e) => requestNewGame(e.target.value as Difficulty)}
       className={cn(
         styles.select,
-        'px-3 py-1.5 pr-8 bg-bg-tertiary/80 backdrop-blur-sm border-none rounded-lg text-sm font-normal text-text-primary cursor-pointer transition-all duration-200 ease-out hover:bg-bg-tertiary focus:outline-none focus:ring-2 focus:ring-accent/40 appearance-none bg-no-repeat',
+        'h-11 cursor-pointer appearance-none rounded-full border-none bg-weak bg-no-repeat pr-9 pl-[18px] text-base font-semibold text-on-weak transition-colors duration-150 hover:bg-border-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
       )}
     >
       {options.map((option) => (

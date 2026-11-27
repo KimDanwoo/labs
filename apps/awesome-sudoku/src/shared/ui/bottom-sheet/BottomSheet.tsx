@@ -15,10 +15,9 @@ type BottomSheetProps = {
   onClose: () => void;
   children: ReactNode;
   title?: string;
-  className?: string;
 };
 
-export function BottomSheet({ isOpen, onClose, children, title, className }: BottomSheetProps) {
+export function BottomSheet({ isOpen, onClose, children, title }: BottomSheetProps) {
   const titleId = useId();
   const isDesktop = useIsDesktop();
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -55,7 +54,6 @@ export function BottomSheet({ isOpen, onClose, children, title, className }: Bot
         className={cn(
           'absolute max-h-[85vh] bg-surface-elevated',
           isDesktop ? 'left-1/2 top-1/2 w-full max-w-md rounded-3xl' : 'bottom-0 left-0 right-0 rounded-t-3xl',
-          className,
         )}
         style={sheetStyle}
       >

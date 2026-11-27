@@ -8,17 +8,29 @@
   --play-on-accent: rgb(var(--rgb-on-primary));
   --play-pick: rgb(var(--rgb-lemon));
   --play-on-pick: rgb(var(--rgb-ink));
+  --head-h: 5.75rem;
+  --stage-h: 18.5rem;
+  --status-h: 2.75rem;
+  position: relative;
   display: grid;
   grid-template-areas: 'head' 'play' 'cta';
+  grid-template-rows: var(--head-h) auto auto;
   gap: 1rem;
 }
 
 .slideHead {
   display: flex;
   grid-area: head;
-  align-self: start;
   align-items: center;
   gap: 0.75rem;
+  overflow: hidden;
+}
+
+.slideHint {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 
 .slidePlay {
@@ -30,17 +42,42 @@
   grid-area: cta;
 }
 
+.slidePager {
+  display: none;
+  grid-area: pager;
+  align-items: center;
+  gap: 0.25rem;
+}
+
 .playArea,
 .wordGame {
   position: relative;
   display: grid;
-  align-content: center;
-  justify-items: center;
-  gap: 0.875rem;
+  gap: 1rem;
   min-width: 0;
 }
 
-.wordGame {
+.stage {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.875rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.slidePlay > * > :first-child {
+  height: var(--stage-h);
+}
+
+.slidePlay > * > :last-child > :first-child {
+  height: var(--status-h);
+  overflow: hidden;
+}
+
+.wordStage {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  align-content: stretch;
   justify-items: stretch;
 }
 
@@ -143,21 +180,34 @@
 }
 
 .gomokuBoard {
+  --board-pad: 0.5rem;
+  position: relative;
   display: grid;
   width: min(100%, 15rem);
   aspect-ratio: 1;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  overflow: hidden;
+  padding: var(--board-pad);
   border-radius: 1rem;
   background: rgb(var(--rgb-goban));
 }
 
+.gomokuBoard::before {
+  position: absolute;
+  inset: calc(var(--board-pad) + (100% - 2 * var(--board-pad)) / 14);
+  border: 1px solid rgb(var(--rgb-goban-line));
+  background-image:
+    linear-gradient(to right, rgb(var(--rgb-goban-line)) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(var(--rgb-goban-line)) 1px, transparent 1px);
+  background-size: calc(100% / 6) calc(100% / 6);
+  content: '';
+  pointer-events: none;
+}
+
 .gomokuBoard button {
+  position: relative;
   display: grid;
   place-items: center;
-  background:
-    linear-gradient(rgb(var(--rgb-goban-line)), rgb(var(--rgb-goban-line))) center / 1px 100% no-repeat,
-    linear-gradient(rgb(var(--rgb-goban-line)), rgb(var(--rgb-goban-line))) center / 100% 1px no-repeat;
+  border-radius: 50%;
 }
 
 .gomokuBoard button:enabled {
@@ -165,11 +215,10 @@
 }
 
 .gomokuBoard button:enabled:hover {
-  background-color: rgb(255 255 255 / 0.3);
+  background-color: rgb(255 255 255 / 0.35);
 }
 
 .gomokuBoard button:focus-visible {
-  position: relative;
   z-index: 1;
   outline: 2px solid rgb(var(--rgb-ink));
   outline-offset: -2px;
@@ -271,7 +320,10 @@
 
 .wordHints {
   display: grid;
+  align-content: start;
   gap: 0.375rem;
+  min-height: 0;
+  overflow-y: auto;
   padding: 0.875rem 0.875rem 0.875rem 2rem;
   border-radius: 0.875rem;
   background: var(--play-surface);
@@ -282,7 +334,7 @@
 }
 
 .wordHints:empty {
-  display: none;
+  visibility: hidden;
 }
 
 .wordHints li::marker {
@@ -318,12 +370,6 @@
   outline-offset: 0;
 }
 
-.wordStatus {
-  color: var(--play-muted);
-  font-size: 0.875rem;
-  text-align: center;
-}
-
 .keypad {
   display: grid;
   width: min(100%, 15rem);
@@ -352,11 +398,7 @@
 }
 
 .feedback {
-  display: flex;
-  flex-wrap: wrap;
-  min-height: 2.5rem;
-  align-items: center;
-  justify-content: center;
+  display: grid;
   gap: 0.5rem;
   color: var(--play-muted);
   font-size: 0.875rem;
@@ -365,7 +407,19 @@
 }
 
 .feedback p {
-  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2rem;
 }
 
 .victoryLink {
@@ -399,10 +453,57 @@
 
 @media (min-width: 64rem) {
   .slide {
-    grid-template-areas: 'play head' 'cta cta';
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
-    column-gap: 1.5rem;
-    row-gap: 1.25rem;
+    --head-h: 7rem;
+    --stage-h: 20.5rem;
+    --status-h: 4.5rem;
+    grid-template-areas:
+      'play head head'
+      'play status status'
+      'play actions pager'
+      'play . .'
+      'play cta cta';
+    grid-template-columns: 15rem minmax(0, 1fr) auto;
+    grid-template-rows: var(--head-h) var(--status-h) 2rem minmax(0, 1fr) 3rem;
+    column-gap: 1.25rem;
+    row-gap: 1rem;
     padding: 1.5rem;
+  }
+
+  .slideHead {
+    align-items: flex-start;
+  }
+
+  .slideHint {
+    -webkit-line-clamp: 4;
+  }
+
+  .slidePlay,
+  .slidePlay > *,
+  .slidePlay > * > :last-child {
+    display: contents;
+  }
+
+  .slidePlay > * > :first-child {
+    grid-area: play;
+  }
+
+  .slidePlay > * > :last-child > :first-child {
+    grid-area: status;
+    align-content: flex-start;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .slidePlay > * > :last-child > :last-child {
+    grid-area: actions;
+    justify-content: flex-start;
+  }
+
+  .slidePager {
+    display: flex;
+  }
+
+  .slide .victoryLink {
+    display: none;
   }
 }

@@ -1,8 +1,17 @@
-.guide {
+.guide,
+.stage {
   position: relative;
   display: grid;
   justify-items: center;
   gap: 0.75rem;
+}
+
+.guide {
+  gap: 1rem;
+}
+
+.stage {
+  width: 100%;
 }
 
 .board {
@@ -114,5 +123,15 @@
 
 .feedback p {
   flex-basis: 100%;
+}
+
+.score {
+  display: block;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
 }
 

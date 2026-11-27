@@ -38,33 +38,37 @@ export function QuickGomoku() {
 
   return (
     <div className={styles.playArea}>
-      <div className={styles.gomokuBoard} role="group" aria-label="오목판">
-        {QUICK_GOMOKU_CELLS.map(({ id, row, column }) => {
-          const isWinningStone = isSolved && id === board.winning;
-          const isBlack = black.includes(id) || isWinningStone;
-          const isWhite = white.includes(id);
-          const stone = isBlack ? '흑돌' : '빈 교차점';
-          const content = isWhite ? '백돌' : stone;
-          const isOccupied = isBlack || isWhite;
+      <div className={styles.stage}>
+        <div className={styles.gomokuBoard} role="group" aria-label="오목판">
+          {QUICK_GOMOKU_CELLS.map(({ id, row, column }) => {
+            const isWinningStone = isSolved && id === board.winning;
+            const isBlack = black.includes(id) || isWinningStone;
+            const isWhite = white.includes(id);
+            const stone = isBlack ? '흑돌' : '빈 교차점';
+            const content = isWhite ? '백돌' : stone;
+            const isOccupied = isBlack || isWhite;
 
-          return (
-            <button
-              key={id}
-              type="button"
-              aria-label={`${row}행 ${column}열 ${content}`}
-              disabled={isOccupied || isSolved}
-              data-stone={content}
-              data-winning={isWinningStone}
-              onClick={() => handleMove(id)}
-            />
-          );
-        })}
+            return (
+              <button
+                key={id}
+                type="button"
+                aria-label={`${row}행 ${column}열 ${content}`}
+                disabled={isOccupied || isSolved}
+                data-stone={content}
+                data-winning={isWinningStone}
+                onClick={() => handleMove(id)}
+              />
+            );
+          })}
+        </div>
       </div>
       <div className={styles.feedback}>
         <p role="status">{isSolved ? <PuzzleVictory /> : status}</p>
-        <Button variant="surface" size="s" onClick={handleReset}>
-          다른 판
-        </Button>
+        <div className={styles.actions}>
+          <Button variant="surface" size="s" onClick={handleReset}>
+            다른 판
+          </Button>
+        </div>
       </div>
     </div>
   );

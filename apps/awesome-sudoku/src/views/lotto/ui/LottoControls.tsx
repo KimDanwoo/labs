@@ -20,7 +20,7 @@ export function LottoControls() {
 
   return (
     <>
-      <div className="grid w-full max-w-[408px] grid-cols-5 justify-items-center gap-2 md:gap-3">
+      <div className="grid grid-cols-5 gap-2">
         <IconButton.Root type="button" onClick={handleAutoFill} disabled={isSimulating}>
           <IconButton.Icon>
             <LuDices strokeWidth={2} />

@@ -2,20 +2,15 @@
 
 @theme inline {
   --color-accent: rgb(var(--rgb-accent));
-  --color-accent-light: rgb(var(--rgb-accent-light));
   --color-accent-text: rgb(var(--rgb-accent-text));
-  --color-bg-tertiary: rgb(var(--rgb-bg-tertiary));
   --color-border-light: rgb(var(--rgb-border-light));
   --color-border-medium: rgb(var(--rgb-border-medium));
   --color-cell-related: rgb(var(--rgb-cell-related));
   --color-cell-selected: rgb(var(--rgb-cell-selected));
   --color-error-text: rgb(var(--rgb-error-text));
   --color-face: rgb(var(--rgb-face));
-  --color-glass: rgb(var(--rgb-glass));
   --color-goban: rgb(var(--rgb-goban));
   --color-goban-line: rgb(var(--rgb-goban-line));
-  --color-gradient-from: rgb(var(--rgb-gradient-from));
-  --color-gradient-to: rgb(var(--rgb-gradient-to));
   --color-hint-text: rgb(var(--rgb-hint-text));
   --color-ink: rgb(var(--rgb-ink));
   --color-lemon: rgb(var(--rgb-lemon));
@@ -24,14 +19,22 @@
   --color-on-lemon-soft: rgb(var(--rgb-on-lemon-soft));
   --color-on-primary: rgb(var(--rgb-on-primary));
   --color-on-weak: rgb(var(--rgb-on-weak));
+  --color-stone-black: rgb(var(--rgb-stone-black));
+  --color-stone-white: rgb(var(--rgb-stone-white));
+  --color-stone-white-edge: rgb(var(--rgb-stone-white-edge));
   --color-primary: rgb(var(--rgb-primary));
   --color-surface-elevated: rgb(var(--rgb-surface-elevated));
   --color-surface-primary: rgb(var(--rgb-surface-primary));
   --color-surface-secondary: rgb(var(--rgb-surface-secondary));
-  --color-surface-tertiary: rgb(var(--rgb-surface-tertiary));
   --color-text-primary: rgb(var(--rgb-text-primary));
   --color-text-secondary: rgb(var(--rgb-text-secondary));
   --color-text-tertiary: rgb(var(--rgb-text-tertiary));
+  --color-walls-cell: rgb(var(--rgb-walls-cell));
+  --color-walls-cpu: rgb(var(--rgb-walls-cpu));
+  --color-walls-cpu-pawn: rgb(var(--rgb-walls-cpu-pawn));
+  --color-walls-cpu-soft: rgb(var(--rgb-walls-cpu-soft));
+  --color-walls-me: rgb(var(--rgb-walls-me));
+  --color-walls-me-soft: rgb(var(--rgb-walls-me-soft));
   --color-weak: rgb(var(--rgb-weak));
 }
 
@@ -50,7 +53,6 @@
 
   --rgb-bg-primary: 255, 255, 255;
   --rgb-bg-secondary: 255, 255, 255;
-  --rgb-bg-tertiary: 242, 244, 246;
 
   --rgb-text-primary: 25, 31, 40;
   --rgb-text-secondary: 78, 89, 104;
@@ -58,7 +60,6 @@
 
   --rgb-accent: var(--rgb-ink);
   --rgb-accent-text: var(--rgb-ink);
-  --rgb-accent-light: 255, 244, 191;
   --rgb-accent-soft: 255, 250, 224;
 
   --rgb-cell-selected: 255, 236, 140;
@@ -77,18 +78,10 @@
 
   --rgb-surface-primary: 255, 255, 255;
   --rgb-surface-secondary: 255, 255, 255;
-  --rgb-surface-tertiary: 242, 244, 246;
   --rgb-surface-elevated: 255, 255, 255;
-
-  --rgb-glass: 255, 255, 255;
-  --glass-opacity: 0.7;
-  --overlay-opacity: 0.9;
 
   --rgb-hover: 249, 250, 251;
   --rgb-active: 242, 244, 246;
-
-  --rgb-gradient-from: var(--rgb-primary);
-  --rgb-gradient-to: var(--rgb-primary);
 
   --rgb-error-bg: 255, 238, 238;
   --rgb-error-text: 228, 41, 57;
@@ -101,6 +94,16 @@
 
   --rgb-goban: 241, 217, 168;
   --rgb-goban-line: 165, 124, 69;
+  --rgb-stone-black: 30, 34, 41;
+  --rgb-stone-white: 255, 255, 255;
+  --rgb-stone-white-edge: 203, 182, 140;
+
+  --rgb-walls-cell: 255, 255, 255;
+  --rgb-walls-me: 255, 225, 77;
+  --rgb-walls-me-soft: 255, 244, 191;
+  --rgb-walls-cpu: 176, 184, 193;
+  --rgb-walls-cpu-soft: 229, 232, 235;
+  --rgb-walls-cpu-pawn: var(--rgb-ink);
 }
 
 .dark {
@@ -114,7 +117,6 @@
 
   --rgb-bg-primary: 16, 18, 22;
   --rgb-bg-secondary: 16, 18, 22;
-  --rgb-bg-tertiary: 38, 42, 49;
 
   --rgb-text-primary: 242, 244, 246;
   --rgb-text-secondary: 195, 202, 211;
@@ -122,7 +124,6 @@
 
   --rgb-accent: var(--rgb-lemon);
   --rgb-accent-text: var(--rgb-lemon);
-  --rgb-accent-light: 46, 42, 20;
   --rgb-accent-soft: 34, 31, 16;
 
   --rgb-cell-selected: 82, 72, 28;
@@ -138,12 +139,7 @@
 
   --rgb-surface-primary: 16, 18, 22;
   --rgb-surface-secondary: 16, 18, 22;
-  --rgb-surface-tertiary: 29, 32, 38;
   --rgb-surface-elevated: 29, 32, 38;
-
-  --rgb-glass: 29, 32, 38;
-  --glass-opacity: 0.8;
-  --overlay-opacity: 0.95;
 
   --rgb-hover: 38, 42, 49;
   --rgb-active: 44, 48, 56;
@@ -159,4 +155,14 @@
 
   --rgb-goban: 210, 178, 122;
   --rgb-goban-line: 110, 82, 48;
+  --rgb-stone-black: 21, 24, 29;
+  --rgb-stone-white: 247, 244, 236;
+  --rgb-stone-white-edge: 169, 141, 94;
+
+  --rgb-walls-cell: 38, 42, 49;
+  --rgb-walls-me: 112, 96, 28;
+  --rgb-walls-me-soft: 52, 47, 22;
+  --rgb-walls-cpu: 96, 106, 121;
+  --rgb-walls-cpu-soft: 58, 64, 74;
+  --rgb-walls-cpu-pawn: 195, 202, 211;
 }

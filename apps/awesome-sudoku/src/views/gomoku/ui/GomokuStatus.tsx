@@ -1,18 +1,18 @@
-import { GOMOKU_COPY, MY_TURN, OUTCOME_TITLE } from '@views/gomoku/config/copy';
-import { OUTCOME } from '@views/gomoku/config/game';
+import { cn } from '@shared/lib/cn';
+import { StatusPill } from '@shared/ui/status-pill';
+import { STONE_DOT_CLASS } from '@views/gomoku/config/stone';
+import { statusViewOf } from '@views/gomoku/lib/status';
 import { useGomokuContext } from '@views/gomoku/model/hooks/useGomokuContext';
 
 export function GomokuStatus() {
   const { outcome, isThinking, playerStone } = useGomokuContext();
-  const turnText = isThinking ? GOMOKU_COPY.thinking : MY_TURN[playerStone];
+  const status = statusViewOf(outcome, isThinking, playerStone);
 
   return (
-    <p
-      role="status"
-      aria-live="polite"
-      className="rounded-full bg-bg-tertiary/80 px-4 py-1.5 text-sm font-semibold text-text-primary backdrop-blur-sm"
-    >
-      {outcome === OUTCOME.PLAYING ? turnText : OUTCOME_TITLE[outcome]}
-    </p>
+    <StatusPill.Root role="status" aria-live="polite">
+      {status.stone && <span aria-hidden="true" className={cn('size-5 rounded-full', STONE_DOT_CLASS[status.stone])} />}
+      {status.text}
+      {status.note && <StatusPill.Note>{status.note}</StatusPill.Note>}
+    </StatusPill.Root>
   );
 }
