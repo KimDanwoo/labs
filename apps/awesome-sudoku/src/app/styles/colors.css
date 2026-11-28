@@ -12,6 +12,9 @@
   --color-goban: rgb(var(--rgb-goban));
   --color-goban-line: rgb(var(--rgb-goban-line));
   --color-hint-text: rgb(var(--rgb-hint-text));
+  --color-hwatu-blue: rgb(var(--rgb-hwatu-blue));
+  --color-hwatu-gray: rgb(var(--rgb-hwatu-gray));
+  --color-hwatu-red: rgb(var(--rgb-hwatu-red));
   --color-ink: rgb(var(--rgb-ink));
   --color-lemon: rgb(var(--rgb-lemon));
   --color-lemon-soft: rgb(var(--rgb-lemon-soft));
@@ -104,6 +107,10 @@
   --rgb-walls-cpu: 176, 184, 193;
   --rgb-walls-cpu-soft: 229, 232, 235;
   --rgb-walls-cpu-pawn: var(--rgb-ink);
+
+  --rgb-hwatu-red: 214, 40, 57;
+  --rgb-hwatu-blue: 36, 92, 214;
+  --rgb-hwatu-gray: 112, 121, 133;
 }
 
 .dark {
@@ -165,4 +172,8 @@
   --rgb-walls-cpu: 96, 106, 121;
   --rgb-walls-cpu-soft: 58, 64, 74;
   --rgb-walls-cpu-pawn: 195, 202, 211;
+
+  --rgb-hwatu-red: 226, 58, 74;
+  --rgb-hwatu-blue: 64, 120, 238;
+  --rgb-hwatu-gray: 128, 137, 150;
 }
