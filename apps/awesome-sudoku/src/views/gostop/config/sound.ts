@@ -36,7 +36,13 @@ const NOTE = {
   e4: 329.63,
   c4: 261.63,
   a4: 440,
+  e6: 1318.51,
+  g6: 1567.98,
 } as const;
+
+const COIN_START_SECONDS = 0.32;
+const COIN_GAP_SECONDS = 0.075;
+const COIN_PITCHES = [NOTE.e6, NOTE.g6, NOTE.c6, NOTE.g6, NOTE.e6];
 
 export const SOUND_RECIPES: Record<SoundName, readonly SoundVoice[]> = {
   deal: [0, 0.06, 0.12, 0.18, 0.24, 0.3].map((startAt) => ({
@@ -125,4 +131,18 @@ export const SOUND_RECIPES: Record<SoundName, readonly SoundVoice[]> = {
     { wave: 'sine', frequency: NOTE.a5, startAt: 0, duration: 0.1, gain: 0.12 },
     { wave: 'sine', frequency: NOTE.e5, startAt: 0.08, duration: 0.16, gain: 0.1 },
   ],
+  coins: COIN_PITCHES.flatMap((frequency, index) => {
+    const startAt = COIN_START_SECONDS + index * COIN_GAP_SECONDS;
+    return [
+      { wave: 'triangle', frequency, startAt, duration: 0.09, gain: 0.09 },
+      {
+        wave: 'noise',
+        frequency: 0,
+        startAt,
+        duration: 0.03,
+        gain: 0.12,
+        filter: { type: 'highpass', frequency: 5200 },
+      },
+    ] satisfies SoundVoice[];
+  }),
 };

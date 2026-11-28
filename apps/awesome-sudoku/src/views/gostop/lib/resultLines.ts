@@ -1,10 +1,11 @@
 import { CARD_KIND } from '@views/gostop/config/cards';
-import { JOKBO_LABEL, RESULT_COPY, SCORE_LINE_LABEL } from '@views/gostop/config/copy';
+import { JOKBO_LABEL, RECORD_COPY, RESULT_COPY, SCORE_LINE_LABEL } from '@views/gostop/config/copy';
 import { SIDE } from '@views/gostop/config/game';
 import { cardOf, rivalOf } from '@views/gostop/lib/cards';
 import { completedDans } from '@views/gostop/lib/jokbo';
 import { countPi } from '@views/gostop/lib/score';
 import type { Bak, CardKind, GameResult, ScoreBreakdown, Side } from '@views/gostop/model/types/gostop';
+import type { GameRecord } from '@views/gostop/model/types/record';
 import type { ScorePart } from '@views/gostop/model/types/view';
 
 export interface ScoreLine {
@@ -57,4 +58,16 @@ export function bakLines(
     goBak: `${SUBJECT[loser]} ${goCount[loser]}${RESULT_COPY.goBakTail}`,
   };
   return result.baks.map((bak) => ({ bak, reason: reasons[bak] }));
+}
+
+export function recordLine(record: GameRecord): string {
+  const tally = [
+    `${record.played}${RECORD_COPY.played}`,
+    `${record.wins}${RECORD_COPY.wins}`,
+    `${record.losses}${RECORD_COPY.losses}`,
+    `${record.draws}${RECORD_COPY.draws}`,
+  ].join(' ');
+  const streak = `${RECORD_COPY.streak} ${record.streak}`;
+  const best = `${RECORD_COPY.bestPoints} ${record.bestPoints}${RESULT_COPY.pointsUnit}`;
+  return [tally, streak, best].join(` ${RESULT_COPY.recordJoin} `);
 }

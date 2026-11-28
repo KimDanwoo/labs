@@ -4,6 +4,7 @@ import { isSameMonth } from '@views/gostop/lib/cards';
 import { bakRisks } from '@views/gostop/lib/risk';
 import { scoreOf } from '@views/gostop/lib/score';
 import { choiceStage, type TableStage } from '@views/gostop/lib/stage';
+import { stopPreviewOf, type StopPreview } from '@views/gostop/lib/stopPreview';
 import type {
   FloorChoice,
   GameResult,
@@ -37,12 +38,13 @@ export interface BoardView {
   risks: readonly BakRisk[];
   matchable: ReadonlySet<number>;
   result: GameResult | null;
+  preview: StopPreview;
 }
 
 const ACTIVE_PHASES: ReadonlySet<Phase> = new Set([PHASE.PLAY, PHASE.CHOOSE, PHASE.DECIDE]);
 
 type TurnView = Pick<BoardView, 'phase' | 'turn' | 'activeSide' | 'isPlaying' | 'isMyTurn' | 'isDeciding' | 'result'>;
-type TableView = Omit<BoardView, keyof TurnView | 'held' | 'revealed' | 'choice' | 'gathering' | 'goCount'>;
+type TableView = Omit<BoardView, keyof TurnView | 'held' | 'revealed' | 'choice' | 'gathering' | 'goCount' | 'preview'>;
 
 function turnView(game: GameState, step: PlaybackStep | null): TurnView {
   const isPlaying = step !== null;
@@ -94,5 +96,6 @@ export function boardView(game: GameState, step: PlaybackStep | null): BoardView
     choice: step ? null : myChoiceOf(game),
     gathering: new Set(step?.gathering ?? []),
     goCount: game.goCount,
+    preview: stopPreviewOf(game, table),
   };
 }

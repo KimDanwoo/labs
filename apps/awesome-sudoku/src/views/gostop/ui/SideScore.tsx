@@ -11,7 +11,7 @@ export function SideScore({ side }: SideScoreProps) {
   const { scores } = useGostopContext();
 
   return (
-    <dl className="ml-auto flex items-center gap-1.5 tabular-nums">
+    <dl className="ml-auto flex items-center gap-1 tabular-nums lg:gap-1.5">
       <dt className="sr-only">{BOARD_COPY.score}</dt>
       <dd className="text-[19px] leading-none font-black text-lemon lg:text-[22px]">
         {scores[side].total}

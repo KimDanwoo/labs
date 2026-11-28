@@ -6,6 +6,7 @@ import styles from '@views/gostop/styles/table.module.css';
 import { CapturedOpener } from '@views/gostop/ui/CapturedOpener';
 import { CapturedRow } from '@views/gostop/ui/CapturedRow';
 import { RiskChips } from '@views/gostop/ui/RiskChips';
+import { SidePurse } from '@views/gostop/ui/SidePurse';
 import { SideScore } from '@views/gostop/ui/SideScore';
 
 export function GostopMine() {
@@ -21,7 +22,8 @@ export function GostopMine() {
         styles.mineGrid,
       )}
     >
-      <div className="flex min-h-7 items-center gap-1.5 [grid-area:aside] lg:flex-col-reverse lg:items-end lg:justify-center">
+      <div className="flex min-h-7 items-center gap-0.5 [grid-area:aside] lg:gap-1 lg:flex-col-reverse lg:items-end lg:justify-center">
+        <SidePurse side={SIDE.ME} />
         <RiskChips />
         <SideScore side={SIDE.ME} />
       </div>

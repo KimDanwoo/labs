@@ -19,7 +19,8 @@ export type SoundName =
   | 'win'
   | 'lose'
   | 'draw'
-  | 'choose';
+  | 'choose'
+  | 'coins';
 
 export type CutInTone = 'mine' | 'rival';
 

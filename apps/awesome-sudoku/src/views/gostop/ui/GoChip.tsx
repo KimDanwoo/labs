@@ -1,5 +1,5 @@
 import { BOARD_COPY, GO_CHIP_COPY, GOSTOP_COPY } from '@views/gostop/config/copy';
-import { goChipOf } from '@views/gostop/lib/view';
+import { goTagOf } from '@views/gostop/lib/stopPreview';
 import { useGostopContext } from '@views/gostop/model/hooks/useGostopContext';
 import type { Side } from '@views/gostop/model/types/gostop';
 
@@ -8,8 +8,8 @@ interface GoChipProps {
 }
 
 export function GoChip({ side }: GoChipProps) {
-  const { scores, goCount } = useGostopContext();
-  const chip = goChipOf(scores[side].total, goCount[side]);
+  const { preview, goCount } = useGostopContext();
+  const chip = goTagOf(goCount[side], preview.stop[side]);
 
   if (!chip) {
     return (

@@ -12,12 +12,14 @@ export function ResultPoints({ points }: ResultPointsProps) {
   const shown = useCountUp(points, isReducedMotion);
 
   return (
-    <p className="grid justify-items-center">
-      <span className="text-[13px] font-bold opacity-75">{RESULT_POINTS_LABEL[outcomeOf(result)]}</span>
-      <span className="text-[52px] leading-none font-black tracking-[-0.04em] tabular-nums">
+    <p className="grid justify-items-center gap-1 pl-1">
+      <span className="text-[12px] font-bold whitespace-nowrap opacity-75">
+        {RESULT_POINTS_LABEL[outcomeOf(result)]}
+      </span>
+      <span className="text-[44px] leading-[0.9] font-black tracking-[-0.04em] whitespace-nowrap tabular-nums">
         <span aria-hidden="true">{shown}</span>
         <span className="sr-only">{points}</span>
-        <span className="ml-0.5 text-[22px] tracking-normal">{GOSTOP_COPY.points}</span>
+        <span className="ml-0.5 text-[20px] tracking-normal">{GOSTOP_COPY.points}</span>
       </span>
     </p>
   );
