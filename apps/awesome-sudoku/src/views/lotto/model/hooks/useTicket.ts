@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import type { RandomInt } from '@views/lotto/lib/random';
+import type { RandomInt } from '@shared/lib/random';
 import { fillTicket, isTicketFull, toggleTicketNumber } from '@views/lotto/lib/ticket';
 
 export function useTicket(randomInt: RandomInt) {

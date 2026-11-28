@@ -15,5 +15,6 @@ describe('GAME_SHELF', () => {
     const names = Object.fromEntries(GAME_SHELF.map(({ id, name }) => [id, name]));
     expect(names.guess).toBe('오늘의 맞춰봐');
     expect(names.lotto).toBe('로또 시뮬레이터');
+    expect(names.gostop).toBe('맞고');
   });
 });

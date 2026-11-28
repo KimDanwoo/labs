@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 
+import type { RandomInt } from '@shared/lib/random';
 import type { LottoRank } from '@views/lotto/config/lotto';
 import { drawNumbers } from '@views/lotto/lib/draw';
-import type { RandomInt } from '@views/lotto/lib/random';
 import { rankOf } from '@views/lotto/lib/rank';
 import type { LottoDraw } from '@views/lotto/model/types/lotto';
 

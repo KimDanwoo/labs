@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { createCryptoRandom, type RandomInt } from '@shared/lib/random';
 import {
   LOTTO_MAX_NUMBER,
   LOTTO_RANKS,
@@ -8,7 +9,6 @@ import {
   type LottoRank,
 } from '@views/lotto/config/lotto';
 import { createNumberPool, drawNumbers } from '@views/lotto/lib/draw';
-import { createCryptoRandom, type RandomInt } from '@views/lotto/lib/random';
 import { createTicketFlags, gradeMatches, rankOf } from '@views/lotto/lib/rank';
 import { runTicketChunk, simulateInChunks } from '@views/lotto/lib/simulate';
 import { createEmptyTally, returnRateOf, spentOf, wonOf } from '@views/lotto/lib/tally';

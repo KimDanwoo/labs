@@ -5,6 +5,7 @@ import { findGameByPath } from '@entities/game-catalog/lib/findGameByPath';
 describe('findGameByPath', () => {
   it('게임 경로와 정확히 같으면 그 게임을 찾는다', () => {
     expect(findGameByPath('/lotto')?.id).toBe('lotto');
+    expect(findGameByPath('/gostop')?.id).toBe('gostop');
   });
 
   it('하위 경로와 끝 슬래시도 같은 게임으로 본다', () => {

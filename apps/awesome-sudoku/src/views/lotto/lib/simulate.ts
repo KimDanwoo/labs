@@ -1,6 +1,6 @@
+import type { RandomInt } from '@shared/lib/random';
 import { LOTTO_PICK_COUNT, SIMULATION_CHUNK_SIZE } from '@views/lotto/config/lotto';
 import { createNumberPool, shuffleDrawnInto } from '@views/lotto/lib/draw';
-import type { RandomInt } from '@views/lotto/lib/random';
 import { createTicketFlags, gradeMatches } from '@views/lotto/lib/rank';
 import { createEmptyTally, mergeTally } from '@views/lotto/lib/tally';
 import type { SimulationRequest, SimulationResult, Tally } from '@views/lotto/model/types/lotto';

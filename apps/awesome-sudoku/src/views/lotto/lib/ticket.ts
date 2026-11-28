@@ -1,6 +1,6 @@
+import type { RandomInt } from '@shared/lib/random';
 import { LOTTO_MAX_NUMBER, LOTTO_PICK_COUNT } from '@views/lotto/config/lotto';
 import { sortAscending } from '@views/lotto/lib/draw';
-import type { RandomInt } from '@views/lotto/lib/random';
 
 export const isTicketFull = (ticket: readonly number[]): boolean => ticket.length >= LOTTO_PICK_COUNT;
 
