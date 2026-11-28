@@ -24,6 +24,7 @@ import { useGostopSettings, type GostopSettingsControl } from '@views/gostop/mod
 import { useHandFocusRequest, type HandFocusControl } from '@views/gostop/model/hooks/useHandFocusRequest';
 import { usePlaybackClock } from '@views/gostop/model/hooks/usePlaybackClock';
 import { useReducedMotion } from '@views/gostop/model/hooks/useReducedMotion';
+import { useRival, type RivalView } from '@views/gostop/model/hooks/useRival';
 import { useWallet } from '@views/gostop/model/hooks/useWallet';
 import { INITIAL_PLAYBACK, playbackReducer } from '@views/gostop/model/reducer/playbackReducer';
 import type { GameAction } from '@views/gostop/model/types/gostop';
@@ -33,7 +34,7 @@ import type { GameRecord } from '@views/gostop/model/types/record';
 import { useCallback, useMemo, useReducer, useState } from 'react';
 
 export interface GostopGame
-  extends BoardView, GostopSettingsControl, CapturedSheetControl, DecideSheetControl, HandFocusControl {
+  extends BoardView, GostopSettingsControl, CapturedSheetControl, DecideSheetControl, HandFocusControl, RivalView {
   announcement: string;
   cutIn: ShownCutIn | null;
   step: PlaybackStep | null;
@@ -79,6 +80,7 @@ export const useGostopGame = (): GostopGame => {
   const audioRef = useAudioContext();
   useGameSound(step, settings.isMuted, audioRef);
   const cutIn = useCutIn(step);
+  const rivalView = useRival(playback.game, step);
   const record = useGameRecord(playback.game, playback.gameId, isSettled);
   const { wallet, settlement, settledGameId, bonus, dismissBonus, prepareWallet } = useWallet(
     playback.game,
@@ -111,6 +113,7 @@ export const useGostopGame = (): GostopGame => {
       ...decideSheet,
       ...handFocus,
       ...actions,
+      ...rivalView,
       announcement: isSettled ? withMoneyLine(playback.announcement, settlement, wallet.money) : '',
       cutIn,
       step,
@@ -131,6 +134,7 @@ export const useGostopGame = (): GostopGame => {
       decideSheet,
       handFocus,
       actions,
+      rivalView,
       isSettled,
       cutIn,
       speedFactor,

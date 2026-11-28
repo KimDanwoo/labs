@@ -1,22 +1,27 @@
 import { CARD_KIND } from '@views/gostop/config/cards';
 import { CHOICE_SOURCE, TURN_EVENT } from '@views/gostop/config/game';
 import { DAILY_BONUS, RELIEF_MONEY, RIVAL_MONEY, STAKE } from '@views/gostop/config/money';
+import { RIVAL_NAME } from '@views/gostop/config/rival';
 import type { Bak, CardKind, ChoiceSource, TurnEvent } from '@views/gostop/model/types/gostop';
 import type { BakRisk, CardMark, GameStatus, JokboKey, Outcome, ScorePart } from '@views/gostop/model/types/view';
 
 const MAN = 10_000;
 const manWon = (amount: number): string => `${amount / MAN}만 원`;
+const RIVAL_SUBJECT = `${RIVAL_NAME}이`;
+const RIVAL_TOPIC = `${RIVAL_NAME}은`;
+const RIVAL_PURSE = `${RIVAL_NAME} 머니`;
+const RIVAL_TURN = `${RIVAL_NAME} 차례`;
 
 export const GOSTOP_COPY = {
   tableLabel: '맞고 판',
   floorLabel: '바닥 패',
   handLabel: '내 손패',
   capturedLabel: '내가 먹은 패',
-  rivalLabel: '컴퓨터',
+  rivalLabel: RIVAL_NAME,
   rivalHand: '장',
   cardUnit: '장',
   matchHint: '바닥과 짝',
-  rivalCapturedLabel: '컴퓨터가 먹은 패',
+  rivalCapturedLabel: `${RIVAL_SUBJECT} 먹은 패`,
   deckLabel: '더미',
   deal: '패 돌리기',
   dealHint: '패를 돌리면 내가 먼저 내요',
@@ -32,7 +37,7 @@ export const GOSTOP_COPY = {
   points: '점',
   goUnit: '고',
   turnMe: '내가',
-  turnComputer: '컴퓨터가',
+  turnComputer: RIVAL_SUBJECT,
   ruleTitle: '맞고 규칙',
   ruleCaption: '같은 달끼리 짝을 맞춰 먼저 7점',
 } as const;
@@ -40,7 +45,7 @@ export const GOSTOP_COPY = {
 export const STATUS_TEXT: Record<GameStatus, string> = {
   ready: '패를 돌려요',
   myTurn: '내 차례예요',
-  rivalTurn: '컴퓨터 차례',
+  rivalTurn: RIVAL_TURN,
   choosing: '패를 골라요',
   deciding: '고? 스톱?',
   over: '',
@@ -54,7 +59,7 @@ export const OUTCOME_TITLE: Record<Outcome, string> = {
 
 export const RESULT_POINTS_LABEL: Record<Outcome, string> = {
   win: '내 최종 점수',
-  lose: '컴퓨터 최종 점수',
+  lose: `${RIVAL_NAME} 최종 점수`,
   draw: '',
 };
 
@@ -107,7 +112,7 @@ export const GOSTOP_RULES = [
   '머니는 이 게임 안에서만 쓰는 게임머니예요. 진짜 돈이 아니고, 이 기기에만 저장되며 현금이나 상품으로 바꿀 수 없어요.',
   `판돈은 점당 ${STAKE}원이에요. 이긴 쪽이 점수 × ${STAKE}원을 받는데, 진 쪽이 가진 만큼까지만 받아요.`,
   `하루에 한 번, 그날 처음 들어오면 출석 보너스로 ${manWon(DAILY_BONUS)}을 받아요.`,
-  `머니가 0이 되면 올인이에요. 다음 판을 시작할 때 내 머니는 ${manWon(RELIEF_MONEY)}, 컴퓨터 머니는 ${manWon(RIVAL_MONEY)}으로 다시 채워요.`,
+  `머니가 0이 되면 올인이에요. 다음 판을 시작할 때 내 머니는 ${manWon(RELIEF_MONEY)}, ${RIVAL_PURSE}는 ${manWon(RIVAL_MONEY)}으로 다시 채워요.`,
 ] as const;
 
 export const CUT_IN_COPY = {
@@ -120,7 +125,7 @@ export const CUT_IN_COPY = {
   } satisfies Record<TurnEvent, string>,
   go: '고!',
   stop: '스톱!',
-  who: { mine: '나', rival: '컴퓨터' },
+  who: { mine: '나', rival: RIVAL_NAME },
 } as const;
 
 export const ANNOUNCE_COPY = {
@@ -134,7 +139,7 @@ export const ANNOUNCE_COPY = {
   go: '고를 불렀어요.',
   stop: '스톱했어요.',
   myTurn: '내 차례예요.',
-  rivalTurn: '컴퓨터 차례예요.',
+  rivalTurn: `${RIVAL_TURN}예요.`,
   deciding: '고 또는 스톱을 고르세요.',
   choosing: '바닥에 같은 달이 두 장 있어요. 먹을 패를 고르세요.',
 } as const;
@@ -153,7 +158,7 @@ export const BOARD_COPY = {
   score: '점수',
   goBonus: '고 횟수와 지금 스톱하면 받는 점수',
   risks: '박 위험',
-  computerName: '컴퓨터',
+  computerName: RIVAL_NAME,
   mineLabel: '내 점수와 먹은 패',
 } as const;
 
@@ -219,9 +224,9 @@ export const RESULT_COPY = {
   times: '×',
   danJoin: '·',
   me: '내',
-  rival: '컴퓨터',
+  rival: RIVAL_NAME,
   meSubject: '내가',
-  rivalSubject: '컴퓨터가',
+  rivalSubject: RIVAL_SUBJECT,
   pi: '피',
   gwang: '광',
   yeol: '열끗',
@@ -241,14 +246,14 @@ export const SHEET_COPY = {
   openCaptured: '먹은 패 크게 보기',
   title: '먹은 패',
   mine: '나',
-  rival: '컴퓨터',
+  rival: RIVAL_NAME,
   empty: '아직 없어요',
   jokbo: '족보 진행',
   close: '닫기',
 } as const;
 
 export const HAND_COPY = {
-  waiting: '컴퓨터 차례',
+  waiting: RIVAL_TURN,
   ready: '내 차례',
 } as const;
 
@@ -266,28 +271,28 @@ export const MONEY_COPY = {
   stakePrefix: '점당',
   purse: '머니',
   myPurse: '내 머니',
-  rivalPurse: '컴퓨터 머니',
+  rivalPurse: RIVAL_PURSE,
   me: '나',
-  rival: '컴퓨터',
+  rival: RIVAL_NAME,
   settleTitle: '머니 정산',
   noChange: '머니 변동 없음',
-  cappedGain: '컴퓨터가 가진 만큼만 받았어요',
+  cappedGain: `${RIVAL_SUBJECT} 가진 만큼만 받았어요`,
   cappedLoss: '내가 가진 만큼만 냈어요',
   stopMoney: '스톱하면 받는 돈',
-  stopCapped: '컴퓨터가 가진 만큼',
+  stopCapped: `${RIVAL_SUBJECT} 가진 만큼`,
   bestMoney: '최고 보유',
   biggestWin: '한 판 최대',
   allInStamp: '올인 승!',
-  allInLine: '컴퓨터 머니를 모두 땄어요.',
+  allInLine: `${RIVAL_PURSE}를 모두 땄어요.`,
   brokeStamp: '빈털터리',
-  allInTitle: '올인 승! 컴퓨터 머니를 모두 땄어요',
-  allInNote: `컴퓨터는 다음 판에 ${manWon(RIVAL_MONEY)}을 다시 채워요.`,
+  allInTitle: `올인 승! ${RIVAL_PURSE}를 모두 땄어요`,
+  allInNote: `${RIVAL_TOPIC} 다음 판에 ${manWon(RIVAL_MONEY)}을 다시 채워요.`,
   brokeTitle: '빈털터리가 됐어요',
   brokeNote: `다음 판에 ${manWon(RELIEF_MONEY)}을 다시 채워 드려요.`,
   gained: '원을 받았어요.',
   lost: '원을 잃었어요.',
   balance: '내 머니',
-  rivalBalance: '컴퓨터 머니',
+  rivalBalance: RIVAL_PURSE,
 } as const;
 
 export const MONEY_HEADLINE: Record<Outcome, string> = {

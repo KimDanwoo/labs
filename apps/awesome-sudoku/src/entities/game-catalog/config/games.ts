@@ -45,7 +45,7 @@ export const GAMES = {
     name: '맞고',
     category: '카드게임',
     title: '맞고 · 컴퓨터와 1:1 고스톱',
-    description: '컴퓨터와 화투를 번갈아 내 먼저 7점을 내고, 고를 할지 스톱할지 골라요.',
+    description: '호랑이 호 사장과 화투를 번갈아 내 먼저 7점을 내고, 고를 할지 스톱할지 골라요.',
   },
   lotto: {
     href: '/lotto',

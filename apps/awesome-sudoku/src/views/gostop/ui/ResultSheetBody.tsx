@@ -4,6 +4,7 @@ import { useGostopContext } from '@views/gostop/model/hooks/useGostopContext';
 import { ResultBanner } from '@views/gostop/ui/ResultBanner';
 import { ResultLedger } from '@views/gostop/ui/ResultLedger';
 import { ResultRecordLine } from '@views/gostop/ui/ResultRecordLine';
+import { ResultRival } from '@views/gostop/ui/ResultRival';
 
 export function ResultSheetBody() {
   const { deal } = useGostopContext();
@@ -11,6 +12,7 @@ export function ResultSheetBody() {
   return (
     <>
       <ResultBanner />
+      <ResultRival />
       <ResultLedger />
       <ResultRecordLine />
       <Button size="l" isFull onClick={deal} className="mt-3">
