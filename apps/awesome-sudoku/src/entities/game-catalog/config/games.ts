@@ -40,6 +40,13 @@ export const GAMES = {
     title: '담쌓기 · 컴퓨터와 땅따먹기',
     description: '말을 옮기고 담을 세워 상대보다 넓은 땅을 차지해요.',
   },
+  gostop: {
+    href: '/gostop',
+    name: '맞고',
+    category: '카드게임',
+    title: '맞고 · 컴퓨터와 1:1 고스톱',
+    description: '컴퓨터와 화투를 번갈아 내 먼저 7점을 내고, 고를 할지 스톱할지 골라요.',
+  },
   lotto: {
     href: '/lotto',
     name: '로또 시뮬레이터',
@@ -57,5 +64,5 @@ export const GAMES = {
 } as const;
 
 export type GameId = keyof typeof GAMES;
-const GAME_IDS = ['sudoku', 'killer', 'slitherlink', 'gomoku', 'walls', 'lotto', 'guess'] as const;
+const GAME_IDS = ['sudoku', 'killer', 'slitherlink', 'gomoku', 'walls', 'gostop', 'lotto', 'guess'] as const;
 export const GAME_LIST = GAME_IDS.map((id) => [id, GAMES[id]] as const);

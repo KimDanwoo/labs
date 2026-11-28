@@ -43,6 +43,11 @@ export const GAME_GLYPHS: Record<GameId, readonly GlyphShape[]> = {
       attrs: { d: 'M3.5 9.7h17M3.5 14.3h17M9 5v4.7M15 5v4.7M12 9.7v4.6M7.5 14.3V19M16.5 14.3V19', strokeWidth: 1.6 },
     },
   ],
+  gostop: [
+    { tag: 'rect', attrs: { x: 3.5, y: 6, width: 10, height: 14, rx: 2, transform: 'rotate(-10 8.5 13)' } },
+    { tag: 'rect', attrs: { x: 10.5, y: 4, width: 10, height: 14, rx: 2, transform: 'rotate(8 15.5 11)' } },
+    { tag: 'circle', attrs: { cx: 15.5, cy: 9.5, r: 2.2, ...FILLED } },
+  ],
   lotto: [
     { tag: 'circle', attrs: { cx: 12, cy: 12, r: 8.5 } },
     { tag: 'circle', attrs: { cx: 12, cy: 12, r: 4.3 } },

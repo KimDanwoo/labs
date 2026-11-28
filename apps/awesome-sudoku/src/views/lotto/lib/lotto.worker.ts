@@ -1,4 +1,4 @@
-import { createCryptoRandom } from '@views/lotto/lib/random';
+import { createCryptoRandom } from '@shared/lib/random';
 import { simulateInChunks } from '@views/lotto/lib/simulate';
 import type { SimulationRequest, SimulationResult } from '@views/lotto/model/types/lotto';
 

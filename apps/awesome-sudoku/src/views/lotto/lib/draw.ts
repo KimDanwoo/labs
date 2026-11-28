@@ -1,5 +1,5 @@
+import type { RandomInt } from '@shared/lib/random';
 import { LOTTO_DRAWN_COUNT, LOTTO_MAX_NUMBER, LOTTO_PICK_COUNT } from '@views/lotto/config/lotto';
-import type { RandomInt } from '@views/lotto/lib/random';
 import type { LottoDraw } from '@views/lotto/model/types/lotto';
 
 export const sortAscending = (numbers: readonly number[]): number[] => [...numbers].sort((a, b) => a - b);

@@ -1,5 +1,5 @@
+import { createCryptoRandom } from '@shared/lib/random';
 import type { SimulationMessage } from '@views/lotto/lib/lotto.worker';
-import { createCryptoRandom } from '@views/lotto/lib/random';
 import { simulateInChunks } from '@views/lotto/lib/simulate';
 import type { SimulationRequest, SimulationResult } from '@views/lotto/model/types/lotto';
 

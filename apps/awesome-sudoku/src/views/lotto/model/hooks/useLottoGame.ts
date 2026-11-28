@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 
+import { createCryptoRandom } from '@shared/lib/random';
 import { JACKPOT_TICKET_LIMIT } from '@views/lotto/config/lotto';
-import { createCryptoRandom } from '@views/lotto/lib/random';
 import { useSimulation } from '@views/lotto/model/hooks/useSimulation';
 import { useSingleDraw } from '@views/lotto/model/hooks/useSingleDraw';
 import { useTicket } from '@views/lotto/model/hooks/useTicket';
