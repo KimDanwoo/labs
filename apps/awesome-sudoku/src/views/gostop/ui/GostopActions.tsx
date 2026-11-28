@@ -4,11 +4,9 @@ import { Button } from '@shared/ui/button';
 import { GameLayout } from '@shared/ui/game-layout';
 import { GOSTOP_COPY } from '@views/gostop/config/copy';
 import { useGostopContext } from '@views/gostop/model/hooks/useGostopContext';
-import { useNewGame } from '@views/gostop/model/hooks/useNewGame';
 
 export function GostopActions() {
-  const { isDeciding, go, stop } = useGostopContext();
-  const handleNewGame = useNewGame();
+  const { isDeciding, go, stop, deal } = useGostopContext();
 
   if (isDeciding) {
     return (
@@ -24,7 +22,7 @@ export function GostopActions() {
   }
 
   return (
-    <Button variant="weak" size="xl" isFull onClick={handleNewGame}>
+    <Button variant="weak" size="xl" isFull onClick={deal}>
       <LuRotateCcw aria-hidden="true" />
       {GOSTOP_COPY.newGame}
     </Button>

@@ -175,6 +175,9 @@ describe('고·스톱 흐름', () => {
     const afterRival = gameReducer(went, { type: GAME_ACTION.PLAY, side: SIDE.COMPUTER, card: 17 });
     const afterMe = gameReducer(afterRival, { type: GAME_ACTION.PLAY, side: SIDE.ME, card: 16 });
     expect(afterMe.phase).toBe(PHASE.PLAY);
+    const exhausted = gameReducer(afterMe, { type: GAME_ACTION.PLAY, side: SIDE.COMPUTER, card: 18 });
+    expect(exhausted.phase).toBe(PHASE.OVER);
+    expect(exhausted.result?.winner).toBeNull();
   });
 
   it('고를 부른 쪽이 지면 고박으로 두 배가 된다', () => {
