@@ -5,7 +5,7 @@ import { MOTION, PLAYBACK_ACTION, SPEED_FACTOR, STEP_KIND } from '@views/gostop/
 import { chooseCard, shouldGo } from '@views/gostop/lib/ai';
 import { shuffleDealableDeck } from '@views/gostop/lib/deck';
 import { collapseSteps, totalDuration, transitionSteps, turnSteps } from '@views/gostop/lib/playback';
-import { resolveTurn } from '@views/gostop/lib/turn';
+import { bestPicks, resolveTurn } from '@views/gostop/lib/turn';
 import { gameReducer, INITIAL_STATE } from '@views/gostop/model/reducer/gameReducer';
 import { INITIAL_PLAYBACK, isPlaybackRunning, playbackReducer } from '@views/gostop/model/reducer/playbackReducer';
 import type { GameAction, GameState, Table } from '@views/gostop/model/types/gostop';
@@ -57,7 +57,8 @@ const settle = (state: PlaybackState): PlaybackState => {
 const nextAction = (game: GameState, random: RandomInt): GameAction => {
   const side = game.turn;
   if (game.phase === PHASE.DECIDE) return { type: shouldGo(game, side) ? GAME_ACTION.GO : GAME_ACTION.STOP, side };
-  return { type: GAME_ACTION.PLAY, side, card: chooseCard(game.table, side, random) };
+  const card = chooseCard(game.table, side, random);
+  return { type: GAME_ACTION.PLAY, side, card, picks: bestPicks(game.table, card) };
 };
 
 function playWholeGame(

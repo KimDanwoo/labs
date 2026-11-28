@@ -3,7 +3,7 @@ import { WIN_SCORE } from '@views/gostop/config/score';
 import { rivalOf } from '@views/gostop/lib/cards';
 import { dealTable } from '@views/gostop/lib/deck';
 import { DRAW_RESULT, scoreOf, winResult } from '@views/gostop/lib/score';
-import { resolveTurn } from '@views/gostop/lib/turn';
+import { nextChoice, resolveTurn } from '@views/gostop/lib/turn';
 import type { GameAction, GameState, Side } from '@views/gostop/model/types/gostop';
 
 const NO_GO = { [SIDE.ME]: 0, [SIDE.COMPUTER]: 0 };
@@ -20,6 +20,7 @@ export const INITIAL_STATE: GameState = {
   goCount: NO_GO,
   goScore: NO_GO,
   lastTurn: null,
+  pending: null,
   result: null,
 };
 
@@ -45,11 +46,30 @@ function afterTurn(state: GameState, side: Side): GameState {
   return { ...state, turn: rivalOf(side) };
 }
 
-function play(state: GameState, side: Side, card: number): GameState {
+interface Play {
+  side: Side;
+  card: number;
+  picks: readonly number[];
+}
+
+function resolvePlay(state: GameState, { side, card, picks }: Play): GameState {
+  const choice = nextChoice(state.table, card, picks);
+  if (choice) return { ...state, phase: PHASE.CHOOSE, pending: { card, picks, choice } };
+  const { table, report } = resolveTurn(state.table, side, card, picks);
+  return afterTurn({ ...state, phase: PHASE.PLAY, table, lastTurn: report, pending: null }, side);
+}
+
+function play(state: GameState, { side, card, picks }: Play): GameState {
   const isAllowed = state.phase === PHASE.PLAY && state.turn === side && state.table.hands[side].includes(card);
-  if (!isAllowed) return state;
-  const { table, report } = resolveTurn(state.table, side, card);
-  return afterTurn({ ...state, table, lastTurn: report }, side);
+  return isAllowed ? resolvePlay(state, { side, card, picks }) : state;
+}
+
+function choose(state: GameState, side: Side, pick: number): GameState {
+  const { pending } = state;
+  const isChoosing = state.phase === PHASE.CHOOSE && state.turn === side && pending !== null;
+  if (!isChoosing) return state;
+  if (!pending.choice.options.includes(pick)) return state;
+  return resolvePlay(state, { side, card: pending.card, picks: [...pending.picks, pick] });
 }
 
 const isDeciding = (state: GameState, side: Side): boolean => state.phase === PHASE.DECIDE && state.turn === side;
@@ -67,7 +87,9 @@ function go(state: GameState, side: Side): GameState {
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   if (action.type === GAME_ACTION.DEAL) return deal(action.deck);
-  if (action.type === GAME_ACTION.PLAY) return play(state, action.side, action.card);
+  if (action.type === GAME_ACTION.PLAY)
+    return play(state, { side: action.side, card: action.card, picks: action.picks ?? [] });
+  if (action.type === GAME_ACTION.CHOOSE) return choose(state, action.side, action.pick);
   if (action.type === GAME_ACTION.GO) return go(state, action.side);
   if (action.type === GAME_ACTION.STOP) return isDeciding(state, action.side) ? stop(state, action.side) : state;
   return INITIAL_STATE;

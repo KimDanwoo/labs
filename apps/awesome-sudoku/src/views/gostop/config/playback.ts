@@ -1,5 +1,6 @@
 export const STEP_KIND = {
   DEAL: 'deal',
+  LIFT: 'lift',
   PLAY: 'play',
   REVEAL: 'reveal',
   LAND: 'land',
@@ -8,10 +9,12 @@ export const STEP_KIND = {
   STEAL: 'steal',
   CALL: 'call',
   RESULT: 'result',
+  ASK: 'ask',
 } as const;
 
 export const STEP_MS = {
   [STEP_KIND.DEAL]: 1150,
+  [STEP_KIND.LIFT]: 320,
   [STEP_KIND.PLAY]: 340,
   [STEP_KIND.REVEAL]: 260,
   [STEP_KIND.LAND]: 320,
@@ -20,6 +23,7 @@ export const STEP_MS = {
   [STEP_KIND.STEAL]: 320,
   [STEP_KIND.CALL]: 760,
   [STEP_KIND.RESULT]: 520,
+  [STEP_KIND.ASK]: 160,
 } as const;
 
 export const TURN_MIN_MS = 1250;

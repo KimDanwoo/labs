@@ -1,6 +1,6 @@
 import { CARD_KIND } from '@views/gostop/config/cards';
-import { TURN_EVENT } from '@views/gostop/config/game';
-import type { Bak, CardKind, TurnEvent } from '@views/gostop/model/types/gostop';
+import { CHOICE_SOURCE, TURN_EVENT } from '@views/gostop/config/game';
+import type { Bak, CardKind, ChoiceSource, TurnEvent } from '@views/gostop/model/types/gostop';
 import type { BakRisk, CardMark, GameStatus, JokboKey, Outcome, ScorePart } from '@views/gostop/model/types/view';
 
 export const GOSTOP_COPY = {
@@ -39,6 +39,7 @@ export const STATUS_TEXT: Record<GameStatus, string> = {
   ready: '패를 돌려 시작하세요',
   myTurn: '내 차례예요',
   rivalTurn: '컴퓨터 생각 중…',
+  choosing: '먹을 패를 골라요',
   deciding: '고? 스톱?',
   over: '',
 };
@@ -92,7 +93,7 @@ export const BAK_LABEL: Record<Bak, string> = {
 
 export const GOSTOP_RULES = [
   '같은 달끼리 짝을 맞춰 가져와요. 패를 낸 뒤 더미에서 한 장을 뒤집어 한 번 더 맞춰요.',
-  '바닥에 같은 달이 2장 있으면 값이 큰 패를 자동으로 가져와요.',
+  '바닥에 같은 달이 2장 있으면 둘 중 먹을 패를 직접 골라요. 낸 패와 뒤집은 패에서 한 번씩, 한 차례에 두 번까지 고를 수 있어요.',
   '광은 3장 3점(비광이 끼면 2점), 4장 4점, 5장 15점이에요.',
   '열끗·띠는 5장부터, 피는 10장부터 1점이고 한 장 늘 때마다 1점씩 더해요. 쌍피는 피 2장으로 세요.',
   '고도리는 5점, 홍단·청단·초단은 각각 3점이에요.',
@@ -129,6 +130,17 @@ export const ANNOUNCE_COPY = {
   myTurn: '내 차례예요.',
   rivalTurn: '컴퓨터 차례예요.',
   deciding: '고 또는 스톱을 고르세요.',
+  choosing: '바닥에 같은 달이 두 장 있어요. 먹을 패를 고르세요.',
+} as const;
+
+export const CHOICE_COPY = {
+  prompt: '어느 패를 먹을까요?',
+  pick: '먹기',
+  source: {
+    [CHOICE_SOURCE.PLAYED]: '낸 패',
+    [CHOICE_SOURCE.FLIPPED]: '뒤집은 패',
+  } satisfies Record<ChoiceSource, string>,
+  ssangPi: '쌍피',
 } as const;
 
 export const BOARD_COPY = {

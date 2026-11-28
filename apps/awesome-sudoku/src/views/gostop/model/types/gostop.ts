@@ -1,11 +1,12 @@
 import type { CARD_KIND, RIBBON } from '@views/gostop/config/cards';
-import type { GAME_ACTION, PHASE, SIDE, TURN_EVENT } from '@views/gostop/config/game';
+import type { CHOICE_SOURCE, GAME_ACTION, PHASE, SIDE, TURN_EVENT } from '@views/gostop/config/game';
 
 export type CardKind = (typeof CARD_KIND)[keyof typeof CARD_KIND];
 export type Ribbon = (typeof RIBBON)[keyof typeof RIBBON];
 export type Side = (typeof SIDE)[keyof typeof SIDE];
 export type Phase = (typeof PHASE)[keyof typeof PHASE];
 export type TurnEvent = (typeof TURN_EVENT)[keyof typeof TURN_EVENT];
+export type ChoiceSource = (typeof CHOICE_SOURCE)[keyof typeof CHOICE_SOURCE];
 export type Bak = 'piBak' | 'gwangBak' | 'meongTta' | 'goBak';
 
 export interface CardSpec {
@@ -42,6 +43,18 @@ export interface TurnReport {
   events: readonly TurnEvent[];
 }
 
+export interface FloorChoice {
+  source: ChoiceSource;
+  card: number;
+  options: readonly number[];
+}
+
+export interface PendingPlay {
+  card: number;
+  picks: readonly number[];
+  choice: FloorChoice;
+}
+
 export interface ScoreBreakdown {
   gwang: number;
   yeol: number;
@@ -67,12 +80,14 @@ export interface GameState {
   goCount: Record<Side, number>;
   goScore: Record<Side, number>;
   lastTurn: TurnReport | null;
+  pending: PendingPlay | null;
   result: GameResult | null;
 }
 
 export type GameAction =
   | { type: typeof GAME_ACTION.DEAL; deck: readonly number[] }
-  | { type: typeof GAME_ACTION.PLAY; side: Side; card: number }
+  | { type: typeof GAME_ACTION.PLAY; side: Side; card: number; picks?: readonly number[] }
+  | { type: typeof GAME_ACTION.CHOOSE; side: Side; pick: number }
   | { type: typeof GAME_ACTION.GO; side: Side }
   | { type: typeof GAME_ACTION.STOP; side: Side }
   | { type: typeof GAME_ACTION.RESET };

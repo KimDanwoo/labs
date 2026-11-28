@@ -7,7 +7,19 @@ export type Motion = (typeof MOTION)[keyof typeof MOTION];
 export type FlightOrigin = (typeof FLIGHT_ORIGIN)[keyof typeof FLIGHT_ORIGIN];
 
 export type SoundName =
-  'deal' | 'place' | 'flip' | 'match' | 'capture' | 'steal' | 'cutIn' | 'go' | 'stop' | 'win' | 'lose' | 'draw';
+  | 'deal'
+  | 'place'
+  | 'flip'
+  | 'match'
+  | 'capture'
+  | 'steal'
+  | 'cutIn'
+  | 'go'
+  | 'stop'
+  | 'win'
+  | 'lose'
+  | 'draw'
+  | 'choose';
 
 export type CutInTone = 'mine' | 'rival';
 
@@ -21,6 +33,7 @@ export interface PlaybackStep {
   kind: StepKind;
   side: Side | null;
   table: Table;
+  held: number | null;
   revealed: number | null;
   gathering: readonly number[];
   sound: SoundName | null;

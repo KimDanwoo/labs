@@ -1,9 +1,19 @@
 import { CUT_IN_COPY } from '@views/gostop/config/copy';
-import { GAME_ACTION, PHASE, SIDE } from '@views/gostop/config/game';
+import { CHOICE_SOURCE, GAME_ACTION, PHASE, SIDE } from '@views/gostop/config/game';
 import { CUT_IN_POWER, REDUCED_STEP_MS, STEP_KIND, STEP_MS, TURN_MIN_MS } from '@views/gostop/config/playback';
 import { without } from '@views/gostop/lib/cards';
 import { cutInPower } from '@views/gostop/lib/cutIn';
-import type { GameAction, GameResult, GameState, Side, Table, TurnReport } from '@views/gostop/model/types/gostop';
+import { choiceStage, playedTable, revealedTable } from '@views/gostop/lib/stage';
+import type {
+  ChoiceSource,
+  GameAction,
+  GameResult,
+  GameState,
+  PendingPlay,
+  Side,
+  Table,
+  TurnReport,
+} from '@views/gostop/model/types/gostop';
 import type { CutIn, PlaybackStep, SoundName, StepKind } from '@views/gostop/model/types/playback';
 
 type StepExtra = Partial<Omit<PlaybackStep, 'kind' | 'table'>>;
@@ -12,6 +22,7 @@ const step = (kind: StepKind, table: Table, extra: StepExtra = {}): PlaybackStep
   kind,
   side: null,
   table,
+  held: null,
   revealed: null,
   gathering: [],
   sound: null,
@@ -38,19 +49,24 @@ const RESULT_SOUND: Record<string, SoundName> = {
 
 const resultSound = (result: GameResult | null): SoundName => RESULT_SOUND[result?.winner ?? ''] ?? 'draw';
 
-const playedTable = (prev: Table, side: Side, card: number): Table => ({
-  ...prev,
-  hands: { ...prev.hands, [side]: without(prev.hands[side], [card]) },
-  floor: [...prev.floor, card],
-});
+const SHOWN_TURN_STEPS: Record<ChoiceSource, number> = {
+  [CHOICE_SOURCE.PLAYED]: 0,
+  [CHOICE_SOURCE.FLIPPED]: 2,
+};
+
+const playStep = (prev: Table, side: Side, card: number): PlaybackStep =>
+  step(STEP_KIND.PLAY, playedTable(prev, side, card), { side, sound: 'place' });
+
+const revealStep = (table: Table, side: Side, flipped: number): PlaybackStep =>
+  step(STEP_KIND.REVEAL, revealedTable(table), { side, revealed: flipped, sound: 'flip' });
 
 function flipSteps(table: Table, report: TurnReport): PlaybackStep[] {
   const { flipped, side } = report;
   if (flipped === null) return [];
-  const revealed = { ...table, deck: table.deck.slice(1) };
+  const reveal = revealStep(table, side, flipped);
   return [
-    step(STEP_KIND.REVEAL, revealed, { side, revealed: flipped, sound: 'flip' }),
-    step(STEP_KIND.LAND, { ...revealed, floor: [...revealed.floor, flipped] }, { side, sound: 'place' }),
+    reveal,
+    step(STEP_KIND.LAND, { ...reveal.table, floor: [...reveal.table.floor, flipped] }, { side, sound: 'place' }),
   ];
 }
 
@@ -88,16 +104,28 @@ function padToMinimum(steps: readonly PlaybackStep[], minimumMs: number): Playba
   );
 }
 
-export function turnSteps(prev: Table, report: TurnReport, next: Table): PlaybackStep[] {
+export function turnSteps(prev: Table, report: TurnReport, next: Table, shownCount = 0): PlaybackStep[] {
   const { side, played } = report;
-  const playTable = playedTable(prev, side, played);
-  const play = step(STEP_KIND.PLAY, playTable, { side, sound: 'place' });
-  const flips = flipSteps(playTable, report);
-  const captures = captureSteps(lastTableOf(flips, playTable), report, next);
+  const play = playStep(prev, side, played);
+  const flips = flipSteps(play.table, report);
+  const captures = captureSteps(lastTableOf(flips, play.table), report, next);
   const steps = withPlainCutIn([play, ...flips, ...captures], report);
   const settled = steps.map((item, index) => (index === steps.length - 1 ? { ...item, table: next } : item));
-  return padToMinimum(settled, TURN_MIN_MS);
+  const shownMs = settled.slice(0, shownCount).reduce((sum, item) => sum + item.durationMs, 0);
+  return padToMinimum(settled.slice(shownCount), TURN_MIN_MS - shownMs);
 }
+
+function choiceLeadSteps(table: Table, side: Side, pending: PendingPlay): PlaybackStep[] {
+  const stage = choiceStage(table, side, pending);
+  const ask = step(STEP_KIND.ASK, stage.table, { side, held: stage.held, revealed: stage.revealed, sound: 'choose' });
+  if (stage.held !== null) {
+    return [step(STEP_KIND.LIFT, stage.table, { side, held: stage.held, sound: 'place' }), ask];
+  }
+  const play = playStep(table, side, pending.card);
+  return [play, revealStep(play.table, side, pending.choice.card), ask];
+}
+
+const shownTurnSteps = (prev: GameState): number => (prev.pending ? SHOWN_TURN_STEPS[prev.pending.choice.source] : 0);
 
 const resultStep = (next: GameState): PlaybackStep =>
   step(STEP_KIND.RESULT, next.table, { sound: resultSound(next.result) });
@@ -115,16 +143,20 @@ function callStep(prev: GameState, next: GameState, action: GameAction): Playbac
 }
 
 function playSteps(prev: GameState, next: GameState): PlaybackStep[] {
-  if (!next.lastTurn) return [];
-  const steps = turnSteps(prev.table, next.lastTurn, next.table);
+  if (next.pending) return choiceLeadSteps(next.table, next.turn, next.pending);
+  const report = next.lastTurn;
+  if (!report) return [];
+  const steps = turnSteps(prev.table, report, next.table, shownTurnSteps(prev));
   return next.phase === PHASE.OVER ? [...steps, resultStep(next)] : steps;
 }
+
+const TURN_ACTIONS: ReadonlySet<string> = new Set([GAME_ACTION.PLAY, GAME_ACTION.CHOOSE]);
 
 const dealSteps = (next: GameState): PlaybackStep[] => [step(STEP_KIND.DEAL, next.table, { sound: 'deal' })];
 
 export function transitionSteps(prev: GameState, next: GameState, action: GameAction): PlaybackStep[] {
   if (action.type === GAME_ACTION.DEAL) return dealSteps(next);
-  if (action.type === GAME_ACTION.PLAY) return playSteps(prev, next);
+  if (TURN_ACTIONS.has(action.type)) return playSteps(prev, next);
   if (action.type === GAME_ACTION.RESET) return [];
   return callStep(prev, next, action);
 }
@@ -152,7 +184,6 @@ export function collapseSteps(steps: readonly PlaybackStep[]): PlaybackStep[] {
   return [
     {
       ...last,
-      revealed: null,
       gathering: [],
       cutIn: mergedCutIn(steps),
       sound: mergedSound(steps),

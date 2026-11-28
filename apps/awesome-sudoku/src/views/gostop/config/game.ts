@@ -6,6 +6,7 @@ export const SIDE = {
 export const PHASE = {
   READY: 'ready',
   PLAY: 'play',
+  CHOOSE: 'choose',
   DECIDE: 'decide',
   OVER: 'over',
 } as const;
@@ -13,9 +14,15 @@ export const PHASE = {
 export const GAME_ACTION = {
   DEAL: 'deal',
   PLAY: 'play',
+  CHOOSE: 'choose',
   GO: 'go',
   STOP: 'stop',
   RESET: 'reset',
+} as const;
+
+export const CHOICE_SOURCE = {
+  PLAYED: 'played',
+  FLIPPED: 'flipped',
 } as const;
 
 export const TURN_EVENT = {

@@ -1,4 +1,4 @@
-export type GameStatus = 'ready' | 'myTurn' | 'rivalTurn' | 'deciding' | 'over';
+export type GameStatus = 'ready' | 'myTurn' | 'rivalTurn' | 'choosing' | 'deciding' | 'over';
 
 export type Outcome = 'win' | 'lose' | 'draw';
 

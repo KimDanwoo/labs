@@ -3,7 +3,16 @@ import { PHASE, SIDE } from '@views/gostop/config/game';
 import { isSameMonth } from '@views/gostop/lib/cards';
 import { bakRisks } from '@views/gostop/lib/risk';
 import { scoreOf } from '@views/gostop/lib/score';
-import type { GameResult, GameState, Phase, ScoreBreakdown, Side, Table } from '@views/gostop/model/types/gostop';
+import { choiceStage, type TableStage } from '@views/gostop/lib/stage';
+import type {
+  FloorChoice,
+  GameResult,
+  GameState,
+  Phase,
+  ScoreBreakdown,
+  Side,
+  Table,
+} from '@views/gostop/model/types/gostop';
 import type { PlaybackStep } from '@views/gostop/model/types/playback';
 import type { BakRisk } from '@views/gostop/model/types/view';
 
@@ -18,7 +27,9 @@ export interface BoardView {
   rivalHandCount: number;
   floor: readonly number[];
   deckCount: number;
+  held: number | null;
   revealed: number | null;
+  choice: FloorChoice | null;
   gathering: ReadonlySet<number>;
   captured: Record<Side, readonly number[]>;
   scores: Record<Side, ScoreBreakdown>;
@@ -28,10 +39,10 @@ export interface BoardView {
   result: GameResult | null;
 }
 
-const ACTIVE_PHASES: ReadonlySet<Phase> = new Set([PHASE.PLAY, PHASE.DECIDE]);
+const ACTIVE_PHASES: ReadonlySet<Phase> = new Set([PHASE.PLAY, PHASE.CHOOSE, PHASE.DECIDE]);
 
 type TurnView = Pick<BoardView, 'phase' | 'turn' | 'activeSide' | 'isPlaying' | 'isMyTurn' | 'isDeciding' | 'result'>;
-type TableView = Omit<BoardView, keyof TurnView | 'revealed' | 'gathering' | 'goCount'>;
+type TableView = Omit<BoardView, keyof TurnView | 'held' | 'revealed' | 'choice' | 'gathering' | 'goCount'>;
 
 function turnView(game: GameState, step: PlaybackStep | null): TurnView {
   const isPlaying = step !== null;
@@ -64,13 +75,23 @@ function tableView({ hands, floor, deck, captured }: Table): TableView {
 
 const shownDeckCount = (phase: Phase, deckLength: number): number => (phase === PHASE.READY ? DECK_SIZE : deckLength);
 
+function settledStage(game: GameState): TableStage {
+  if (!game.pending) return { table: game.table, held: null, revealed: null };
+  return choiceStage(game.table, game.turn, game.pending);
+}
+
+const myChoiceOf = (game: GameState): FloorChoice | null =>
+  game.turn === SIDE.ME ? (game.pending?.choice ?? null) : null;
+
 export function boardView(game: GameState, step: PlaybackStep | null): BoardView {
-  const table = step?.table ?? game.table;
+  const { table, held, revealed } = step ?? settledStage(game);
   return {
     ...turnView(game, step),
     ...tableView(table),
     deckCount: shownDeckCount(game.phase, table.deck.length),
-    revealed: step?.revealed ?? null,
+    held,
+    revealed,
+    choice: step ? null : myChoiceOf(game),
     gathering: new Set(step?.gathering ?? []),
     goCount: game.goCount,
   };

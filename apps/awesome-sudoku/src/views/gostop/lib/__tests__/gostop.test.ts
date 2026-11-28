@@ -1,10 +1,10 @@
 import type { RandomInt } from '@shared/lib/random';
 import { CARD_KIND, CARDS, RIBBON } from '@views/gostop/config/cards';
-import { GAME_ACTION, PHASE, SIDE, TURN_EVENT } from '@views/gostop/config/game';
+import { CHOICE_SOURCE, GAME_ACTION, PHASE, SIDE, TURN_EVENT } from '@views/gostop/config/game';
 import { chooseCard, shouldGo } from '@views/gostop/lib/ai';
 import { dealTable, hasFullMonth, shuffleDealableDeck } from '@views/gostop/lib/deck';
 import { countPi, goPoints, scoreOf } from '@views/gostop/lib/score';
-import { resolveTurn } from '@views/gostop/lib/turn';
+import { bestPicks, nextChoice, resolveTurn } from '@views/gostop/lib/turn';
 import { gameReducer, INITIAL_STATE } from '@views/gostop/model/reducer/gameReducer';
 import type { GameState, Table } from '@views/gostop/model/types/gostop';
 import { describe, expect, it } from 'vitest';
@@ -150,6 +150,64 @@ describe('한 차례 처리', () => {
   });
 });
 
+describe('바닥 2장 중 고르기', () => {
+  const twoOnFloor = (): GameState => playingState({ me: [3, 30], computer: [31], floor: [1, 2], deck: [20, 21] });
+  const flipChoice = (): GameState => playingState({ me: [30, 16], computer: [31], floor: [1, 2], deck: [3, 21] });
+
+  it('낸 패와 같은 달이 바닥에 2장이면 고르는 단계가 되고 판은 그대로다', () => {
+    const before = twoOnFloor();
+    const choosing = gameReducer(before, { type: GAME_ACTION.PLAY, side: SIDE.ME, card: 3 });
+    expect(choosing.phase).toBe(PHASE.CHOOSE);
+    expect(choosing.table).toBe(before.table);
+    expect(choosing.pending?.choice).toEqual({ source: CHOICE_SOURCE.PLAYED, card: 3, options: [1, 2] });
+  });
+
+  it('고른 패를 먹고 나머지는 바닥에 남으며 차례가 넘어간다', () => {
+    const choosing = gameReducer(twoOnFloor(), { type: GAME_ACTION.PLAY, side: SIDE.ME, card: 3 });
+    const done = gameReducer(choosing, { type: GAME_ACTION.CHOOSE, side: SIDE.ME, pick: 2 });
+    expect(done.phase).toBe(PHASE.PLAY);
+    expect(done.pending).toBeNull();
+    expect(done.lastTurn?.taken).toEqual([3, 2]);
+    expect(done.table.floor).toEqual([1, 20]);
+    expect(done.turn).toBe(SIDE.COMPUTER);
+  });
+
+  it('뒤집은 패와 같은 달이 바닥에 2장이어도 고른다', () => {
+    const choosing = gameReducer(flipChoice(), { type: GAME_ACTION.PLAY, side: SIDE.ME, card: 30 });
+    expect(choosing.pending?.choice).toEqual({ source: CHOICE_SOURCE.FLIPPED, card: 3, options: [1, 2] });
+    const done = gameReducer(choosing, { type: GAME_ACTION.CHOOSE, side: SIDE.ME, pick: 2 });
+    expect(done.lastTurn?.taken).toEqual([3, 2]);
+    expect(done.table.floor).toEqual([1, 30]);
+  });
+
+  it('낸 패와 뒤집은 패 둘 다 2장이면 차례로 두 번 고른다', () => {
+    const table = tableOf({ me: [3], computer: [31], floor: [1, 2, 5, 6], deck: [7, 21] });
+    const first = nextChoice(table, 3, []);
+    expect(first?.source).toBe(CHOICE_SOURCE.PLAYED);
+    const second = nextChoice(table, 3, [2]);
+    expect(second).toEqual({ source: CHOICE_SOURCE.FLIPPED, card: 7, options: [5, 6] });
+    expect(nextChoice(table, 3, [2, 6])).toBeNull();
+    expect(resolveTurn(table, SIDE.ME, 3, [2, 6]).report.taken).toEqual([3, 2, 7, 6]);
+  });
+
+  it('뒤집은 패가 낸 패와 같은 달이면 따닥이라 고르지 않는다', () => {
+    const table = tableOf({ me: [3], floor: [1, 2], deck: [0, 21] });
+    expect(nextChoice(table, 3, [])).toBeNull();
+  });
+
+  it('고르는 중에는 다른 패를 내거나 바닥에 없는 패를 고를 수 없다', () => {
+    const choosing = gameReducer(twoOnFloor(), { type: GAME_ACTION.PLAY, side: SIDE.ME, card: 3 });
+    expect(gameReducer(choosing, { type: GAME_ACTION.PLAY, side: SIDE.ME, card: 30 })).toBe(choosing);
+    expect(gameReducer(choosing, { type: GAME_ACTION.CHOOSE, side: SIDE.ME, pick: 20 })).toBe(choosing);
+    expect(gameReducer(choosing, { type: GAME_ACTION.CHOOSE, side: SIDE.COMPUTER, pick: 2 })).toBe(choosing);
+  });
+
+  it('컴퓨터는 값이 큰 패를 미리 골라 한 번에 낸다', () => {
+    const table = tableOf({ me: [30], computer: [3], floor: [1, 2], deck: [20, 21] });
+    expect(bestPicks(table, 3)).toEqual([1]);
+  });
+});
+
 describe('고·스톱 흐름', () => {
   const nearWin = (): GameState =>
     playingState({
@@ -230,7 +288,8 @@ describe('컴퓨터끼리 끝까지 두기', () => {
         state = gameReducer(state, { type: shouldGo(state, side) ? GAME_ACTION.GO : GAME_ACTION.STOP, side });
         continue;
       }
-      state = gameReducer(state, { type: GAME_ACTION.PLAY, side, card: chooseCard(state.table, side, random) });
+      const card = chooseCard(state.table, side, random);
+      state = gameReducer(state, { type: GAME_ACTION.PLAY, side, card, picks: bestPicks(state.table, card) });
       expect(new Set(allCards(state.table)).size).toBe(48);
       expect(allCards(state.table)).toHaveLength(48);
     }

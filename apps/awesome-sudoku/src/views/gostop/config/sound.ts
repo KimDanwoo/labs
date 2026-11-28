@@ -121,4 +121,8 @@ export const SOUND_RECIPES: Record<SoundName, readonly SoundVoice[]> = {
     { wave: 'sine', frequency: NOTE.a4, startAt: 0, duration: 0.14, gain: 0.16 },
     { wave: 'sine', frequency: NOTE.a4, startAt: 0.18, duration: 0.2, gain: 0.14 },
   ],
+  choose: [
+    { wave: 'sine', frequency: NOTE.a5, startAt: 0, duration: 0.1, gain: 0.12 },
+    { wave: 'sine', frequency: NOTE.e5, startAt: 0.08, duration: 0.16, gain: 0.1 },
+  ],
 };
