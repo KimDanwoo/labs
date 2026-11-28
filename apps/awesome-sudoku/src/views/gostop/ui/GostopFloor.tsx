@@ -1,20 +1,27 @@
+import { cn } from '@shared/lib/cn';
 import { GOSTOP_COPY } from '@views/gostop/config/copy';
-import { floorByMonth } from '@views/gostop/lib/view';
+import { MONTHS } from '@views/gostop/config/table';
+import { floorSlots } from '@views/gostop/lib/table';
 import { useGostopContext } from '@views/gostop/model/hooks/useGostopContext';
+import styles from '@views/gostop/styles/table.module.css';
+import { DeckPile } from '@views/gostop/ui/DeckPile';
 import { FloorSlot } from '@views/gostop/ui/FloorSlot';
-import { GostopDeal } from '@views/gostop/ui/GostopDeal';
 
 export function GostopFloor() {
   const { floor } = useGostopContext();
+  const slots = floorSlots(floor);
 
   return (
-    <section aria-label={GOSTOP_COPY.floorLabel} className="relative rounded-[20px] bg-face p-2.5 lg:px-5 lg:py-4">
-      <ul className="grid grid-cols-6 gap-x-1.5 gap-y-1 lg:gap-x-4 lg:gap-y-2">
-        {floorByMonth(floor).map((ids, index) => (
-          <FloorSlot key={index} slot={index} ids={ids} />
+    <section
+      aria-label={GOSTOP_COPY.floorLabel}
+      className={cn('rounded-[20px] px-1 py-2 lg:px-3 lg:py-3', styles.felt)}
+    >
+      <ul className="grid grid-cols-7 grid-rows-[auto_auto] justify-items-center gap-x-1 gap-y-2 lg:gap-x-3 lg:gap-y-3">
+        {MONTHS.map((month) => (
+          <FloorSlot key={month} month={month} ids={slots[month] ?? []} />
         ))}
+        <DeckPile />
       </ul>
-      <GostopDeal />
     </section>
   );
 }

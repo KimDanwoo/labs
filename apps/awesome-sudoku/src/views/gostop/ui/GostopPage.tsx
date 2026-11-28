@@ -11,14 +11,16 @@ export function GostopPage() {
         <GameHeading game="gostop" />
         <GameLayout.Status>
           <Gostop.Status />
+          <Gostop.Settings />
         </GameLayout.Status>
         <GameLayout.Board>
           <Gostop.Table>
             <Gostop.Rival />
-            <Gostop.TurnBar />
             <Gostop.Floor />
-            <Gostop.Captured />
+            <Gostop.Mine />
             <Gostop.Hand />
+            <Gostop.Deal />
+            <Gostop.CutIn />
           </Gostop.Table>
         </GameLayout.Board>
         <GameLayout.Panel>
@@ -26,6 +28,7 @@ export function GostopPage() {
           <Gostop.Rule />
         </GameLayout.Panel>
       </GameLayout.Root>
+      <Gostop.Announcer />
       <Gostop.DecideSheet />
       <Gostop.ResultSheet />
     </Gostop.Root>

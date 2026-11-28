@@ -1,81 +1,106 @@
-.deal {
-  animation: hwatu-deal 260ms var(--ease-snappy) both;
+.reveal {
+  animation: hwatu-reveal 240ms var(--ease-snappy) both;
+  transform-origin: 50% 50%;
 }
 
-.fromMe {
-  animation: hwatu-from-me 280ms var(--ease-snappy) both;
+.gatherGlow {
+  animation: hwatu-glow 260ms var(--ease-snappy) both;
 }
 
-.fromRival {
-  animation: hwatu-from-rival 280ms var(--ease-snappy) both;
+.cutIn {
+  animation: hwatu-cut-in-fade 850ms linear both;
 }
 
-.flip {
-  animation: hwatu-flip 300ms var(--ease-snappy) both;
+.cutInBand {
+  animation: hwatu-cut-in-band 850ms var(--ease-snappy) both;
 }
 
-.taken {
-  animation: hwatu-taken 260ms var(--ease-snappy) both;
+.cutInText {
+  animation: hwatu-cut-in-text 850ms var(--ease-snappy) both;
 }
 
-.chip {
-  animation: hwatu-chip 240ms var(--ease-snappy) both;
+.stamp {
+  animation: hwatu-stamp 320ms cubic-bezier(0.3, 1.6, 0.5, 1) both;
 }
 
-@keyframes hwatu-deal {
+.pulse {
+  animation: hwatu-pulse 1400ms ease-in-out infinite;
+}
+
+@keyframes hwatu-reveal {
   from {
-    opacity: 0;
-    translate: 0 -12px;
-    scale: 0.9;
+    opacity: 0.3;
+    transform: perspective(400px) rotateY(88deg) scale(1.08);
   }
 }
 
-@keyframes hwatu-from-me {
+@keyframes hwatu-glow {
   from {
     opacity: 0;
-    translate: 0 48px;
-    scale: 1.08;
   }
 }
 
-@keyframes hwatu-from-rival {
-  from {
+@keyframes hwatu-cut-in-fade {
+  0%,
+  72% {
+    opacity: 1;
+  }
+  100% {
     opacity: 0;
-    translate: 0 -48px;
-    scale: 1.08;
   }
 }
 
-@keyframes hwatu-flip {
-  from {
-    opacity: 0.4;
-    rotate: y 90deg;
+@keyframes hwatu-cut-in-band {
+  0% {
+    transform: rotate(-6deg) scaleX(0);
+  }
+  12%,
+  100% {
+    transform: rotate(-6deg) scaleX(1);
   }
 }
 
-@keyframes hwatu-taken {
-  from {
+@keyframes hwatu-cut-in-text {
+  0% {
     opacity: 0;
-    translate: 0 -24px;
-    scale: 1.2;
+    transform: translateX(-28px) scale(1.5);
+  }
+  14% {
+    opacity: 1;
+    transform: translateX(0) scale(0.96);
+  }
+  22%,
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
   }
 }
 
-@keyframes hwatu-chip {
+@keyframes hwatu-stamp {
   from {
     opacity: 0;
-    translate: 0 6px;
-    scale: 0.7;
+    transform: rotate(-14deg) scale(2.2);
+  }
+}
+
+@keyframes hwatu-pulse {
+  50% {
+    opacity: 0.62;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .deal,
-  .fromMe,
-  .fromRival,
-  .flip,
-  .taken,
-  .chip {
+  .reveal,
+  .gatherGlow,
+  .cutIn,
+  .cutInBand,
+  .cutInText,
+  .stamp,
+  .pulse {
     animation: none;
+  }
+
+  .cutInBand {
+    transform: rotate(-6deg);
   }
 }

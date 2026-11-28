@@ -18,6 +18,7 @@ export function HwatuCard({ id, className }: HwatuCardProps) {
         alt=""
         fill
         sizes={HWATU_IMAGE.sizes}
+        loading="eager"
         draggable={false}
         className="object-cover select-none"
       />

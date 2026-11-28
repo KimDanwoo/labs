@@ -1,7 +1,7 @@
-import { Badge } from '@shared/ui/badge';
-import { BAK_LABEL, GOSTOP_COPY, RESULT_POINTS_LABEL } from '@views/gostop/config/copy';
-import { outcomeOf } from '@views/gostop/lib/view';
+import { GOSTOP_COPY } from '@views/gostop/config/copy';
 import { useGostopContext } from '@views/gostop/model/hooks/useGostopContext';
+import { BakStamps } from '@views/gostop/ui/BakStamps';
+import { ResultPoints } from '@views/gostop/ui/ResultPoints';
 import { ResultRow } from '@views/gostop/ui/ResultRow';
 
 export function ResultSummary() {
@@ -15,8 +15,6 @@ export function ResultSummary() {
     );
   }
 
-  const hasBaks = result.baks.length > 0;
-
   return (
     <dl className="mt-4 grid gap-2.5 rounded-2xl bg-weak p-4 text-[15px]">
       <ResultRow label={GOSTOP_COPY.resultBase}>
@@ -28,17 +26,9 @@ export function ResultSummary() {
         {GOSTOP_COPY.goTimes}
       </ResultRow>
       <ResultRow label={GOSTOP_COPY.resultBaks}>
-        {hasBaks
-          ? result.baks.map((bak) => <Badge key={bak}>{`${BAK_LABEL[bak]} ${GOSTOP_COPY.bakTimes}`}</Badge>)
-          : GOSTOP_COPY.resultNoBak}
+        <BakStamps baks={result.baks} />
       </ResultRow>
-      <div className="mt-1 flex items-baseline justify-between border-t border-border-light pt-3">
-        <dt className="font-semibold text-text-secondary">{RESULT_POINTS_LABEL[outcomeOf(result)]}</dt>
-        <dd className="text-3xl font-extrabold text-text-primary tabular-nums">
-          {result.points}
-          {GOSTOP_COPY.points}
-        </dd>
-      </div>
+      <ResultPoints points={result.points} />
     </dl>
   );
 }

@@ -1,70 +1,88 @@
-import { createCryptoRandom } from '@shared/lib/random';
-import { GAME_ACTION, PHASE, SIDE } from '@views/gostop/config/game';
-import { isSameMonth } from '@views/gostop/lib/cards';
+import { createCryptoRandom, type RandomInt } from '@shared/lib/random';
+import { COMPUTER_DELAY_MS, GAME_ACTION, SIDE } from '@views/gostop/config/game';
+import {
+  GAME_ID_BOUND,
+  GAME_ID_PARTS,
+  GAME_ID_RADIX,
+  MOTION,
+  PLAYBACK_ACTION,
+  SPEED_FACTOR,
+} from '@views/gostop/config/playback';
+import { boardView, type BoardView } from '@views/gostop/lib/board';
 import { shuffleDealableDeck } from '@views/gostop/lib/deck';
-import { scoreOf } from '@views/gostop/lib/score';
+import { flightPlanOf, type FlightPlan } from '@views/gostop/lib/flight';
 import { useComputerTurn } from '@views/gostop/model/hooks/useComputerTurn';
-import { gameReducer, INITIAL_STATE } from '@views/gostop/model/reducer/gameReducer';
-import type { GameResult, Phase, ScoreBreakdown, Side, TurnReport } from '@views/gostop/model/types/gostop';
-import { useMemo, useReducer, useState } from 'react';
+import { useCutIn, type ShownCutIn } from '@views/gostop/model/hooks/useCutIn';
+import { useGameRecord } from '@views/gostop/model/hooks/useGameRecord';
+import { useGameSound } from '@views/gostop/model/hooks/useGameSound';
+import { useGostopSettings, type GostopSettingsControl } from '@views/gostop/model/hooks/useGostopSettings';
+import { usePlaybackClock } from '@views/gostop/model/hooks/usePlaybackClock';
+import { useReducedMotion } from '@views/gostop/model/hooks/useReducedMotion';
+import { INITIAL_PLAYBACK, playbackReducer } from '@views/gostop/model/reducer/playbackReducer';
+import type { GameAction } from '@views/gostop/model/types/gostop';
+import type { PlaybackStep } from '@views/gostop/model/types/playback';
+import type { GameRecord } from '@views/gostop/model/types/record';
+import { useCallback, useMemo, useReducer, useState } from 'react';
 
-export interface GostopGame {
-  phase: Phase;
-  turn: Side;
-  isMyTurn: boolean;
-  isDeciding: boolean;
-  myHand: readonly number[];
-  rivalHandCount: number;
-  floor: readonly number[];
-  deckCount: number;
-  captured: Record<Side, readonly number[]>;
-  scores: Record<Side, ScoreBreakdown>;
-  goCount: Record<Side, number>;
-  matchable: ReadonlySet<number>;
-  lastTurn: TurnReport | null;
-  result: GameResult | null;
+export interface GostopGame extends BoardView, GostopSettingsControl {
+  announcement: string;
+  cutIn: ShownCutIn | null;
+  step: PlaybackStep | null;
+  flight: FlightPlan | null;
+  record: GameRecord;
+  isReducedMotion: boolean;
   deal: () => void;
   play: (card: number) => void;
   go: () => void;
   stop: () => void;
-  reset: () => void;
 }
 
+const createGameId = (random: RandomInt): string =>
+  Array.from({ length: GAME_ID_PARTS }, () => random(GAME_ID_BOUND).toString(GAME_ID_RADIX)).join('-');
+
 export const useGostopGame = (): GostopGame => {
-  const [state, dispatch] = useReducer(gameReducer, INITIAL_STATE);
+  const [playback, dispatch] = useReducer(playbackReducer, INITIAL_PLAYBACK);
   const [random] = useState(createCryptoRandom);
-  useComputerTurn(state, dispatch, random);
+  const settings = useGostopSettings();
+  const isReducedMotion = useReducedMotion();
+  const speedFactor = SPEED_FACTOR[settings.speed];
+  const motion = isReducedMotion ? MOTION.REDUCED : MOTION.FULL;
+  const step = playback.steps[playback.cursor] ?? null;
+  const isSettled = step === null;
+
+  const act = useCallback(
+    (action: GameAction, gameId?: string) => dispatch({ type: PLAYBACK_ACTION.APPLY, action, motion, gameId }),
+    [motion],
+  );
+
+  usePlaybackClock(playback, dispatch, speedFactor);
+  useComputerTurn({ state: playback.game, isSettled, random, delayMs: COMPUTER_DELAY_MS * speedFactor }, act);
+  useGameSound(step, settings.isMuted);
+  const cutIn = useCutIn(step);
+  const record = useGameRecord(playback.game, playback.gameId, isSettled);
 
   const actions = useMemo(
     () => ({
-      deal: () => dispatch({ type: GAME_ACTION.DEAL, deck: shuffleDealableDeck(random) }),
-      play: (card: number) => dispatch({ type: GAME_ACTION.PLAY, side: SIDE.ME, card }),
-      go: () => dispatch({ type: GAME_ACTION.GO, side: SIDE.ME }),
-      stop: () => dispatch({ type: GAME_ACTION.STOP, side: SIDE.ME }),
-      reset: () => dispatch({ type: GAME_ACTION.RESET }),
+      deal: () => act({ type: GAME_ACTION.DEAL, deck: shuffleDealableDeck(random) }, createGameId(random)),
+      play: (card: number) => act({ type: GAME_ACTION.PLAY, side: SIDE.ME, card }),
+      go: () => act({ type: GAME_ACTION.GO, side: SIDE.ME }),
+      stop: () => act({ type: GAME_ACTION.STOP, side: SIDE.ME }),
     }),
-    [random],
+    [act, random],
   );
 
-  return useMemo(() => {
-    const { hands, floor, deck, captured } = state.table;
-    const isMine = state.turn === SIDE.ME;
-    return {
+  return useMemo(
+    () => ({
+      ...boardView(playback.game, step),
+      ...settings,
       ...actions,
-      phase: state.phase,
-      turn: state.turn,
-      isMyTurn: isMine && state.phase === PHASE.PLAY,
-      isDeciding: isMine && state.phase === PHASE.DECIDE,
-      myHand: hands.me,
-      rivalHandCount: hands.computer.length,
-      floor,
-      deckCount: deck.length,
-      captured,
-      scores: { [SIDE.ME]: scoreOf(captured.me), [SIDE.COMPUTER]: scoreOf(captured.computer) },
-      goCount: state.goCount,
-      matchable: new Set(hands.me.filter((card) => floor.some((id) => isSameMonth(id, card)))),
-      lastTurn: state.lastTurn,
-      result: state.result,
-    };
-  }, [actions, state]);
+      announcement: isSettled ? playback.announcement : '',
+      cutIn,
+      step,
+      flight: flightPlanOf(step, speedFactor, isReducedMotion),
+      record,
+      isReducedMotion,
+    }),
+    [playback, step, settings, actions, isSettled, cutIn, speedFactor, isReducedMotion, record],
+  );
 };

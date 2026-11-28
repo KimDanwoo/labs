@@ -1,0 +1,66 @@
+.table {
+  --floor-card: 43px;
+  --table-radius: 26px;
+  border-radius: var(--table-radius);
+  background:
+    radial-gradient(ellipse 85% 46% at 50% 44%, rgba(255, 255, 255, 0.055), transparent 72%),
+    repeating-linear-gradient(128deg, rgba(255, 255, 255, 0.016) 0 1px, transparent 1px 5px),
+    rgb(var(--rgb-ink));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
+    inset 0 0 0 5px rgb(var(--rgb-ink)),
+    inset 0 0 0 6px rgba(var(--rgb-lemon), 0.2),
+    inset 0 18px 40px rgba(0, 0, 0, 0.35),
+    0 22px 44px -22px rgba(0, 0, 0, 0.55);
+  color: rgb(242, 244, 246);
+}
+
+@media (min-width: 1024px) {
+  .table {
+    --floor-card: 54px;
+    --table-radius: 30px;
+  }
+}
+
+.felt {
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.26), transparent);
+}
+
+.slot {
+  width: var(--floor-card);
+  height: calc(var(--floor-card) * 2.4);
+}
+
+.floorCard {
+  position: relative;
+  width: var(--floor-card);
+}
+
+.stacked {
+  margin-top: calc(var(--floor-card) * -1.2);
+}
+
+.gathered {
+  margin-top: calc(var(--floor-card) * -1.38);
+}
+
+.deck {
+  position: relative;
+  width: var(--floor-card);
+  aspect-ratio: 2 / 3;
+}
+
+.side[data-active='true'] {
+  box-shadow: inset 0 0 0 1.5px rgba(var(--rgb-lemon), 0.55);
+}
+
+.side {
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.dealOverlay {
+  border-radius: var(--table-radius);
+  background: rgba(var(--rgb-ink), 0.82);
+  backdrop-filter: blur(3px);
+}

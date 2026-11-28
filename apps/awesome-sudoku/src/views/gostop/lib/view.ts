@@ -102,8 +102,6 @@ export function entranceOf(id: number, lastTurn: TurnReport | null): Entrance {
   return lastTurn.side === SIDE.ME ? 'fromMe' : 'fromRival';
 }
 
-export const turnKey = (lastTurn: TurnReport): string => `${lastTurn.side}-${lastTurn.played}`;
-
 export function turnChips(lastTurn: TurnReport): TurnChip[] {
   const events = lastTurn.events.map((event, index): TurnChip => ({
     key: `${event}-${index}`,
@@ -116,27 +114,7 @@ export function turnChips(lastTurn: TurnReport): TurnChip[] {
   return [...events, { key: 'stolen', label: `${stolenLabel} ${stolen}`, tone: 'ink' }];
 }
 
-export function turnSummary(lastTurn: TurnReport): string {
-  const who = lastTurn.side === SIDE.ME ? GOSTOP_COPY.turnMe : GOSTOP_COPY.turnComputer;
-  const taken = lastTurn.taken.length;
-  return taken > 0 ? `${who} ${taken}${GOSTOP_COPY.taken}` : `${who} ${GOSTOP_COPY.placed}`;
-}
-
-export const isFreshCard = (id: number, lastTurn: TurnReport | null): boolean =>
-  lastTurn?.played === id || lastTurn?.flipped === id;
-
 export const goPreview = (total: number, goCount: number) => ({
   stop: goPoints(total, goCount),
   go: goPoints(total, goCount + 1),
 });
-
-export function goNote(goCount: Record<Side, number>): string {
-  const sides: [string, number][] = [
-    [GOSTOP_COPY.me, goCount[SIDE.ME]],
-    [GOSTOP_COPY.computer, goCount[SIDE.COMPUTER]],
-  ];
-  return sides
-    .filter(([, count]) => count > 0)
-    .map(([who, count]) => ` · ${who} ${count}${GOSTOP_COPY.goUnit}`)
-    .join('');
-}

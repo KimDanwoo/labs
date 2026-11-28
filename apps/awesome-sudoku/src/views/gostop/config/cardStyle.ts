@@ -1,5 +1,4 @@
 import { CARD_KIND } from '@views/gostop/config/cards';
-import { HAND_SIZE } from '@views/gostop/config/game';
 import type { CardKind } from '@views/gostop/model/types/gostop';
 import type { CardMark, HandCardState } from '@views/gostop/model/types/view';
 
@@ -54,7 +53,7 @@ export const MARK_TEXT: Partial<Record<CardMark, string>> = {
 };
 
 export const HAND_CARD_BASE =
-  'block w-full cursor-pointer rounded-[5px] transition-[translate,opacity,filter,box-shadow] duration-200 ease-snappy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-default';
+  'block w-full cursor-pointer rounded-[5px] transition-[translate,opacity,filter,box-shadow] duration-200 ease-snappy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent aria-disabled:cursor-default';
 
 export const HAND_CARD_STATE: Record<HandCardState, string> = {
   match: '-translate-y-2 shadow-[0_0_0_3px_rgb(var(--rgb-lemon)),0_8px_16px_rgb(0_0_0/0.28)] hover:-translate-y-3',
@@ -64,11 +63,4 @@ export const HAND_CARD_STATE: Record<HandCardState, string> = {
 
 export const CAPTURE_KINDS: readonly CardKind[] = [CARD_KIND.GWANG, CARD_KIND.YEOL, CARD_KIND.TTI, CARD_KIND.PI];
 
-export const FLOOR_STACK_STEP_PERCENT = 18;
-export const DEAL_STAGGER_MS = 35;
-export const CHIP_STAGGER_MS = 60;
 export const RIVAL_BACKS_MAX = 10;
-
-export const FRESH_CARD = 'ring-[2.5px] ring-lemon';
-
-export const HAND_PLACEHOLDERS = Array.from({ length: HAND_SIZE }, (_, index) => index);

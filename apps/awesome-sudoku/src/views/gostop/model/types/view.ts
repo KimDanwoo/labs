@@ -16,3 +16,5 @@ export interface TurnChip {
   label: string;
   tone: BadgeTone;
 }
+
+export type BakRisk = 'piBak' | 'gwangBak';

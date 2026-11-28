@@ -1,7 +1,7 @@
 import { CARD_KIND } from '@views/gostop/config/cards';
 import { TURN_EVENT } from '@views/gostop/config/game';
 import type { Bak, CardKind, TurnEvent } from '@views/gostop/model/types/gostop';
-import type { CardMark, GameStatus, Outcome } from '@views/gostop/model/types/view';
+import type { BakRisk, CardMark, GameStatus, Outcome } from '@views/gostop/model/types/view';
 
 export const GOSTOP_COPY = {
   tableLabel: '맞고 판',
@@ -28,13 +28,8 @@ export const GOSTOP_COPY = {
   decideNote: '박은 판이 끝날 때 따로 계산해요.',
   points: '점',
   goUnit: '고',
-  me: '나',
-  computer: '컴',
-  turnHint: '같은 달 패를 내서 바닥 패를 가져와요',
   turnMe: '내가',
   turnComputer: '컴퓨터가',
-  taken: '장 먹음',
-  placed: '바닥에 냄',
   stolenByMe: '피 뺏음',
   stolenByRival: '피 뺏김',
   resultBase: '기본 점수',
@@ -70,13 +65,6 @@ export const RESULT_POINTS_LABEL: Record<Outcome, string> = {
 export const KIND_LABEL: Record<CardKind, string> = {
   [CARD_KIND.GWANG]: '광',
   [CARD_KIND.YEOL]: '열끗',
-  [CARD_KIND.TTI]: '띠',
-  [CARD_KIND.PI]: '피',
-};
-
-export const KIND_SHORT: Record<CardKind, string> = {
-  [CARD_KIND.GWANG]: '광',
-  [CARD_KIND.YEOL]: '열',
   [CARD_KIND.TTI]: '띠',
   [CARD_KIND.PI]: '피',
 };
@@ -121,3 +109,66 @@ export const GOSTOP_RULES = [
   '아무도 스톱하지 못하고 패가 떨어지면 나가리예요. 고를 한 뒤 점수를 더 내지 못한 채 끝나도 나가리예요.',
   '흔들기·폭탄·총통은 없어요.',
 ] as const;
+
+export const CUT_IN_COPY = {
+  events: {
+    [TURN_EVENT.JJOK]: '쪽!',
+    [TURN_EVENT.PPUK]: '뻑!',
+    [TURN_EVENT.TTADAK]: '따닥!',
+    [TURN_EVENT.COLLECT]: '뻑 먹기!',
+    [TURN_EVENT.SWEEP]: '싹쓸이!',
+  } satisfies Record<TurnEvent, string>,
+  go: '고!',
+  stop: '스톱!',
+} as const;
+
+export const ANNOUNCE_COPY = {
+  dealt: '패를 돌렸어요.',
+  played: '냄.',
+  flipped: '뒤집음.',
+  taken: '장 먹음.',
+  placed: '바닥에 둠.',
+  stolenByMe: '피를 뺏음',
+  stolenByRival: '피를 뺏김',
+  go: '고를 불렀어요.',
+  stop: '스톱했어요.',
+  myTurn: '내 차례예요.',
+  rivalTurn: '컴퓨터 차례예요.',
+  deciding: '고 또는 스톱을 고르세요.',
+} as const;
+
+export const BOARD_COPY = {
+  score: '점수',
+  goBonus: '고 횟수, 지금 스톱하면 붙는 고 보너스',
+  risks: '박 위험',
+  computerName: '컴퓨터',
+  mineLabel: '내 점수와 먹은 패',
+} as const;
+
+export const RISK_LABEL: Record<BakRisk, string> = {
+  piBak: '피박 위험',
+  gwangBak: '광박 위험',
+};
+
+export const SETTINGS_COPY = {
+  sound: '효과음',
+  soundOn: '효과음 켜짐',
+  soundOff: '효과음 꺼짐',
+  speed: '진행 속도',
+  speedNormal: '보통',
+  speedFast: '빠름',
+} as const;
+
+export const RECORD_COPY = {
+  title: '내 전적',
+  played: '판',
+  wins: '승',
+  losses: '패',
+  draws: '나가리',
+  streak: '연승',
+  bestPoints: '최고 점수',
+} as const;
+
+export const DEAL_COPY = {
+  title: '한 판 붙어 볼까요?',
+} as const;
