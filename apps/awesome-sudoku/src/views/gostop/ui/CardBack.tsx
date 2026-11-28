@@ -10,7 +10,15 @@ interface CardBackProps {
 export function CardBack({ className }: CardBackProps) {
   return (
     <span aria-hidden="true" className={cn(CARD_BACK, className)}>
-      <Image src={HWATU_IMAGE.back} alt="" fill sizes={HWATU_IMAGE.sizes} draggable={false} className="object-cover" />
+      <Image
+        src={HWATU_IMAGE.back}
+        alt=""
+        fill
+        sizes={HWATU_IMAGE.sizes}
+        loading="eager"
+        draggable={false}
+        className="object-cover"
+      />
     </span>
   );
 }

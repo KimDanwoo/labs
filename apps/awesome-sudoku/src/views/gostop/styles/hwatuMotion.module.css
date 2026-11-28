@@ -1,81 +1,210 @@
-.deal {
-  animation: hwatu-deal 260ms var(--ease-snappy) both;
+.reveal {
+  animation: hwatu-reveal 240ms var(--ease-snappy) both;
+  transform-origin: 50% 50%;
 }
 
-.fromMe {
-  animation: hwatu-from-me 280ms var(--ease-snappy) both;
+.gatherGlow {
+  animation: hwatu-glow 260ms var(--ease-snappy) both;
 }
 
-.fromRival {
-  animation: hwatu-from-rival 280ms var(--ease-snappy) both;
+.cutIn {
+  --band-tilt: -7deg;
+  --band-from: -60%;
+  --stripe-shift: 48px;
+  --slam-from: 2.6;
+  --cut-scale: 1;
+  animation: hwatu-cut-in-fade 850ms linear both;
 }
 
-.flip {
-  animation: hwatu-flip 300ms var(--ease-snappy) both;
+.cutIn[data-tone='rival'] {
+  --band-tilt: 7deg;
+  --band-from: 60%;
+  --stripe-shift: -48px;
 }
 
-.taken {
-  animation: hwatu-taken 260ms var(--ease-snappy) both;
+.cutIn[data-power='2'] {
+  --slam-from: 3.2;
+  --cut-scale: 1.12;
 }
 
-.chip {
-  animation: hwatu-chip 240ms var(--ease-snappy) both;
+.cutIn[data-power='3'] {
+  --slam-from: 3.8;
+  --cut-scale: 1.26;
 }
 
-@keyframes hwatu-deal {
+.cutInBand {
+  position: relative;
+  overflow: hidden;
+  transform: rotate(var(--band-tilt));
+  animation: hwatu-cut-in-band 850ms var(--ease-snappy) both;
+}
+
+.cutInBand::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0.16) 0 10px,
+    transparent 10px 24px
+  );
+  animation: hwatu-cut-in-stripes 850ms linear both;
+  pointer-events: none;
+}
+
+.cutIn[data-tone='rival'] .cutInBand::before {
+  background: repeating-linear-gradient(
+    65deg,
+    rgba(0, 0, 0, 0.16) 0 10px,
+    transparent 10px 24px
+  );
+}
+
+.cutInText {
+  position: relative;
+  scale: var(--cut-scale);
+  animation: hwatu-cut-in-slam 850ms cubic-bezier(0.2, 0.9, 0.3, 1.15) both;
+}
+
+.cutInTag {
+  animation: hwatu-cut-in-tag 850ms var(--ease-snappy) both;
+}
+
+.cutInBurst {
+  display: none;
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 70cqw;
+  aspect-ratio: 1;
+  margin: -35cqw 0 0 -35cqw;
+  border-radius: 50%;
+  background: repeating-conic-gradient(rgba(var(--rgb-lemon), 0.32) 0 7deg, transparent 7deg 20deg);
+  mask: radial-gradient(closest-side, transparent 26%, #000 30%, transparent 100%);
+  animation: hwatu-cut-in-burst 850ms var(--ease-snappy) both;
+}
+
+.cutIn[data-tone='rival'] .cutInBurst {
+  background: repeating-conic-gradient(rgba(var(--rgb-hwatu-red), 0.4) 0 7deg, transparent 7deg 20deg);
+}
+
+.cutIn[data-power='2'] .cutInBurst,
+.cutIn[data-power='3'] .cutInBurst {
+  display: block;
+}
+
+.pulse {
+  animation: hwatu-pulse 1400ms ease-in-out infinite;
+}
+
+@keyframes hwatu-reveal {
   from {
-    opacity: 0;
-    translate: 0 -12px;
-    scale: 0.9;
+    opacity: 0.3;
+    transform: perspective(400px) rotateY(88deg) scale(1.08);
   }
 }
 
-@keyframes hwatu-from-me {
+@keyframes hwatu-glow {
   from {
     opacity: 0;
-    translate: 0 48px;
-    scale: 1.08;
   }
 }
 
-@keyframes hwatu-from-rival {
-  from {
+@keyframes hwatu-cut-in-fade {
+  0%,
+  72% {
+    opacity: 1;
+  }
+  100% {
     opacity: 0;
-    translate: 0 -48px;
-    scale: 1.08;
   }
 }
 
-@keyframes hwatu-flip {
-  from {
-    opacity: 0.4;
-    rotate: y 90deg;
+@keyframes hwatu-cut-in-band {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--band-tilt)) translateX(var(--band-from)) scaleY(0.3);
+  }
+  12%,
+  100% {
+    opacity: 1;
+    transform: rotate(var(--band-tilt)) translateX(0) scaleY(1);
   }
 }
 
-@keyframes hwatu-taken {
-  from {
-    opacity: 0;
-    translate: 0 -24px;
-    scale: 1.2;
+@keyframes hwatu-cut-in-stripes {
+  to {
+    transform: translateX(var(--stripe-shift));
   }
 }
 
-@keyframes hwatu-chip {
-  from {
+@keyframes hwatu-cut-in-slam {
+  0%,
+  8% {
     opacity: 0;
-    translate: 0 6px;
-    scale: 0.7;
+    transform: scale(var(--slam-from));
+  }
+  20% {
+    opacity: 1;
+    transform: scale(0.88);
+  }
+  28% {
+    transform: scale(1.05);
+  }
+  36%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes hwatu-cut-in-tag {
+  0%,
+  18% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  30%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes hwatu-cut-in-burst {
+  0%,
+  14% {
+    opacity: 0;
+    transform: scale(0.3) rotate(0deg);
+  }
+  24% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5) rotate(40deg);
+  }
+}
+
+@keyframes hwatu-pulse {
+  50% {
+    opacity: 0.62;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .deal,
-  .fromMe,
-  .fromRival,
-  .flip,
-  .taken,
-  .chip {
+  .reveal,
+  .gatherGlow,
+  .cutIn,
+  .cutInBand,
+  .cutInBand::before,
+  .cutInText,
+  .cutInTag,
+  .cutInBurst,
+  .pulse {
     animation: none;
+  }
+
+  .cutInBurst {
+    opacity: 0;
   }
 }

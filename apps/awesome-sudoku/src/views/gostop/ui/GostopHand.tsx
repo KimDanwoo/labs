@@ -1,28 +1,22 @@
-import { HAND_PLACEHOLDERS } from '@views/gostop/config/cardStyle';
+import { HAND_LIST } from '@views/gostop/config/cardStyle';
 import { GOSTOP_COPY } from '@views/gostop/config/copy';
-import { PHASE } from '@views/gostop/config/game';
 import { sortByMonth } from '@views/gostop/lib/view';
 import { useGostopContext } from '@views/gostop/model/hooks/useGostopContext';
+import { useHandFocus } from '@views/gostop/model/hooks/useHandFocus';
 import { HandCard } from '@views/gostop/ui/HandCard';
+import { HandTurnCue } from '@views/gostop/ui/HandTurnCue';
 
 export function GostopHand() {
-  const { myHand, phase } = useGostopContext();
-  const isReady = phase === PHASE.READY;
+  const { myHand } = useGostopContext();
+  const listRef = useHandFocus();
 
   return (
-    <section aria-label={GOSTOP_COPY.handLabel}>
-      <ul className="grid grid-cols-5 gap-1.5 pt-2 lg:grid-cols-10 lg:gap-2">
-        {sortByMonth(myHand).map((id, index) => (
-          <HandCard key={id} id={id} order={index} />
+    <section aria-label={GOSTOP_COPY.handLabel} className="relative [grid-area:hand]">
+      <HandTurnCue />
+      <ul ref={listRef} className={HAND_LIST}>
+        {sortByMonth(myHand).map((id) => (
+          <HandCard key={id} id={id} />
         ))}
-        {isReady &&
-          HAND_PLACEHOLDERS.map((index) => (
-            <li
-              key={index}
-              aria-hidden="true"
-              className="aspect-[2/3] rounded-[5px] border border-dashed border-border-medium"
-            />
-          ))}
       </ul>
     </section>
   );

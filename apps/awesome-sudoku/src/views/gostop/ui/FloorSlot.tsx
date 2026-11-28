@@ -1,25 +1,20 @@
+import { cn } from '@shared/lib/cn';
+import { FLOOR_CELL } from '@views/gostop/config/table';
+import styles from '@views/gostop/styles/table.module.css';
 import { FloorCard } from '@views/gostop/ui/FloorCard';
 
 interface FloorSlotProps {
-  slot: number;
+  month: number;
   ids: readonly number[];
 }
 
-export function FloorSlot({ slot, ids }: FloorSlotProps) {
+export function FloorSlot({ month, ids }: FloorSlotProps) {
   const isEmpty = ids.length === 0;
 
   return (
-    <li className="relative aspect-[25/51]">
-      {isEmpty && (
-        <span
-          aria-hidden="true"
-          className="absolute inset-x-0 top-0 grid aspect-[2/3] place-items-center rounded-[5px] border border-dashed border-border-medium text-[11px] font-semibold text-text-tertiary/60"
-        >
-          {slot + 1}
-        </span>
-      )}
+    <li aria-hidden={isEmpty || undefined} className={cn('flex flex-col', styles.slot, FLOOR_CELL[month])}>
       {ids.map((id, index) => (
-        <FloorCard key={id} id={id} stack={index} slot={slot} />
+        <FloorCard key={id} id={id} stackIndex={index} />
       ))}
     </li>
   );

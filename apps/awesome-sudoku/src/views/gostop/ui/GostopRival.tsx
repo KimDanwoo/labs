@@ -1,41 +1,38 @@
-import { Badge } from '@shared/ui/badge';
-import { CAPTURE_KINDS } from '@views/gostop/config/cardStyle';
-import { GOSTOP_COPY, KIND_SHORT } from '@views/gostop/config/copy';
+import { cn } from '@shared/lib/cn';
+import { GOSTOP_COPY } from '@views/gostop/config/copy';
 import { SIDE } from '@views/gostop/config/game';
-import { capturedByKind, kindCount } from '@views/gostop/lib/view';
 import { useGostopContext } from '@views/gostop/model/hooks/useGostopContext';
+import styles from '@views/gostop/styles/table.module.css';
+import { CapturedOpener } from '@views/gostop/ui/CapturedOpener';
+import { CapturedRow } from '@views/gostop/ui/CapturedRow';
 import { RivalBacks } from '@views/gostop/ui/RivalBacks';
+import { RivalProfile } from '@views/gostop/ui/RivalProfile';
+import { SideScore } from '@views/gostop/ui/SideScore';
 
 export function GostopRival() {
-  const { rivalHandCount, captured, scores } = useGostopContext();
-  const groups = capturedByKind(captured[SIDE.COMPUTER]);
+  const { activeSide } = useGostopContext();
 
   return (
     <section
       aria-label={GOSTOP_COPY.rivalLabel}
-      className="flex h-12 items-center gap-2 rounded-2xl bg-face px-3 lg:h-14 lg:px-4"
+      data-active={activeSide === SIDE.COMPUTER}
+      className={cn(
+        'relative grid items-center gap-x-2 [grid-area:rival] gap-y-1.5 px-2.5 py-2 lg:gap-x-4 lg:px-3',
+        styles.side,
+        styles.rivalGrid,
+      )}
     >
-      <RivalBacks count={rivalHandCount} />
-      <p className="text-[13px] font-semibold text-text-secondary tabular-nums">
-        <span className="sr-only">{GOSTOP_COPY.rivalLabel} </span>
-        {rivalHandCount}
-        {GOSTOP_COPY.rivalHand}
-      </p>
-      <dl
-        aria-label={GOSTOP_COPY.rivalCapturedLabel}
-        className="ml-auto flex items-center gap-2 text-[13px] tabular-nums lg:gap-3 lg:text-sm"
-      >
-        {CAPTURE_KINDS.map((kind) => (
-          <div key={kind} className="flex gap-0.5">
-            <dt className="text-text-tertiary">{KIND_SHORT[kind]}</dt>
-            <dd className="font-bold text-text-primary">{kindCount(kind, groups[kind])}</dd>
-          </div>
-        ))}
-      </dl>
-      <Badge tone="ink">
-        {scores[SIDE.COMPUTER].total}
-        {GOSTOP_COPY.points}
-      </Badge>
+      <div className="flex items-center gap-2 [grid-area:head] lg:flex-col lg:items-start lg:gap-1.5">
+        <RivalProfile />
+        <RivalBacks />
+      </div>
+      <div className="flex justify-end [grid-area:score] lg:self-start">
+        <SideScore side={SIDE.COMPUTER} />
+      </div>
+      <div className="min-w-0 [grid-area:cap]">
+        <CapturedRow side={SIDE.COMPUTER} />
+      </div>
+      <CapturedOpener />
     </section>
   );
 }

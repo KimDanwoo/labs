@@ -36,3 +36,4 @@ export const STEALING_EVENTS: ReadonlySet<string> = new Set([
 export const HAND_SIZE = 10;
 export const FLOOR_SIZE = 8;
 export const COMPUTER_DELAY_MS = 700;
+export const KEYBOARD_CLICK_DETAIL = 0;

@@ -1,7 +1,7 @@
 import { CARD_KIND } from '@views/gostop/config/cards';
 import { TURN_EVENT } from '@views/gostop/config/game';
 import type { Bak, CardKind, TurnEvent } from '@views/gostop/model/types/gostop';
-import type { CardMark, GameStatus, Outcome } from '@views/gostop/model/types/view';
+import type { BakRisk, CardMark, GameStatus, JokboKey, Outcome, ScorePart } from '@views/gostop/model/types/view';
 
 export const GOSTOP_COPY = {
   tableLabel: '맞고 판',
@@ -11,7 +11,6 @@ export const GOSTOP_COPY = {
   rivalLabel: '컴퓨터',
   rivalHand: '장',
   cardUnit: '장',
-  goTimes: '번',
   matchHint: '바닥과 짝',
   rivalCapturedLabel: '컴퓨터가 먹은 패',
   deckLabel: '더미',
@@ -28,21 +27,10 @@ export const GOSTOP_COPY = {
   decideNote: '박은 판이 끝날 때 따로 계산해요.',
   points: '점',
   goUnit: '고',
-  me: '나',
-  computer: '컴',
-  turnHint: '같은 달 패를 내서 바닥 패를 가져와요',
   turnMe: '내가',
   turnComputer: '컴퓨터가',
-  taken: '장 먹음',
-  placed: '바닥에 냄',
-  stolenByMe: '피 뺏음',
-  stolenByRival: '피 뺏김',
   resultBase: '기본 점수',
   resultGo: '고',
-  resultBaks: '박',
-  resultNoBak: '없음',
-  bakTimes: '×2',
-  resultDraw: '아무도 스톱하지 못하고 패가 떨어져 점수 없이 끝났어요.',
   ruleTitle: '맞고 규칙',
   ruleCaption: '같은 달끼리 짝을 맞춰 먼저 7점',
 } as const;
@@ -70,13 +58,6 @@ export const RESULT_POINTS_LABEL: Record<Outcome, string> = {
 export const KIND_LABEL: Record<CardKind, string> = {
   [CARD_KIND.GWANG]: '광',
   [CARD_KIND.YEOL]: '열끗',
-  [CARD_KIND.TTI]: '띠',
-  [CARD_KIND.PI]: '피',
-};
-
-export const KIND_SHORT: Record<CardKind, string> = {
-  [CARD_KIND.GWANG]: '광',
-  [CARD_KIND.YEOL]: '열',
   [CARD_KIND.TTI]: '띠',
   [CARD_KIND.PI]: '피',
 };
@@ -121,3 +102,134 @@ export const GOSTOP_RULES = [
   '아무도 스톱하지 못하고 패가 떨어지면 나가리예요. 고를 한 뒤 점수를 더 내지 못한 채 끝나도 나가리예요.',
   '흔들기·폭탄·총통은 없어요.',
 ] as const;
+
+export const CUT_IN_COPY = {
+  events: {
+    [TURN_EVENT.JJOK]: '쪽!',
+    [TURN_EVENT.PPUK]: '뻑!',
+    [TURN_EVENT.TTADAK]: '따닥!',
+    [TURN_EVENT.COLLECT]: '뻑 먹기!',
+    [TURN_EVENT.SWEEP]: '싹쓸이!',
+  } satisfies Record<TurnEvent, string>,
+  go: '고!',
+  stop: '스톱!',
+  who: { mine: '나', rival: '컴퓨터' },
+} as const;
+
+export const ANNOUNCE_COPY = {
+  dealt: '패를 돌렸어요.',
+  played: '냄.',
+  flipped: '뒤집음.',
+  taken: '장 먹음.',
+  placed: '바닥에 둠.',
+  stolenByMe: '피를 뺏음',
+  stolenByRival: '피를 뺏김',
+  go: '고를 불렀어요.',
+  stop: '스톱했어요.',
+  myTurn: '내 차례예요.',
+  rivalTurn: '컴퓨터 차례예요.',
+  deciding: '고 또는 스톱을 고르세요.',
+} as const;
+
+export const BOARD_COPY = {
+  score: '점수',
+  goBonus: '고 횟수와 지금 스톱하면 받는 점수',
+  risks: '박 위험',
+  computerName: '컴퓨터',
+  mineLabel: '내 점수와 먹은 패',
+} as const;
+
+export const RISK_LABEL: Record<BakRisk, string> = {
+  piBak: '피박 위험',
+  gwangBak: '광박 위험',
+};
+
+export const SETTINGS_COPY = {
+  sound: '효과음',
+  soundOn: '효과음 켜짐',
+  soundOff: '효과음 꺼짐',
+  speed: '진행 속도',
+  speedNormal: '보통',
+  speedFast: '빠름',
+} as const;
+
+export const RECORD_COPY = {
+  title: '내 전적',
+  played: '판',
+  wins: '승',
+  losses: '패',
+  draws: '나가리',
+  streak: '연승',
+  bestPoints: '최고 점수',
+} as const;
+
+export const DEAL_COPY = {
+  title: '한 판 붙어 볼까요?',
+} as const;
+
+export const JOKBO_LABEL: Record<JokboKey, string> = {
+  gwang: '광',
+  godori: '고도리',
+  hong: '홍단',
+  cheong: '청단',
+  cho: '초단',
+  yeol: '열끗',
+  tti: '띠',
+  pi: '피',
+};
+
+export const SCORE_LINE_LABEL: Record<ScorePart, string> = {
+  gwang: '광',
+  yeol: '열끗',
+  tti: '띠',
+  pi: '피',
+  godori: '고도리',
+  dan: '단',
+};
+
+export const RESULT_COPY = {
+  scoreTitle: '점수 낸 내역',
+  bakTitle: '박',
+  goLine: '고',
+  goTimes: '번',
+  plus: '+',
+  times: '×',
+  danJoin: '·',
+  me: '내',
+  rival: '컴퓨터',
+  meSubject: '내가',
+  rivalSubject: '컴퓨터가',
+  pi: '피',
+  gwang: '광',
+  yeol: '열끗',
+  cardUnit: '장',
+  goBakTail: '고 하고 짐',
+  bakTimes: '×2',
+  pointsUnit: '점',
+} as const;
+
+export const RESULT_CAPTION: Record<Outcome, string> = {
+  win: '이번 판은 내 거예요',
+  lose: '다음 판에서 갚아 줘요',
+  draw: '점수 없이 다음 판으로 넘어가요',
+};
+
+export const SHEET_COPY = {
+  openCaptured: '먹은 패 크게 보기',
+  title: '먹은 패',
+  mine: '나',
+  rival: '컴퓨터',
+  empty: '아직 없어요',
+  jokbo: '족보 진행',
+  close: '닫기',
+} as const;
+
+export const HAND_COPY = {
+  waiting: '컴퓨터 차례',
+  ready: '내 차례',
+} as const;
+
+export const GO_CHIP_COPY = {
+  stopPrefix: '스톱하면',
+  separator: '·',
+} as const;

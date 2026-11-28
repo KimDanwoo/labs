@@ -1,19 +1,11 @@
 import { HWATU_IMAGE, MONTH_DIGITS } from '@views/gostop/config/cardStyle';
-import { CARD_KIND, MONTH_COUNT, RIBBON } from '@views/gostop/config/cards';
-import { EVENT_LABEL, GOSTOP_COPY, MARK_LABEL } from '@views/gostop/config/copy';
+import { CARD_KIND, RIBBON } from '@views/gostop/config/cards';
+import { MARK_LABEL } from '@views/gostop/config/copy';
 import { PHASE, SIDE } from '@views/gostop/config/game';
 import { cardOf, monthOf } from '@views/gostop/lib/cards';
 import { countPi, goPoints } from '@views/gostop/lib/score';
-import type {
-  CardKind,
-  GameResult,
-  HwatuCard,
-  Phase,
-  ScoreBreakdown,
-  Side,
-  TurnReport,
-} from '@views/gostop/model/types/gostop';
-import type { CardMark, Entrance, GameStatus, HandCardState, Outcome, TurnChip } from '@views/gostop/model/types/view';
+import type { CardKind, GameResult, HwatuCard, Phase, ScoreBreakdown, Side } from '@views/gostop/model/types/gostop';
+import type { CardMark, GameStatus, HandCardState, Outcome } from '@views/gostop/model/types/view';
 
 const RIBBON_MARK: Record<string, CardMark> = {
   [RIBBON.HONG]: 'hong',
@@ -39,12 +31,6 @@ export const cardImageSrc = (id: number): string =>
   `${HWATU_IMAGE.monthPrefix}${String(monthOf(id)).padStart(MONTH_DIGITS, '0')}${HWATU_IMAGE.extension}`;
 
 export const sortByMonth = (ids: readonly number[]): number[] => [...ids].sort((a, b) => a - b);
-
-export function floorByMonth(floor: readonly number[]): number[][] {
-  const slots = Array.from({ length: MONTH_COUNT }, (): number[] => []);
-  sortByMonth(floor).forEach((id) => slots[monthOf(id) - 1]?.push(id));
-  return slots;
-}
 
 export function capturedByKind(captured: readonly number[]): Record<CardKind, number[]> {
   const groups: Record<CardKind, number[]> = {
@@ -96,47 +82,15 @@ export function handCardState(isMyTurn: boolean, isMatch: boolean): HandCardStat
   return isMatch ? 'match' : 'open';
 }
 
-export function entranceOf(id: number, lastTurn: TurnReport | null): Entrance {
-  if (lastTurn?.flipped === id) return 'flip';
-  if (lastTurn?.played !== id) return 'deal';
-  return lastTurn.side === SIDE.ME ? 'fromMe' : 'fromRival';
-}
-
-export const turnKey = (lastTurn: TurnReport): string => `${lastTurn.side}-${lastTurn.played}`;
-
-export function turnChips(lastTurn: TurnReport): TurnChip[] {
-  const events = lastTurn.events.map((event, index): TurnChip => ({
-    key: `${event}-${index}`,
-    label: EVENT_LABEL[event],
-    tone: 'lemon',
-  }));
-  const stolen = lastTurn.stolen.length;
-  if (stolen === 0) return events;
-  const stolenLabel = lastTurn.side === SIDE.ME ? GOSTOP_COPY.stolenByMe : GOSTOP_COPY.stolenByRival;
-  return [...events, { key: 'stolen', label: `${stolenLabel} ${stolen}`, tone: 'ink' }];
-}
-
-export function turnSummary(lastTurn: TurnReport): string {
-  const who = lastTurn.side === SIDE.ME ? GOSTOP_COPY.turnMe : GOSTOP_COPY.turnComputer;
-  const taken = lastTurn.taken.length;
-  return taken > 0 ? `${who} ${taken}${GOSTOP_COPY.taken}` : `${who} ${GOSTOP_COPY.placed}`;
-}
-
-export const isFreshCard = (id: number, lastTurn: TurnReport | null): boolean =>
-  lastTurn?.played === id || lastTurn?.flipped === id;
-
 export const goPreview = (total: number, goCount: number) => ({
   stop: goPoints(total, goCount),
   go: goPoints(total, goCount + 1),
 });
 
-export function goNote(goCount: Record<Side, number>): string {
-  const sides: [string, number][] = [
-    [GOSTOP_COPY.me, goCount[SIDE.ME]],
-    [GOSTOP_COPY.computer, goCount[SIDE.COMPUTER]],
-  ];
-  return sides
-    .filter(([, count]) => count > 0)
-    .map(([who, count]) => ` · ${who} ${count}${GOSTOP_COPY.goUnit}`)
-    .join('');
+export interface GoChip {
+  count: number;
+  stopPoints: number;
 }
+
+export const goChipOf = (total: number, goCount: number): GoChip | null =>
+  goCount > 0 ? { count: goCount, stopPoints: goPoints(total, goCount) } : null;

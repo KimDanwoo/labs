@@ -1,32 +1,27 @@
 import { cn } from '@shared/lib/cn';
-import { DEAL_STAGGER_MS, FLOOR_STACK_STEP_PERCENT, FRESH_CARD } from '@views/gostop/config/cardStyle';
-import { entranceOf, isFreshCard } from '@views/gostop/lib/view';
+import { floorPose, poseStyle } from '@views/gostop/lib/floorPose';
 import { useGostopContext } from '@views/gostop/model/hooks/useGostopContext';
-import styles from '@views/gostop/styles/hwatuMotion.module.css';
+import styles from '@views/gostop/styles/table.module.css';
+import { GatherGlow } from '@views/gostop/ui/GatherGlow';
 import { HwatuCard } from '@views/gostop/ui/HwatuCard';
-import { useState } from 'react';
 
 interface FloorCardProps {
   id: number;
-  stack: number;
-  slot: number;
+  stackIndex: number;
 }
 
-export function FloorCard({ id, stack, slot }: FloorCardProps) {
-  const { lastTurn } = useGostopContext();
-  const [entrance] = useState(() => entranceOf(id, lastTurn));
-  const isFresh = isFreshCard(id, lastTurn);
-  const delay = entrance === 'deal' ? slot * DEAL_STAGGER_MS : 0;
+export function FloorCard({ id, stackIndex }: FloorCardProps) {
+  const { gathering } = useGostopContext();
+  const isGathering = gathering.has(id);
+  const isStacked = stackIndex > 0;
+  const stackClass = isGathering ? styles.gathered : styles.stacked;
 
   return (
-    <span
-      className={cn('absolute inset-x-0 top-0', styles[entrance])}
-      style={{
-        transform: `translateY(${stack * FLOOR_STACK_STEP_PERCENT}%)`,
-        animationDelay: `${delay}ms`,
-      }}
-    >
-      <HwatuCard id={id} className={isFresh ? FRESH_CARD : undefined} />
-    </span>
+    <div data-card={id} className={cn(styles.floorCard, isStacked && stackClass)}>
+      <span className={styles.pose} style={poseStyle(floorPose(id, stackIndex, isGathering))}>
+        <HwatuCard id={id} className="shadow-[0_1px_0_rgb(0_0_0/0.35),0_6px_12px_-2px_rgb(0_0_0/0.55)]" />
+        {isGathering && <GatherGlow />}
+      </span>
+    </div>
   );
 }
