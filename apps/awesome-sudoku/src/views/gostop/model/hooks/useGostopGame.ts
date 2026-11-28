@@ -11,6 +11,7 @@ import {
 import { boardView, type BoardView } from '@views/gostop/lib/board';
 import { shuffleDealableDeck } from '@views/gostop/lib/deck';
 import { flightPlanOf, type FlightPlan } from '@views/gostop/lib/flight';
+import { useCapturedSheet, type CapturedSheetControl } from '@views/gostop/model/hooks/useCapturedSheet';
 import { useComputerTurn } from '@views/gostop/model/hooks/useComputerTurn';
 import { useCutIn, type ShownCutIn } from '@views/gostop/model/hooks/useCutIn';
 import { useGameRecord } from '@views/gostop/model/hooks/useGameRecord';
@@ -24,7 +25,7 @@ import type { PlaybackStep } from '@views/gostop/model/types/playback';
 import type { GameRecord } from '@views/gostop/model/types/record';
 import { useCallback, useMemo, useReducer, useState } from 'react';
 
-export interface GostopGame extends BoardView, GostopSettingsControl {
+export interface GostopGame extends BoardView, GostopSettingsControl, CapturedSheetControl {
   announcement: string;
   cutIn: ShownCutIn | null;
   step: PlaybackStep | null;
@@ -49,6 +50,9 @@ export const useGostopGame = (): GostopGame => {
   const motion = isReducedMotion ? MOTION.REDUCED : MOTION.FULL;
   const step = playback.steps[playback.cursor] ?? null;
   const isSettled = step === null;
+  const board = useMemo(() => boardView(playback.game, step), [playback.game, step]);
+  const isSheetBlocked = board.isDeciding || board.result !== null;
+  const capturedSheet = useCapturedSheet(isSheetBlocked);
 
   const act = useCallback(
     (action: GameAction, gameId?: string) => dispatch({ type: PLAYBACK_ACTION.APPLY, action, motion, gameId }),
@@ -73,8 +77,9 @@ export const useGostopGame = (): GostopGame => {
 
   return useMemo(
     () => ({
-      ...boardView(playback.game, step),
+      ...board,
       ...settings,
+      ...capturedSheet,
       ...actions,
       announcement: isSettled ? playback.announcement : '',
       cutIn,
@@ -83,6 +88,18 @@ export const useGostopGame = (): GostopGame => {
       record,
       isReducedMotion,
     }),
-    [playback, step, settings, actions, isSettled, cutIn, speedFactor, isReducedMotion, record],
+    [
+      board,
+      playback.announcement,
+      step,
+      settings,
+      capturedSheet,
+      actions,
+      isSettled,
+      cutIn,
+      speedFactor,
+      isReducedMotion,
+      record,
+    ],
   );
 };

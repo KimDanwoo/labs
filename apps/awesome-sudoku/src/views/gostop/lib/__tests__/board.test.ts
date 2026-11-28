@@ -1,3 +1,4 @@
+import { DECK_SIZE } from '@views/gostop/config/cards';
 import { GAME_ACTION, PHASE, SIDE } from '@views/gostop/config/game';
 import { FLIGHT_ORIGIN, SPEED_FACTOR, STEP_KIND } from '@views/gostop/config/playback';
 import { boardView } from '@views/gostop/lib/board';
@@ -13,6 +14,11 @@ const dealt = gameReducer(INITIAL_STATE, DEAL);
 const [dealStep] = transitionSteps(INITIAL_STATE, dealt, DEAL);
 
 describe('화면용 판', () => {
+  it('준비 화면에는 48장 더미가 그대로 놓여 있다', () => {
+    expect(boardView(INITIAL_STATE, null).deckCount).toBe(DECK_SIZE);
+    expect(boardView(dealt, null).deckCount).toBe(dealt.table.deck.length);
+  });
+
   it('재생 중에는 내 입력·결정·결과를 잠그고 단계의 판을 보여 준다', () => {
     const deciding: GameState = { ...dealt, phase: PHASE.DECIDE };
     const view = boardView(deciding, dealStep ?? null);

@@ -17,7 +17,7 @@ export function DeckPile() {
         <CardBack key={layer} className={cn('absolute inset-0', layer)} />
       ))}
       {revealed !== null && <RevealedCard id={revealed} />}
-      <Badge tone="lemon" className="absolute -bottom-3 left-1/2 z-20 h-5 -translate-x-1/2 px-2 text-[11px]">
+      <Badge tone="lemon" className="absolute -bottom-3 left-1/2 z-20 h-5 -translate-x-1/2 px-2 text-[12px]">
         <span className="sr-only">{GOSTOP_COPY.deckLabel} </span>
         {deckCount}
         <span className="sr-only">{GOSTOP_COPY.cardUnit}</span>

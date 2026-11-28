@@ -14,9 +14,9 @@ export function GostopFloor() {
   return (
     <section
       aria-label={GOSTOP_COPY.floorLabel}
-      className={cn('rounded-[20px] px-1 py-2 lg:px-3 lg:py-3', styles.felt)}
+      className={cn('rounded-[20px] [grid-area:floor] px-1 py-2.5 lg:px-3 lg:py-2', styles.felt)}
     >
-      <ul className="grid grid-cols-7 grid-rows-[auto_auto] justify-items-center gap-x-1 gap-y-2 lg:gap-x-3 lg:gap-y-3">
+      <ul className="relative grid grid-cols-7 grid-rows-[auto_auto] justify-items-center gap-x-[3px] gap-y-2 lg:gap-x-3 lg:gap-y-3">
         {MONTHS.map((month) => (
           <FloorSlot key={month} month={month} ids={slots[month] ?? []} />
         ))}

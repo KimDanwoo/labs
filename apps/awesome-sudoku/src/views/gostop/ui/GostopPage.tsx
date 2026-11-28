@@ -7,7 +7,7 @@ import { Gostop } from '@views/gostop/ui/gostop';
 export function GostopPage() {
   return (
     <Gostop.Root>
-      <GameLayout.Root>
+      <GameLayout.Root size="wide">
         <GameHeading game="gostop" />
         <GameLayout.Status>
           <Gostop.Status />
@@ -25,11 +25,13 @@ export function GostopPage() {
         </GameLayout.Board>
         <GameLayout.Panel>
           <Gostop.Actions />
+          <Gostop.Record />
           <Gostop.Rule />
         </GameLayout.Panel>
       </GameLayout.Root>
       <Gostop.Announcer />
       <Gostop.DecideSheet />
+      <Gostop.CapturedSheet />
       <Gostop.ResultSheet />
     </Gostop.Root>
   );

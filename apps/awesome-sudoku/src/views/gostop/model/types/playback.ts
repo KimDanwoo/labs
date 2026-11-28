@@ -14,6 +14,7 @@ export type CutInTone = 'mine' | 'rival';
 export interface CutIn {
   label: string;
   tone: CutInTone;
+  power: number;
 }
 
 export interface PlaybackStep {

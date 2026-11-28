@@ -1,3 +1,4 @@
+import { DECK_SIZE } from '@views/gostop/config/cards';
 import { PHASE, SIDE } from '@views/gostop/config/game';
 import { isSameMonth } from '@views/gostop/lib/cards';
 import { bakRisks } from '@views/gostop/lib/risk';
@@ -61,10 +62,14 @@ function tableView({ hands, floor, deck, captured }: Table): TableView {
   };
 }
 
+const shownDeckCount = (phase: Phase, deckLength: number): number => (phase === PHASE.READY ? DECK_SIZE : deckLength);
+
 export function boardView(game: GameState, step: PlaybackStep | null): BoardView {
+  const table = step?.table ?? game.table;
   return {
     ...turnView(game, step),
-    ...tableView(step?.table ?? game.table),
+    ...tableView(table),
+    deckCount: shownDeckCount(game.phase, table.deck.length),
     revealed: step?.revealed ?? null,
     gathering: new Set(step?.gathering ?? []),
     goCount: game.goCount,

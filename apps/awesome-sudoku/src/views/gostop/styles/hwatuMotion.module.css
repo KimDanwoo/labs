@@ -8,19 +8,88 @@
 }
 
 .cutIn {
+  --band-tilt: -7deg;
+  --band-from: -60%;
+  --stripe-shift: 48px;
+  --slam-from: 2.6;
+  --cut-scale: 1;
   animation: hwatu-cut-in-fade 850ms linear both;
 }
 
+.cutIn[data-tone='rival'] {
+  --band-tilt: 7deg;
+  --band-from: 60%;
+  --stripe-shift: -48px;
+}
+
+.cutIn[data-power='2'] {
+  --slam-from: 3.2;
+  --cut-scale: 1.12;
+}
+
+.cutIn[data-power='3'] {
+  --slam-from: 3.8;
+  --cut-scale: 1.26;
+}
+
 .cutInBand {
+  position: relative;
+  overflow: hidden;
+  transform: rotate(var(--band-tilt));
   animation: hwatu-cut-in-band 850ms var(--ease-snappy) both;
 }
 
-.cutInText {
-  animation: hwatu-cut-in-text 850ms var(--ease-snappy) both;
+.cutInBand::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0.16) 0 10px,
+    transparent 10px 24px
+  );
+  animation: hwatu-cut-in-stripes 850ms linear both;
+  pointer-events: none;
 }
 
-.stamp {
-  animation: hwatu-stamp 320ms cubic-bezier(0.3, 1.6, 0.5, 1) both;
+.cutIn[data-tone='rival'] .cutInBand::before {
+  background: repeating-linear-gradient(
+    65deg,
+    rgba(0, 0, 0, 0.16) 0 10px,
+    transparent 10px 24px
+  );
+}
+
+.cutInText {
+  position: relative;
+  scale: var(--cut-scale);
+  animation: hwatu-cut-in-slam 850ms cubic-bezier(0.2, 0.9, 0.3, 1.15) both;
+}
+
+.cutInTag {
+  animation: hwatu-cut-in-tag 850ms var(--ease-snappy) both;
+}
+
+.cutInBurst {
+  display: none;
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 70cqw;
+  aspect-ratio: 1;
+  margin: -35cqw 0 0 -35cqw;
+  border-radius: 50%;
+  background: repeating-conic-gradient(rgba(var(--rgb-lemon), 0.32) 0 7deg, transparent 7deg 20deg);
+  mask: radial-gradient(closest-side, transparent 26%, #000 30%, transparent 100%);
+  animation: hwatu-cut-in-burst 850ms var(--ease-snappy) both;
+}
+
+.cutIn[data-tone='rival'] .cutInBurst {
+  background: repeating-conic-gradient(rgba(var(--rgb-hwatu-red), 0.4) 0 7deg, transparent 7deg 20deg);
+}
+
+.cutIn[data-power='2'] .cutInBurst,
+.cutIn[data-power='3'] .cutInBurst {
+  display: block;
 }
 
 .pulse {
@@ -52,34 +121,67 @@
 
 @keyframes hwatu-cut-in-band {
   0% {
-    transform: rotate(-6deg) scaleX(0);
+    opacity: 0;
+    transform: rotate(var(--band-tilt)) translateX(var(--band-from)) scaleY(0.3);
   }
   12%,
   100% {
-    transform: rotate(-6deg) scaleX(1);
+    opacity: 1;
+    transform: rotate(var(--band-tilt)) translateX(0) scaleY(1);
   }
 }
 
-@keyframes hwatu-cut-in-text {
-  0% {
+@keyframes hwatu-cut-in-stripes {
+  to {
+    transform: translateX(var(--stripe-shift));
+  }
+}
+
+@keyframes hwatu-cut-in-slam {
+  0%,
+  8% {
     opacity: 0;
-    transform: translateX(-28px) scale(1.5);
+    transform: scale(var(--slam-from));
   }
-  14% {
+  20% {
     opacity: 1;
-    transform: translateX(0) scale(0.96);
+    transform: scale(0.88);
   }
-  22%,
+  28% {
+    transform: scale(1.05);
+  }
+  36%,
   100% {
     opacity: 1;
-    transform: translateX(0) scale(1);
+    transform: scale(1);
   }
 }
 
-@keyframes hwatu-stamp {
-  from {
+@keyframes hwatu-cut-in-tag {
+  0%,
+  18% {
     opacity: 0;
-    transform: rotate(-14deg) scale(2.2);
+    transform: translateY(6px);
+  }
+  30%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes hwatu-cut-in-burst {
+  0%,
+  14% {
+    opacity: 0;
+    transform: scale(0.3) rotate(0deg);
+  }
+  24% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5) rotate(40deg);
   }
 }
 
@@ -94,13 +196,15 @@
   .gatherGlow,
   .cutIn,
   .cutInBand,
+  .cutInBand::before,
   .cutInText,
-  .stamp,
+  .cutInTag,
+  .cutInBurst,
   .pulse {
     animation: none;
   }
 
-  .cutInBand {
-    transform: rotate(-6deg);
+  .cutInBurst {
+    opacity: 0;
   }
 }

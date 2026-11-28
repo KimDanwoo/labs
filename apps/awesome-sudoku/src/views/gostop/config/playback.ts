@@ -62,3 +62,17 @@ export const FLIGHT_ORIGIN = {
 export const GAME_ID_RADIX = 36;
 export const GAME_ID_BOUND = 2 ** 30;
 export const GAME_ID_PARTS = 3;
+
+export const CUT_IN_POWER = {
+  min: 1,
+  max: 3,
+  stop: 2,
+} as const;
+
+export const SHAKE = {
+  basePx: 2.5,
+  dropRatio: 0.6,
+  delayMs: 90,
+  durationMs: 360,
+  pattern: [0, 1, -0.8, 0.55, -0.32, 0.12, 0],
+} as const;

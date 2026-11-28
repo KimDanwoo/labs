@@ -7,10 +7,11 @@ import { CardMarks } from '@views/gostop/ui/CardMarks';
 
 interface HwatuCardProps {
   id: number;
+  isMini?: boolean;
   className?: string;
 }
 
-export function HwatuCard({ id, className }: HwatuCardProps) {
+export function HwatuCard({ id, isMini = false, className }: HwatuCardProps) {
   return (
     <span role="img" aria-label={cardLabel(id)} className={cn(CARD_FACE, className)}>
       <Image
@@ -22,7 +23,7 @@ export function HwatuCard({ id, className }: HwatuCardProps) {
         draggable={false}
         className="object-cover select-none"
       />
-      <CardMarks id={id} />
+      <CardMarks id={id} isMini={isMini} />
     </span>
   );
 }

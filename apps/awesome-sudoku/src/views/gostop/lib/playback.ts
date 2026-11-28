@@ -1,7 +1,8 @@
 import { CUT_IN_COPY } from '@views/gostop/config/copy';
 import { GAME_ACTION, PHASE, SIDE } from '@views/gostop/config/game';
-import { REDUCED_STEP_MS, STEP_KIND, STEP_MS, TURN_MIN_MS } from '@views/gostop/config/playback';
+import { CUT_IN_POWER, REDUCED_STEP_MS, STEP_KIND, STEP_MS, TURN_MIN_MS } from '@views/gostop/config/playback';
 import { without } from '@views/gostop/lib/cards';
+import { cutInPower } from '@views/gostop/lib/cutIn';
 import type { GameAction, GameResult, GameState, Side, Table, TurnReport } from '@views/gostop/model/types/gostop';
 import type { CutIn, PlaybackStep, SoundName, StepKind } from '@views/gostop/model/types/playback';
 
@@ -23,7 +24,11 @@ const toneOf = (side: Side): CutIn['tone'] => (side === SIDE.ME ? 'mine' : 'riva
 
 function eventCutIn(report: TurnReport): CutIn | null {
   if (report.events.length === 0) return null;
-  return { label: report.events.map((event) => CUT_IN_COPY.events[event]).join(' '), tone: toneOf(report.side) };
+  return {
+    label: report.events.map((event) => CUT_IN_COPY.events[event]).join(' '),
+    tone: toneOf(report.side),
+    power: cutInPower(report.events.length),
+  };
 }
 
 const RESULT_SOUND: Record<string, SoundName> = {
@@ -103,7 +108,7 @@ function callStep(prev: GameState, next: GameState, action: GameAction): Playbac
   const label = isGo ? `${next.goCount[side]}${CUT_IN_COPY.go}` : CUT_IN_COPY.stop;
   const call = step(STEP_KIND.CALL, next.table, {
     side,
-    cutIn: { label, tone: toneOf(side) },
+    cutIn: { label, tone: toneOf(side), power: isGo ? cutInPower(next.goCount[side]) : CUT_IN_POWER.stop },
     sound: isGo ? 'go' : 'stop',
   });
   return isGo ? [call] : [call, resultStep(next)];
@@ -128,7 +133,11 @@ function mergedCutIn(steps: readonly PlaybackStep[]): CutIn | null {
   const cutIns = steps.flatMap((item) => (item.cutIn ? [item.cutIn] : []));
   const [first] = cutIns;
   if (!first) return null;
-  return { label: cutIns.map((cutIn) => cutIn.label).join(' '), tone: first.tone };
+  return {
+    label: cutIns.map((cutIn) => cutIn.label).join(' '),
+    tone: first.tone,
+    power: Math.max(...cutIns.map((cutIn) => cutIn.power)),
+  };
 }
 
 function mergedSound(steps: readonly PlaybackStep[]): SoundName | null {

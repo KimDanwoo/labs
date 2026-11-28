@@ -1,3 +1,4 @@
+import { CapturedSheet } from '@views/gostop/ui/CapturedSheet';
 import { DecideSheet } from '@views/gostop/ui/DecideSheet';
 import { GostopActions } from '@views/gostop/ui/GostopActions';
 import { GostopAnnouncer } from '@views/gostop/ui/GostopAnnouncer';
@@ -6,6 +7,7 @@ import { GostopDeal } from '@views/gostop/ui/GostopDeal';
 import { GostopFloor } from '@views/gostop/ui/GostopFloor';
 import { GostopHand } from '@views/gostop/ui/GostopHand';
 import { GostopMine } from '@views/gostop/ui/GostopMine';
+import { GostopRecord } from '@views/gostop/ui/GostopRecord';
 import { GostopRival } from '@views/gostop/ui/GostopRival';
 import { GostopRoot } from '@views/gostop/ui/GostopRoot';
 import { GostopRule } from '@views/gostop/ui/GostopRule';
@@ -27,7 +29,9 @@ export const Gostop = {
   CutIn: GostopCutIn,
   Actions: GostopActions,
   Rule: GostopRule,
+  Record: GostopRecord,
   Announcer: GostopAnnouncer,
   DecideSheet,
+  CapturedSheet,
   ResultSheet,
 };

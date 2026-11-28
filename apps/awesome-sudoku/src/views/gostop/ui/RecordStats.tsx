@@ -8,11 +8,11 @@ export function RecordStats() {
   return (
     <dl
       aria-label={RECORD_COPY.title}
-      className="grid w-full max-w-[320px] grid-cols-6 gap-1 rounded-2xl bg-weak p-2 text-center"
+      className="grid w-full max-w-[340px] grid-cols-6 gap-1 rounded-2xl bg-weak p-2 text-center"
     >
       {RECORD_FIELDS.map((field) => (
         <div key={field} className="min-w-0">
-          <dt className="text-[11px] font-semibold text-text-tertiary break-keep">{RECORD_COPY[field]}</dt>
+          <dt className="text-[12px] font-semibold text-text-tertiary break-keep">{RECORD_COPY[field]}</dt>
           <dd className="text-[17px] font-extrabold text-text-primary tabular-nums">{record[field]}</dd>
         </div>
       ))}

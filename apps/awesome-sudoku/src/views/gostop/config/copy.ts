@@ -1,7 +1,7 @@
 import { CARD_KIND } from '@views/gostop/config/cards';
 import { TURN_EVENT } from '@views/gostop/config/game';
 import type { Bak, CardKind, TurnEvent } from '@views/gostop/model/types/gostop';
-import type { BakRisk, CardMark, GameStatus, Outcome } from '@views/gostop/model/types/view';
+import type { BakRisk, CardMark, GameStatus, JokboKey, Outcome, ScorePart } from '@views/gostop/model/types/view';
 
 export const GOSTOP_COPY = {
   tableLabel: '맞고 판',
@@ -11,7 +11,6 @@ export const GOSTOP_COPY = {
   rivalLabel: '컴퓨터',
   rivalHand: '장',
   cardUnit: '장',
-  goTimes: '번',
   matchHint: '바닥과 짝',
   rivalCapturedLabel: '컴퓨터가 먹은 패',
   deckLabel: '더미',
@@ -30,14 +29,8 @@ export const GOSTOP_COPY = {
   goUnit: '고',
   turnMe: '내가',
   turnComputer: '컴퓨터가',
-  stolenByMe: '피 뺏음',
-  stolenByRival: '피 뺏김',
   resultBase: '기본 점수',
   resultGo: '고',
-  resultBaks: '박',
-  resultNoBak: '없음',
-  bakTimes: '×2',
-  resultDraw: '아무도 스톱하지 못하고 패가 떨어져 점수 없이 끝났어요.',
   ruleTitle: '맞고 규칙',
   ruleCaption: '같은 달끼리 짝을 맞춰 먼저 7점',
 } as const;
@@ -120,6 +113,7 @@ export const CUT_IN_COPY = {
   } satisfies Record<TurnEvent, string>,
   go: '고!',
   stop: '스톱!',
+  who: { mine: '나', rival: '컴퓨터' },
 } as const;
 
 export const ANNOUNCE_COPY = {
@@ -139,7 +133,7 @@ export const ANNOUNCE_COPY = {
 
 export const BOARD_COPY = {
   score: '점수',
-  goBonus: '고 횟수, 지금 스톱하면 붙는 고 보너스',
+  goBonus: '고 횟수와 지금 스톱하면 받는 점수',
   risks: '박 위험',
   computerName: '컴퓨터',
   mineLabel: '내 점수와 먹은 패',
@@ -171,4 +165,71 @@ export const RECORD_COPY = {
 
 export const DEAL_COPY = {
   title: '한 판 붙어 볼까요?',
+} as const;
+
+export const JOKBO_LABEL: Record<JokboKey, string> = {
+  gwang: '광',
+  godori: '고도리',
+  hong: '홍단',
+  cheong: '청단',
+  cho: '초단',
+  yeol: '열끗',
+  tti: '띠',
+  pi: '피',
+};
+
+export const SCORE_LINE_LABEL: Record<ScorePart, string> = {
+  gwang: '광',
+  yeol: '열끗',
+  tti: '띠',
+  pi: '피',
+  godori: '고도리',
+  dan: '단',
+};
+
+export const RESULT_COPY = {
+  scoreTitle: '점수 낸 내역',
+  bakTitle: '박',
+  goLine: '고',
+  goTimes: '번',
+  plus: '+',
+  times: '×',
+  danJoin: '·',
+  me: '내',
+  rival: '컴퓨터',
+  meSubject: '내가',
+  rivalSubject: '컴퓨터가',
+  pi: '피',
+  gwang: '광',
+  yeol: '열끗',
+  cardUnit: '장',
+  goBakTail: '고 하고 짐',
+  bakTimes: '×2',
+  pointsUnit: '점',
+} as const;
+
+export const RESULT_CAPTION: Record<Outcome, string> = {
+  win: '이번 판은 내 거예요',
+  lose: '다음 판에서 갚아 줘요',
+  draw: '점수 없이 다음 판으로 넘어가요',
+};
+
+export const SHEET_COPY = {
+  openCaptured: '먹은 패 크게 보기',
+  title: '먹은 패',
+  mine: '나',
+  rival: '컴퓨터',
+  empty: '아직 없어요',
+  jokbo: '족보 진행',
+  close: '닫기',
+} as const;
+
+export const HAND_COPY = {
+  waiting: '컴퓨터 차례',
+  ready: '내 차례',
+} as const;
+
+export const GO_CHIP_COPY = {
+  stopPrefix: '스톱하면',
+  separator: '·',
 } as const;

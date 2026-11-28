@@ -6,19 +6,21 @@ import { cardMarkOf } from '@views/gostop/lib/view';
 
 interface CardMarksProps {
   id: number;
+  isMini: boolean;
 }
 
-export function CardMarks({ id }: CardMarksProps) {
+export function CardMarks({ id, isMini }: CardMarksProps) {
   const mark = cardMarkOf(id);
   const badgeClass = MARK_BADGE[mark];
   const ribbonClass = MARK_RIBBON[mark];
   const isGodori = mark === 'godori';
+  const text = isMini ? null : MARK_TEXT[mark];
 
   return (
     <span aria-hidden="true">
-      <span className={MONTH_TAG}>{monthOf(id)}</span>
-      {ribbonClass && <span className={ribbonClass}>{MARK_TEXT[mark]}</span>}
-      {badgeClass && <span className={badgeClass}>{isGodori ? <LuBird /> : MARK_TEXT[mark]}</span>}
+      {!isMini && <span className={MONTH_TAG}>{monthOf(id)}</span>}
+      {ribbonClass && <span className={ribbonClass}>{text}</span>}
+      {badgeClass && <span className={badgeClass}>{isGodori ? <LuBird /> : text}</span>}
     </span>
   );
 }

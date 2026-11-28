@@ -14,7 +14,7 @@ export function FloorSlot({ month, ids }: FloorSlotProps) {
   return (
     <li aria-hidden={isEmpty || undefined} className={cn('flex flex-col', styles.slot, FLOOR_CELL[month])}>
       {ids.map((id, index) => (
-        <FloorCard key={id} id={id} isStacked={index > 0} />
+        <FloorCard key={id} id={id} stackIndex={index} />
       ))}
     </li>
   );

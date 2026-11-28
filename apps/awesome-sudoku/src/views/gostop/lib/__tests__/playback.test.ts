@@ -145,7 +145,7 @@ describe('차례 단계 순서', () => {
     expect(report.events).toContain(TURN_EVENT.JJOK);
     const steps = turnSteps(jjokTable, report, next);
     const gather = steps.find((step) => step.kind === STEP_KIND.GATHER);
-    expect(gather?.cutIn).toEqual({ label: '쪽!', tone: 'mine' });
+    expect(gather?.cutIn).toEqual({ label: '쪽!', tone: 'mine', power: 1 });
     expect(steps.at(-1)?.kind).toBe(STEP_KIND.STEAL);
     expect(steps.at(-1)?.table.captured.me).toContain(3);
   });
@@ -170,6 +170,9 @@ describe('차례 단계 순서', () => {
     const goSteps = transitionSteps(deciding, gameReducer(deciding, goAction), goAction);
     expect(goSteps.map((step) => step.cutIn?.label)).toEqual(['1고!']);
     expect(goSteps[0]?.cutIn?.tone).toBe('rival');
+    const thirdGo: GameState = { ...deciding, goCount: { [SIDE.ME]: 0, [SIDE.COMPUTER]: 2 } };
+    const thirdSteps = transitionSteps(thirdGo, gameReducer(thirdGo, goAction), goAction);
+    expect(thirdSteps[0]?.cutIn?.power).toBeGreaterThan(goSteps[0]?.cutIn?.power ?? 0);
     const stopAction: GameAction = { type: GAME_ACTION.STOP, side: SIDE.COMPUTER };
     const stopSteps = transitionSteps(deciding, gameReducer(deciding, stopAction), stopAction);
     expect(stopSteps.map((step) => step.kind)).toEqual([STEP_KIND.CALL, STEP_KIND.RESULT]);
@@ -184,6 +187,7 @@ describe('차례 단계 순서', () => {
     const steps = collapseSteps([...turn, ...result]);
     expect(steps).toHaveLength(1);
     expect(steps[0]?.cutIn?.label).toBe('쪽! 싹쓸이!');
+    expect(steps[0]?.cutIn?.power).toBe(2);
     expect(steps[0]?.sound).toBe('win');
     expect(steps[0]?.table).toBe(next);
   });
