@@ -14,3 +14,17 @@ export function shouldFocusHand(isPending: boolean, isSettled: boolean, handSize
   if (!isSettled) return false;
   return handSize > 0;
 }
+
+const CHOICE_PICK_SELECTOR = '[data-choice-pick]';
+const CHOICE_MOVE_KEYS: ReadonlySet<string> = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown']);
+
+export function moveChoiceFocus(
+  event: Pick<KeyboardEvent, 'key' | 'preventDefault'> & { currentTarget: HTMLElement },
+): void {
+  if (!CHOICE_MOVE_KEYS.has(event.key)) return;
+  const picks = event.currentTarget.closest('ul')?.querySelectorAll<HTMLButtonElement>(CHOICE_PICK_SELECTOR) ?? [];
+  const other = Array.from(picks).find((pick) => pick !== event.currentTarget);
+  if (!other) return;
+  event.preventDefault();
+  other.focus();
+}

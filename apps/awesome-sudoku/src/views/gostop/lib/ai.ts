@@ -3,6 +3,7 @@ import { GIVE_AWAY_PENALTY, GO_MAX_RIVAL_SCORE, GO_MIN_CARDS_LEFT, STEAL_VALUE }
 import { GAME_ACTION, PHASE, SIDE } from '@views/gostop/config/game';
 import { bestCard, cardValue, isSameMonth, rivalOf } from '@views/gostop/lib/cards';
 import { scoreOf } from '@views/gostop/lib/score';
+import { bestPicks } from '@views/gostop/lib/turn';
 import type { GameAction, GameState, Side, Table } from '@views/gostop/model/types/gostop';
 
 const PAIR_CHOICE_COUNT = 2;
@@ -35,8 +36,10 @@ export function shouldGo(state: GameState, side: Side): boolean {
 
 export function computerAction(state: GameState, random: RandomInt): GameAction {
   const side = SIDE.COMPUTER;
-  if (state.phase !== PHASE.DECIDE)
-    return { type: GAME_ACTION.PLAY, side, card: chooseCard(state.table, side, random) };
+  if (state.phase !== PHASE.DECIDE) {
+    const card = chooseCard(state.table, side, random);
+    return { type: GAME_ACTION.PLAY, side, card, picks: bestPicks(state.table, card) };
+  }
   if (shouldGo(state, side)) return { type: GAME_ACTION.GO, side };
   return { type: GAME_ACTION.STOP, side };
 }

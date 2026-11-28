@@ -135,8 +135,75 @@
     0 -18px 36px -18px rgba(0, 0, 0, 0.6);
 }
 
+.floorCard {
+  transition:
+    opacity 200ms var(--ease-snappy),
+    filter 200ms var(--ease-snappy);
+}
+
+.floorCard[data-choice='candidate'] {
+  z-index: 20;
+  pointer-events: none;
+}
+
+.floorCard[data-choice='dimmed'] {
+  opacity: 0.4;
+  filter: saturate(0.55);
+}
+
+.pick {
+  pointer-events: auto;
+  border-radius: 5px;
+  box-shadow:
+    0 0 0 2px rgb(var(--rgb-lemon)),
+    0 0 16px rgba(var(--rgb-lemon), 0.5);
+  animation: choice-breathe 1600ms ease-in-out infinite;
+  cursor: pointer;
+}
+
+.pick:hover {
+  box-shadow:
+    0 0 0 3px rgb(var(--rgb-lemon)),
+    0 0 22px rgba(var(--rgb-lemon), 0.7);
+}
+
+.pick:focus-visible {
+  outline: 2px solid rgb(255, 255, 255);
+  outline-offset: 3px;
+}
+
+.prompt {
+  animation: choice-drop 220ms var(--ease-snappy) both;
+}
+
+.held {
+  translate: 0 -10%;
+  rotate: -4deg;
+}
+
+@keyframes choice-breathe {
+  50% {
+    box-shadow:
+      0 0 0 2px rgb(var(--rgb-lemon)),
+      0 0 26px rgba(var(--rgb-lemon), 0.85);
+  }
+}
+
+@keyframes choice-drop {
+  from {
+    opacity: 0;
+    translate: 0 -6px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .pose {
+  .pose,
+  .floorCard {
     transition: none;
+  }
+
+  .pick,
+  .prompt {
+    animation: none;
   }
 }

@@ -35,6 +35,7 @@ export interface GostopGame extends BoardView, GostopSettingsControl, CapturedSh
   isReducedMotion: boolean;
   deal: () => void;
   play: (card: number) => void;
+  choose: (pick: number) => void;
   go: () => void;
   stop: () => void;
 }
@@ -52,7 +53,7 @@ export const useGostopGame = (): GostopGame => {
   const step = playback.steps[playback.cursor] ?? null;
   const isSettled = step === null;
   const board = useMemo(() => boardView(playback.game, step), [playback.game, step]);
-  const isSheetBlocked = board.isDeciding || board.result !== null;
+  const isSheetBlocked = board.isDeciding || board.choice !== null || board.result !== null;
   const capturedSheet = useCapturedSheet(isSheetBlocked);
   const handFocus = useHandFocusRequest();
 
@@ -71,6 +72,7 @@ export const useGostopGame = (): GostopGame => {
     () => ({
       deal: () => act({ type: GAME_ACTION.DEAL, deck: shuffleDealableDeck(random) }, createGameId(random)),
       play: (card: number) => act({ type: GAME_ACTION.PLAY, side: SIDE.ME, card }),
+      choose: (pick: number) => act({ type: GAME_ACTION.CHOOSE, side: SIDE.ME, pick }),
       go: () => act({ type: GAME_ACTION.GO, side: SIDE.ME }),
       stop: () => act({ type: GAME_ACTION.STOP, side: SIDE.ME }),
     }),

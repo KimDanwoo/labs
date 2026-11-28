@@ -36,12 +36,15 @@ function turnLine(report: TurnReport): string {
   return parts.filter(Boolean).join(' ');
 }
 
+const TURN_ACTIONS: ReadonlySet<string> = new Set([GAME_ACTION.PLAY, GAME_ACTION.CHOOSE]);
+
 const joinLines = (...lines: string[]): string => lines.filter(Boolean).join(' ');
 
 export function announce(prev: GameState, next: GameState, action: GameAction): string {
   if (action.type === GAME_ACTION.RESET) return '';
   if (action.type === GAME_ACTION.DEAL) return joinLines(ANNOUNCE_COPY.dealt, followUp(next));
-  if (action.type === GAME_ACTION.PLAY) return next.lastTurn ? joinLines(turnLine(next.lastTurn), followUp(next)) : '';
+  if (next.phase === PHASE.CHOOSE) return ANNOUNCE_COPY.choosing;
+  if (TURN_ACTIONS.has(action.type)) return next.lastTurn ? joinLines(turnLine(next.lastTurn), followUp(next)) : '';
   const who = whoOf(prev.turn);
   if (action.type === GAME_ACTION.GO) {
     return joinLines(`${who} ${next.goCount[prev.turn]}${GOSTOP_COPY.goUnit} ${ANNOUNCE_COPY.go}`, followUp(next));

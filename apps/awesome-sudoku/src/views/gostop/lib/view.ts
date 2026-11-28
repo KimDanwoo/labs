@@ -62,6 +62,7 @@ const PHASE_STATUS: Partial<Record<Phase, GameStatus>> = {
 
 const MY_PHASE_STATUS: Partial<Record<Phase, GameStatus>> = {
   [PHASE.PLAY]: 'myTurn',
+  [PHASE.CHOOSE]: 'choosing',
   [PHASE.DECIDE]: 'deciding',
 };
 
