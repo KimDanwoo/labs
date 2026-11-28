@@ -3,7 +3,7 @@ import { CARD_KIND, RIBBON } from '@views/gostop/config/cards';
 import { MARK_LABEL } from '@views/gostop/config/copy';
 import { PHASE, SIDE } from '@views/gostop/config/game';
 import { cardOf, monthOf } from '@views/gostop/lib/cards';
-import { countPi, goPoints } from '@views/gostop/lib/score';
+import { countPi } from '@views/gostop/lib/score';
 import type { CardKind, GameResult, HwatuCard, Phase, ScoreBreakdown, Side } from '@views/gostop/model/types/gostop';
 import type { CardMark, GameStatus, HandCardState, Outcome } from '@views/gostop/model/types/view';
 
@@ -82,16 +82,3 @@ export function handCardState(isMyTurn: boolean, isMatch: boolean): HandCardStat
   if (!isMyTurn) return 'waiting';
   return isMatch ? 'match' : 'open';
 }
-
-export const goPreview = (total: number, goCount: number) => ({
-  stop: goPoints(total, goCount),
-  go: goPoints(total, goCount + 1),
-});
-
-export interface GoChip {
-  count: number;
-  stopPoints: number;
-}
-
-export const goChipOf = (total: number, goCount: number): GoChip | null =>
-  goCount > 0 ? { count: goCount, stopPoints: goPoints(total, goCount) } : null;

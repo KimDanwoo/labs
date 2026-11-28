@@ -46,7 +46,7 @@ export const CAPTURED_SLOT: Record<Side, string> = {
 };
 
 export const RISK_CHIP =
-  'inline-flex h-6 items-center rounded-full bg-hwatu-red/15 px-2 text-[12px] font-bold text-[rgb(255,160,170)] ring-1 ring-hwatu-red/60';
+  'inline-flex h-6 items-center rounded-full bg-hwatu-red/15 px-1.5 text-[12px] whitespace-nowrap lg:px-2 font-bold text-[rgb(255,160,170)] ring-1 ring-hwatu-red/60';
 
 export const CUT_IN_TONE: Record<CutInTone, string> = {
   mine: 'bg-lemon text-ink shadow-[0_0_0_3px_rgb(var(--rgb-ink)),0_0_0_5px_rgb(var(--rgb-lemon)),0_18px_40px_rgb(0_0_0/0.5)]',

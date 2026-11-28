@@ -9,6 +9,7 @@ import { CardBack } from '@views/gostop/ui/CardBack';
 import { ChoiceTag } from '@views/gostop/ui/ChoiceTag';
 import { HeldCard } from '@views/gostop/ui/HeldCard';
 import { RevealedCard } from '@views/gostop/ui/RevealedCard';
+import { StakeTag } from '@views/gostop/ui/StakeTag';
 
 export function DeckPile() {
   const { deckCount, held, revealed } = useGostopContext();
@@ -26,6 +27,7 @@ export function DeckPile() {
         {deckCount}
         <span className="sr-only">{GOSTOP_COPY.cardUnit}</span>
       </Badge>
+      <StakeTag />
     </li>
   );
 }

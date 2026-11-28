@@ -8,7 +8,7 @@ export function RiskChips() {
   const { risks } = useGostopContext();
 
   return (
-    <ul aria-label={BOARD_COPY.risks} className="flex flex-wrap gap-1">
+    <ul aria-label={BOARD_COPY.risks} className="flex flex-wrap gap-0.5 lg:gap-1">
       {risks.map((risk) => (
         <li key={risk} className={cn(RISK_CHIP, styles.pulse)}>
           {RISK_LABEL[risk]}

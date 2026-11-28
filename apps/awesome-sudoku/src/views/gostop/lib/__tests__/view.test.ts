@@ -1,15 +1,6 @@
 import { CARD_KIND } from '@views/gostop/config/cards';
 import { PHASE, SIDE } from '@views/gostop/config/game';
-import {
-  capturedByKind,
-  cardImageSrc,
-  cardLabel,
-  gameStatus,
-  goChipOf,
-  goPreview,
-  kindCount,
-  outcomeOf,
-} from '@views/gostop/lib/view';
+import { capturedByKind, cardImageSrc, cardLabel, gameStatus, kindCount, outcomeOf } from '@views/gostop/lib/view';
 import { describe, expect, it } from 'vitest';
 
 describe('카드 표시', () => {
@@ -47,16 +38,5 @@ describe('진행 상태', () => {
   it('승자가 없으면 나가리다', () => {
     expect(outcomeOf(null)).toBe('draw');
     expect(outcomeOf({ winner: SIDE.COMPUTER, base: 7, goCount: 0, baks: [], points: 7 })).toBe('lose');
-  });
-
-  it('고 하면 받을 점수를 미리 계산한다', () => {
-    expect(goPreview(7, 0)).toEqual({ stop: 7, go: 8 });
-    expect(goPreview(10, 2)).toEqual({ stop: 12, go: 24 });
-  });
-
-  it('고를 안 했으면 고 칩이 없고, 했으면 스톱할 때 점수를 붙인다', () => {
-    expect(goChipOf(9, 0)).toBeNull();
-    expect(goChipOf(8, 1)).toEqual({ count: 1, stopPoints: 9 });
-    expect(goChipOf(8, 3)).toEqual({ count: 3, stopPoints: 20 });
   });
 });

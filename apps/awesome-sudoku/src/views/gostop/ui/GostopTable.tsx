@@ -21,7 +21,7 @@ export function GostopTable({ children }: GostopTableProps) {
       ref={tableRef}
       aria-label={GOSTOP_COPY.tableLabel}
       className={cn(
-        'dark relative grid w-full max-w-[600px] gap-2.5 p-2.5 max-sm:-mx-3 max-sm:w-[calc(100%+24px)] max-sm:p-1 lg:max-w-[720px] lg:gap-2.5 lg:p-4',
+        'dark relative grid w-full max-w-[600px] gap-2.5 p-2.5 max-sm:-mx-3 max-sm:w-[calc(100%+24px)] max-sm:gap-2 max-sm:p-1 lg:max-w-[720px] lg:gap-2.5 lg:p-4',
         styles.table,
       )}
     >

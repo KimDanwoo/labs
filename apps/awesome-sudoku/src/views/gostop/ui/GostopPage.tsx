@@ -12,6 +12,7 @@ export function GostopPage() {
         <GameLayout.Status>
           <Gostop.Status />
           <Gostop.Settings />
+          <Gostop.Menu />
         </GameLayout.Status>
         <GameLayout.Board>
           <Gostop.Table>
@@ -24,12 +25,15 @@ export function GostopPage() {
           </Gostop.Table>
         </GameLayout.Board>
         <GameLayout.Panel>
-          <Gostop.Actions />
-          <Gostop.Record />
-          <Gostop.Rule />
+          <Gostop.Side>
+            <Gostop.Actions />
+            <Gostop.Record />
+            <Gostop.Rule />
+          </Gostop.Side>
         </GameLayout.Panel>
       </GameLayout.Root>
       <Gostop.Announcer />
+      <Gostop.Bonus />
       <Gostop.DecideSheet />
       <Gostop.CapturedSheet />
       <Gostop.ResultSheet />

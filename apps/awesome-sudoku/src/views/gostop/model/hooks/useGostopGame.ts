@@ -11,27 +11,38 @@ import {
 import { boardView, type BoardView } from '@views/gostop/lib/board';
 import { shuffleDealableDeck } from '@views/gostop/lib/deck';
 import { flightPlanOf, type FlightPlan } from '@views/gostop/lib/flight';
+import { withMoneyLine, type DailyBonus } from '@views/gostop/lib/moneyView';
+import { useAudioContext } from '@views/gostop/model/hooks/useAudioContext';
 import { useCapturedSheet, type CapturedSheetControl } from '@views/gostop/model/hooks/useCapturedSheet';
+import { useCoinSound } from '@views/gostop/model/hooks/useCoinSound';
 import { useComputerTurn } from '@views/gostop/model/hooks/useComputerTurn';
 import { useCutIn, type ShownCutIn } from '@views/gostop/model/hooks/useCutIn';
+import { useDecideSheet, type DecideSheetControl } from '@views/gostop/model/hooks/useDecideSheet';
 import { useGameRecord } from '@views/gostop/model/hooks/useGameRecord';
 import { useGameSound } from '@views/gostop/model/hooks/useGameSound';
 import { useGostopSettings, type GostopSettingsControl } from '@views/gostop/model/hooks/useGostopSettings';
 import { useHandFocusRequest, type HandFocusControl } from '@views/gostop/model/hooks/useHandFocusRequest';
 import { usePlaybackClock } from '@views/gostop/model/hooks/usePlaybackClock';
 import { useReducedMotion } from '@views/gostop/model/hooks/useReducedMotion';
+import { useWallet } from '@views/gostop/model/hooks/useWallet';
 import { INITIAL_PLAYBACK, playbackReducer } from '@views/gostop/model/reducer/playbackReducer';
 import type { GameAction } from '@views/gostop/model/types/gostop';
+import type { Settlement, Wallet } from '@views/gostop/model/types/money';
 import type { PlaybackStep } from '@views/gostop/model/types/playback';
 import type { GameRecord } from '@views/gostop/model/types/record';
 import { useCallback, useMemo, useReducer, useState } from 'react';
 
-export interface GostopGame extends BoardView, GostopSettingsControl, CapturedSheetControl, HandFocusControl {
+export interface GostopGame
+  extends BoardView, GostopSettingsControl, CapturedSheetControl, DecideSheetControl, HandFocusControl {
   announcement: string;
   cutIn: ShownCutIn | null;
   step: PlaybackStep | null;
   flight: FlightPlan | null;
   record: GameRecord;
+  wallet: Wallet;
+  settlement: Settlement | null;
+  bonus: DailyBonus | null;
+  dismissBonus: () => void;
   isReducedMotion: boolean;
   deal: () => void;
   play: (card: number) => void;
@@ -55,6 +66,7 @@ export const useGostopGame = (): GostopGame => {
   const board = useMemo(() => boardView(playback.game, step), [playback.game, step]);
   const isSheetBlocked = board.isDeciding || board.choice !== null || board.result !== null;
   const capturedSheet = useCapturedSheet(isSheetBlocked);
+  const decideSheet = useDecideSheet(board.isDeciding);
   const handFocus = useHandFocusRequest();
 
   const act = useCallback(
@@ -64,19 +76,31 @@ export const useGostopGame = (): GostopGame => {
 
   usePlaybackClock(playback, dispatch, speedFactor);
   useComputerTurn({ state: playback.game, isSettled, random, delayMs: COMPUTER_DELAY_MS * speedFactor }, act);
-  useGameSound(step, settings.isMuted);
+  const audioRef = useAudioContext();
+  useGameSound(step, settings.isMuted, audioRef);
   const cutIn = useCutIn(step);
   const record = useGameRecord(playback.game, playback.gameId, isSettled);
+  const { wallet, settlement, settledGameId, bonus, dismissBonus, prepareWallet } = useWallet(
+    playback.game,
+    playback.gameId,
+    isSettled,
+  );
+  const hasCoinFlow = Boolean(settlement?.amount);
+  useCoinSound(hasCoinFlow ? settledGameId : null, settings.isMuted, audioRef);
+  useCoinSound(bonus?.date ?? null, settings.isMuted, audioRef);
 
   const actions = useMemo(
     () => ({
-      deal: () => act({ type: GAME_ACTION.DEAL, deck: shuffleDealableDeck(random) }, createGameId(random)),
+      deal: () => {
+        prepareWallet();
+        act({ type: GAME_ACTION.DEAL, deck: shuffleDealableDeck(random) }, createGameId(random));
+      },
       play: (card: number) => act({ type: GAME_ACTION.PLAY, side: SIDE.ME, card }),
       choose: (pick: number) => act({ type: GAME_ACTION.CHOOSE, side: SIDE.ME, pick }),
       go: () => act({ type: GAME_ACTION.GO, side: SIDE.ME }),
       stop: () => act({ type: GAME_ACTION.STOP, side: SIDE.ME }),
     }),
-    [act, random],
+    [act, random, prepareWallet],
   );
 
   return useMemo(
@@ -84,13 +108,18 @@ export const useGostopGame = (): GostopGame => {
       ...board,
       ...settings,
       ...capturedSheet,
+      ...decideSheet,
       ...handFocus,
       ...actions,
-      announcement: isSettled ? playback.announcement : '',
+      announcement: isSettled ? withMoneyLine(playback.announcement, settlement, wallet.money) : '',
       cutIn,
       step,
       flight: flightPlanOf(step, speedFactor, isReducedMotion),
       record,
+      wallet,
+      settlement,
+      bonus,
+      dismissBonus,
       isReducedMotion,
     }),
     [
@@ -99,6 +128,7 @@ export const useGostopGame = (): GostopGame => {
       step,
       settings,
       capturedSheet,
+      decideSheet,
       handFocus,
       actions,
       isSettled,
@@ -106,6 +136,10 @@ export const useGostopGame = (): GostopGame => {
       speedFactor,
       isReducedMotion,
       record,
+      wallet,
+      settlement,
+      bonus,
+      dismissBonus,
     ],
   );
 };
