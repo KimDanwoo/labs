@@ -1,5 +1,6 @@
 import { PHASE, SIDE } from '@views/gostop/config/game';
 import { DAILY_BONUS, MONEY_LIMIT, RIVAL_MONEY, STAKE } from '@views/gostop/config/money';
+import { RIVAL_NAME } from '@views/gostop/config/rival';
 import { INITIAL_WALLET, settleGame } from '@views/gostop/lib/money';
 import {
   allInMoodOf,
@@ -88,7 +89,7 @@ describe('정산 한 줄', () => {
     const gain = settlementLine(settlementOf({ amount: 3_000, isAllIn: true }));
     const loss = settlementLine(settlementOf({ winner: SIDE.COMPUTER, amount: 2_000, isAllIn: true }));
     expect(gain.isCapped).toBe(true);
-    expect(cappedNote(gain, 3_000)).toBe('컴퓨터가 가진 만큼만 받았어요 (3,000원)');
+    expect(cappedNote(gain, 3_000)).toBe(`${RIVAL_NAME}이 가진 만큼만 받았어요 (3,000원)`);
     expect(cappedNote(loss, 2_000)).toBe('내가 가진 만큼만 냈어요 (2,000원)');
   });
 });
@@ -126,7 +127,7 @@ describe('스크린리더 머니 안내', () => {
 
   it('받은 금액과 양쪽 머니를 읽는다', () => {
     expect(moneyAnnouncement(settlementOf({}), money)).toBe(
-      '3,200원을 받았어요. 내 머니 1,003,200원, 컴퓨터 머니 996,800원.',
+      `3,200원을 받았어요. 내 머니 1,003,200원, ${RIVAL_NAME} 머니 996,800원.`,
     );
   });
 
@@ -137,9 +138,9 @@ describe('스크린리더 머니 안내', () => {
     expect(broke).toContain('다음 판에 10만 원을 다시 채워 드려요.');
   });
 
-  it('올인 승은 컴퓨터가 100만 원으로 다시 채운다고 읽는다', () => {
+  it('올인 승은 호 사장이 100만 원으로 다시 채운다고 읽는다', () => {
     expect(moneyAnnouncement(settlementOf({ isAllIn: true }), money)).toContain(
-      '컴퓨터는 다음 판에 100만 원을 다시 채워요.',
+      `${RIVAL_NAME}은 다음 판에 100만 원을 다시 채워요.`,
     );
   });
 
@@ -150,7 +151,7 @@ describe('스크린리더 머니 안내', () => {
 
   it('결과 안내 뒤에 머니 변동을 붙인다', () => {
     expect(withMoneyLine('스톱했어요. 이겼어요! 32점', settlementOf({}), money)).toBe(
-      '스톱했어요. 이겼어요! 32점 3,200원을 받았어요. 내 머니 1,003,200원, 컴퓨터 머니 996,800원.',
+      `스톱했어요. 이겼어요! 32점 3,200원을 받았어요. 내 머니 1,003,200원, ${RIVAL_NAME} 머니 996,800원.`,
     );
   });
 });

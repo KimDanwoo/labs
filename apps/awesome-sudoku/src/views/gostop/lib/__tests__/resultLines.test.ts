@@ -1,4 +1,5 @@
 import { SIDE } from '@views/gostop/config/game';
+import { RIVAL_NAME } from '@views/gostop/config/rival';
 import { bakLines, recordLine, scoreLines } from '@views/gostop/lib/resultLines';
 import { scoreOf } from '@views/gostop/lib/score';
 import type { GameResult } from '@views/gostop/model/types/gostop';
@@ -28,8 +29,8 @@ describe('박 이유', () => {
   it('박마다 진 쪽의 패 수로 이유를 붙인다', () => {
     const lines = bakLines(result, captured, { [SIDE.ME]: 0, [SIDE.COMPUTER]: 1 });
     expect(lines).toEqual([
-      { bak: 'piBak', reason: '컴퓨터 피 5장' },
-      { bak: 'goBak', reason: '컴퓨터가 1고 하고 짐' },
+      { bak: 'piBak', reason: `${RIVAL_NAME} 피 5장` },
+      { bak: 'goBak', reason: `${RIVAL_NAME}이 1고 하고 짐` },
     ]);
   });
 

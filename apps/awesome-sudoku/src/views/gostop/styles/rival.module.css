@@ -1,0 +1,138 @@
+.frame {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: rgb(var(--rgb-ink));
+  box-shadow: 0 0 0 2px rgb(var(--rgb-lemon));
+}
+
+.zoom {
+  position: absolute;
+  top: -6%;
+  left: -32%;
+  width: 164%;
+  height: 164%;
+}
+
+.face {
+  opacity: 0;
+  transition: opacity 180ms var(--ease-snappy);
+}
+
+.face[data-active='true'] {
+  opacity: 1;
+}
+
+.bubble {
+  position: absolute;
+  z-index: 45;
+  width: max-content;
+  max-width: 188px;
+  padding: 6px 11px 7px;
+  border-radius: 14px;
+  background: rgb(var(--rgb-lemon));
+  color: rgb(var(--rgb-ink));
+  box-shadow:
+    0 0 0 1.5px rgb(var(--rgb-ink)),
+    0 6px 16px -6px rgba(0, 0, 0, 0.7);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  word-break: keep-all;
+  pointer-events: none;
+  animation:
+    rival-bubble-in 240ms cubic-bezier(0.34, 1.56, 0.64, 1) both,
+    rival-bubble-out 220ms ease-in forwards;
+}
+
+.bubble::before {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: inherit;
+  box-shadow: -1.5px -1.5px 0 0 rgb(var(--rgb-ink));
+  rotate: 45deg;
+}
+
+.tableBubble {
+  top: calc(100% + 9px);
+  left: 0;
+  transform-origin: 18px 0;
+}
+
+.tableBubble::before {
+  top: -5px;
+  left: 17px;
+}
+
+@media (min-width: 1024px) {
+  .tableBubble {
+    top: 50%;
+    left: calc(100% + 14px);
+    translate: 0 -50%;
+    transform-origin: 0 50%;
+  }
+
+  .tableBubble::before {
+    top: calc(50% - 5px);
+    left: -5px;
+    rotate: -45deg;
+  }
+}
+
+.quote {
+  position: relative;
+  padding: 7px 12px 8px;
+  border-radius: 14px;
+  background: rgb(var(--rgb-lemon));
+  color: rgb(var(--rgb-ink));
+  box-shadow: 0 0 0 1.5px rgb(var(--rgb-ink));
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+.quote::before {
+  content: '';
+  position: absolute;
+  top: calc(50% - 5px);
+  left: -5px;
+  width: 10px;
+  height: 10px;
+  background: inherit;
+  box-shadow: -1.5px 1.5px 0 0 rgb(var(--rgb-ink));
+  rotate: 45deg;
+}
+
+@keyframes rival-bubble-in {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes rival-bubble-out {
+  to {
+    opacity: 0;
+    scale: 0.92;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .face {
+    transition: none;
+  }
+
+  .bubble {
+    animation: none;
+  }
+}

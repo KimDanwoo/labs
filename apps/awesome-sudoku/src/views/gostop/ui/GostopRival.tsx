@@ -5,7 +5,9 @@ import { useGostopContext } from '@views/gostop/model/hooks/useGostopContext';
 import styles from '@views/gostop/styles/table.module.css';
 import { CapturedOpener } from '@views/gostop/ui/CapturedOpener';
 import { CapturedRow } from '@views/gostop/ui/CapturedRow';
+import { RivalAvatar } from '@views/gostop/ui/RivalAvatar';
 import { RivalBacks } from '@views/gostop/ui/RivalBacks';
+import { RivalBubble } from '@views/gostop/ui/RivalBubble';
 import { RivalProfile } from '@views/gostop/ui/RivalProfile';
 import { SideScore } from '@views/gostop/ui/SideScore';
 
@@ -22,9 +24,13 @@ export function GostopRival() {
         styles.rivalGrid,
       )}
     >
-      <div className="flex items-center gap-2 [grid-area:head] lg:flex-col lg:items-start lg:gap-1.5">
-        <RivalProfile />
-        <RivalBacks />
+      <div className="relative flex items-center gap-2 [grid-area:head] lg:gap-2.5">
+        <RivalAvatar className="-mt-1 -mb-2 size-[42px] lg:my-0 lg:size-[60px]" />
+        <div className="flex items-center gap-2 lg:flex-col lg:items-start lg:gap-1.5">
+          <RivalProfile />
+          <RivalBacks />
+        </div>
+        <RivalBubble />
       </div>
       <div className="flex justify-end [grid-area:score] lg:self-start">
         <SideScore side={SIDE.COMPUTER} />
