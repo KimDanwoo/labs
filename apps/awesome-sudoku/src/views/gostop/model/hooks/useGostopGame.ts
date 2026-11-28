@@ -17,6 +17,7 @@ import { useCutIn, type ShownCutIn } from '@views/gostop/model/hooks/useCutIn';
 import { useGameRecord } from '@views/gostop/model/hooks/useGameRecord';
 import { useGameSound } from '@views/gostop/model/hooks/useGameSound';
 import { useGostopSettings, type GostopSettingsControl } from '@views/gostop/model/hooks/useGostopSettings';
+import { useHandFocusRequest, type HandFocusControl } from '@views/gostop/model/hooks/useHandFocusRequest';
 import { usePlaybackClock } from '@views/gostop/model/hooks/usePlaybackClock';
 import { useReducedMotion } from '@views/gostop/model/hooks/useReducedMotion';
 import { INITIAL_PLAYBACK, playbackReducer } from '@views/gostop/model/reducer/playbackReducer';
@@ -25,7 +26,7 @@ import type { PlaybackStep } from '@views/gostop/model/types/playback';
 import type { GameRecord } from '@views/gostop/model/types/record';
 import { useCallback, useMemo, useReducer, useState } from 'react';
 
-export interface GostopGame extends BoardView, GostopSettingsControl, CapturedSheetControl {
+export interface GostopGame extends BoardView, GostopSettingsControl, CapturedSheetControl, HandFocusControl {
   announcement: string;
   cutIn: ShownCutIn | null;
   step: PlaybackStep | null;
@@ -53,6 +54,7 @@ export const useGostopGame = (): GostopGame => {
   const board = useMemo(() => boardView(playback.game, step), [playback.game, step]);
   const isSheetBlocked = board.isDeciding || board.result !== null;
   const capturedSheet = useCapturedSheet(isSheetBlocked);
+  const handFocus = useHandFocusRequest();
 
   const act = useCallback(
     (action: GameAction, gameId?: string) => dispatch({ type: PLAYBACK_ACTION.APPLY, action, motion, gameId }),
@@ -80,6 +82,7 @@ export const useGostopGame = (): GostopGame => {
       ...board,
       ...settings,
       ...capturedSheet,
+      ...handFocus,
       ...actions,
       announcement: isSettled ? playback.announcement : '',
       cutIn,
@@ -94,6 +97,7 @@ export const useGostopGame = (): GostopGame => {
       step,
       settings,
       capturedSheet,
+      handFocus,
       actions,
       isSettled,
       cutIn,

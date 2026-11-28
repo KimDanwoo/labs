@@ -1,7 +1,7 @@
 import type { MouseEvent } from 'react';
 
 import { cn } from '@shared/lib/cn';
-import { HAND_CARD_BASE, HAND_CARD_STATE } from '@views/gostop/config/cardStyle';
+import { HAND_CARD_BASE, HAND_CARD_STATE, HAND_SLOT } from '@views/gostop/config/cardStyle';
 import { GOSTOP_COPY } from '@views/gostop/config/copy';
 import { focusNeighborCard } from '@views/gostop/lib/focus';
 import { handCardState } from '@views/gostop/lib/view';
@@ -24,7 +24,7 @@ export function HandCard({ id }: HandCardProps) {
   };
 
   return (
-    <li data-card={id} className="relative">
+    <li data-card={id} className={HAND_SLOT}>
       <button
         type="button"
         aria-disabled={!isMyTurn}

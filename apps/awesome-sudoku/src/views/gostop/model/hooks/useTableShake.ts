@@ -18,7 +18,7 @@ export const useTableShake = (
     const animation = table.animate(shakeFrames(cutIn.power, cutIn.tone), {
       duration: SHAKE.durationMs,
       delay: SHAKE.delayMs,
-      easing: 'ease-out',
+      easing: SHAKE.easing,
     });
     return () => animation.cancel();
   }, [tableRef, cutIn, isReducedMotion]);

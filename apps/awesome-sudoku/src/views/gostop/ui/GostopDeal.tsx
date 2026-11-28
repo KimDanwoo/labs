@@ -1,16 +1,23 @@
+import type { MouseEvent } from 'react';
 import { LuLayers } from 'react-icons/lu';
 
 import { cn } from '@shared/lib/cn';
 import { Button } from '@shared/ui/button';
 import { DEAL_COPY, GOSTOP_COPY } from '@views/gostop/config/copy';
 import { PHASE } from '@views/gostop/config/game';
+import { isKeyboardClick } from '@views/gostop/lib/focus';
 import { useGostopContext } from '@views/gostop/model/hooks/useGostopContext';
 import styles from '@views/gostop/styles/table.module.css';
 import { RecordStats } from '@views/gostop/ui/RecordStats';
 
 export function GostopDeal() {
-  const { phase, deal } = useGostopContext();
+  const { phase, deal, requestHandFocus } = useGostopContext();
   if (phase !== PHASE.READY) return null;
+
+  const handleDeal = (event: MouseEvent<HTMLButtonElement>) => {
+    if (isKeyboardClick(event)) requestHandFocus();
+    deal();
+  };
 
   return (
     <div
@@ -20,7 +27,7 @@ export function GostopDeal() {
       )}
     >
       <p className="text-[22px] font-extrabold tracking-[-0.03em] text-white">{DEAL_COPY.title}</p>
-      <Button size="l" onClick={deal} className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
+      <Button size="l" onClick={handleDeal} className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
         <LuLayers aria-hidden="true" />
         {GOSTOP_COPY.deal}
       </Button>

@@ -1,5 +1,5 @@
 .table {
-  --table-radius: 26px;
+  --table-radius: 22px;
   container-type: inline-size;
   grid-template-areas:
     'rival'
@@ -20,6 +20,12 @@
   color: rgb(242, 244, 246);
 }
 
+@media (min-width: 640px) {
+  .table {
+    --table-radius: 26px;
+  }
+}
+
 @media (min-width: 1024px) {
   .table {
     --table-radius: 30px;
@@ -27,7 +33,7 @@
 }
 
 .felt {
-  --floor-card: clamp(34px, calc((100cqw - 26px) / 7), 48px);
+  --floor-card: clamp(34px, calc((100cqw - 12px) / 7), 56px);
   --stack-step: calc(var(--floor-card) * 0.14);
   position: relative;
   background:

@@ -52,6 +52,11 @@ export const MARK_TEXT: Partial<Record<CardMark, string>> = {
   cheong: '청단',
 };
 
+export const HAND_LIST =
+  'mx-auto flex min-h-[170px] max-w-[300px] flex-wrap content-start justify-center gap-x-2.5 gap-y-1.5 pt-2 lg:min-h-[106px] lg:max-w-none lg:flex-nowrap lg:gap-1';
+
+export const HAND_SLOT = 'relative w-[52px] shrink-0 lg:w-[65px] lg:min-w-0 lg:shrink';
+
 export const HAND_CARD_BASE =
   'block w-full cursor-pointer rounded-[5px] transition-[translate,opacity,filter,box-shadow] duration-200 ease-snappy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent aria-disabled:cursor-default';
 
